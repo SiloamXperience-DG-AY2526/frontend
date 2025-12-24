@@ -1,4 +1,5 @@
-export default function Home() {
+import Link from "next/link";
+export default function LandingPage() {
   return (
     <div className="relative min-h-screen bg-white overflow-hidden">
       {/* right abstract */}
@@ -53,12 +54,16 @@ export default function Home() {
           </h1>
 
           <div className="mt-8 flex gap-5">
-            <button className="px-12 py-2.5 bg-[#D9D9D9] text-black rounded-md text-lg font-bold">
-              Log In
-            </button>
-            <button className="px-12 py-2.5 bg-[#D9D9D9] text-black rounded-md text-lg font-bold">
-              Sign Up
-            </button>
+            <Link href="/login">
+              <button className="px-12 py-2.5 bg-[#D9D9D9] cursor-pointer text-black rounded-md text-lg font-bold">
+                Log In
+              </button>
+            </Link>
+            <Link href="/#">
+              <button className="px-12 py-2.5 bg-[#D9D9D9] cursor-pointer text-black rounded-md text-lg font-bold">
+                Sign Up
+              </button>
+            </Link>
           </div>
         </div>
       </main>
