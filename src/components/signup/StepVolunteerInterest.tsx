@@ -1,11 +1,25 @@
 import { SignupData } from "@/types/SignUpData";
 import Button from "@/components/ui/Button";
+import Input from "../ui/Input";
+import MultiSelect from "../ui/MultiSelect";
 
 interface Props {
   data: SignupData;
   setData: (d: SignupData) => void;
   back: () => void;
 }
+const VOLUNTEER_INTERESTS = [
+  "Education",
+  "Elderly Care",
+  "Children & Youth",
+  "Healthcare",
+  "Mental Health",
+  "Environment",
+  "Animal Welfare",
+  "Disaster Relief",
+  "Community Development",
+  "Fundraising",
+];
 
 export default function VolunteerInterest({ data, setData, back }: Props) {
   const submit = async () => {
@@ -19,16 +33,18 @@ export default function VolunteerInterest({ data, setData, back }: Props) {
 
   return (
     <div>
-      <h2 className="text-3xl font-bold text-black mb-8">Volunteer Interest</h2>
+      <h2 className="text-3xl font-bold text-black text-center mb-8">
+        Volunteer Interest
+      </h2>
 
-      <div className="space-y-6">
+      <div className="space-y-10">
         <div>
-          <label className="block text-black text-sm mb-2">
-            Volunteering Duration
+          <label className="block text-black font-semibold  text-sm mb-2">
+            Volunteering Duration :
           </label>
           <div className="flex gap-6">
             {["Ad Hoc", "Short Term", "Long Term"].map((v) => (
-              <label key={v} className="flex items-center gap-2">
+              <label key={v} className="flex items-center gap-2 mt-4">
                 <input
                   type="radio"
                   checked={data.duration === v}
@@ -40,8 +56,9 @@ export default function VolunteerInterest({ data, setData, back }: Props) {
           </div>
         </div>
 
-        <Input
-          label="Volunteer Interest"
+        <MultiSelect
+          label="Volunteer Interests"
+          options={VOLUNTEER_INTERESTS}
           value={data.interest}
           onChange={(v) => setData({ ...data, interest: v })}
         />
@@ -63,27 +80,6 @@ export default function VolunteerInterest({ data, setData, back }: Props) {
         <Button label="Back" variant="secondary" onClick={back} />
         <Button label="SIGN UP →" onClick={submit} />
       </div>
-    </div>
-  );
-}
-
-function Input({
-  label,
-  value,
-  onChange,
-}: {
-  label: string;
-  value: string;
-  onChange: (v: string) => void;
-}) {
-  return (
-    <div>
-      <label className="block text-black text-sm mb-1">{label}</label>
-      <input
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className="w-full border-b border-black outline-none py-1.5"
-      />
     </div>
   );
 }

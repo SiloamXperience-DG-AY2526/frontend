@@ -1,5 +1,6 @@
 import { SignupData } from "@/types/SignUpData";
 import Button from "@/components/ui/Button";
+import Input from "../ui/Input";
 
 interface Props {
   data: SignupData;
@@ -12,7 +13,7 @@ export default function PersonalDetails({ data, setData, next }: Props) {
     <div>
       <h2 className="text-3xl text-center font-bold text-black mb-5">Personal Details</h2>
 
-      <div className="space-y-5">
+      <div className="space-y-7">
         <Input
           label="Name:"
           value={data.name}
@@ -58,26 +59,3 @@ export default function PersonalDetails({ data, setData, next }: Props) {
   );
 }
 
-function Input({
-  label,
-  value,
-  onChange,
-  type = "text",
-}: {
-  label: string;
-  value: string;
-  onChange: (v: string) => void;
-  type?: string;
-}) {
-  return (
-    <div>
-      <label className="block text-black text-sm mb-1">{label}</label>
-      <input
-        type={type}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className="w-full border-b border-black outline-none py-1.5"
-      />
-    </div>
-  );
-}

@@ -4,8 +4,8 @@ export default function SignUp() {
   return (
     <div className="min-h-screen flex">
       {/* LEFT */}
-      <div className="w-1/2 bg-gray-200 px-30 py-16">
-        <div className="bg-white px-6 py-3 rounded-md w-fit mb-24">
+      <div className="w-1/2 bg-gray-200 px-30 py-16 ">
+        <div className="bg-white px-12 py-12 rounded-md w-fit mb-24">
           Include SiloamXperience pic as background
         </div>
 

@@ -4,6 +4,10 @@ import { useEffect, useState } from "react";
 import { SignupData } from "@/types/SignUpData";
 import Button from "@/components/ui/Button";
 import { fetchNationalities, fetchLanguages } from "@/lib/country_lang.api";
+import Textarea from "../ui/Textarea";
+import Select from "../ui/Select";
+import Input from "../ui/Input";
+import MultiSelect from "../ui/MultiSelect";
 
 interface Props {
   data: SignupData;
@@ -30,24 +34,15 @@ export default function AboutYou({ data, setData, next, back }: Props) {
     load();
   }, []);
 
-  const toggleLanguage = (lang: string) => {
-    setData({
-      ...data,
-      languages: data.languages.includes(lang)
-        ? data.languages.filter((l) => l !== lang)
-        : [...data.languages, lang],
-    });
-  };
-
   if (loading) {
     return <p className="text-black">Loading...</p>;
   }
 
   return (
     <div>
-      <h2 className="text-3xl font-bold text-black mb-8">More About You</h2>
+      <h2 className="text-3xl font-bold text-center text-black mb-8">More About You</h2>
 
-      <div className="space-y-6">
+      <div className="space-y-15">
         {/* ROW 1 */}
         <div className="grid grid-cols-2 gap-6">
           <Select
@@ -58,7 +53,7 @@ export default function AboutYou({ data, setData, next, back }: Props) {
           />
 
           <div>
-            <label className="block text-black text-sm mb-2">Gender</label>
+            <label className="block text-black text-sm font-semibold mb-2">Gender :</label>
             <div className="flex gap-6">
               {["Male", "Female", "Others"].map((g) => (
                 <label key={g} className="flex items-center gap-2">
@@ -83,7 +78,7 @@ export default function AboutYou({ data, setData, next, back }: Props) {
             onChange={(v) => setData({ ...data, dob: v })}
           />
 
-          <Textarea
+          <Input
             label="Occupation"
             value={data.occupation}
             onChange={(v) => setData({ ...data, occupation: v })}
@@ -93,23 +88,14 @@ export default function AboutYou({ data, setData, next, back }: Props) {
         {/* ROW 3 */}
         <div className="grid grid-cols-2 gap-6">
           <div>
-            <label className="block text-black text-sm mb-2">
-              Languages Spoken
-            </label>
-            <div className="flex flex-wrap gap-3 max-h-28 overflow-y-auto">
-              {languages.map((lang) => (
-                <label key={lang} className="flex items-center gap-2 text-sm">
-                  <input
-                    type="checkbox"
-                    checked={data.languages.includes(lang)}
-                    onChange={() => toggleLanguage(lang)}
-                  />
-                  {lang}
-                </label>
-              ))}
-            </div>
+            <MultiSelect
+              label="Languages Spoken"
+              options={languages}
+              value={data.languages}
+              onChange={(v) => setData({ ...data, languages: v })}
+            />
           </div>
-
+<div className="mt-4">
           <Select
             label="Highest Qualification"
             value={data.qualification}
@@ -123,6 +109,7 @@ export default function AboutYou({ data, setData, next, back }: Props) {
             ]}
             onChange={(v) => setData({ ...data, qualification: v })}
           />
+</div>
         </div>
 
         {/* ROW 4 */}
@@ -137,84 +124,6 @@ export default function AboutYou({ data, setData, next, back }: Props) {
         <Button label="Back" variant="secondary" onClick={back} />
         <Button label="NEXT →" onClick={next} />
       </div>
-    </div>
-  );
-}
-
-/* ---------- Inputs ---------- */
-
-function Input({
-  label,
-  value,
-  onChange,
-  type = "text",
-}: {
-  label: string;
-  value: string;
-  onChange: (v: string) => void;
-  type?: string;
-}) {
-  return (
-    <div>
-      <label className="block text-black text-sm mb-1">{label}</label>
-      <input
-        type={type}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className="w-full border-b border-black outline-none py-1.5"
-      />
-    </div>
-  );
-}
-
-function Textarea({
-  label,
-  value,
-  onChange,
-}: {
-  label: string;
-  value: string;
-  onChange: (v: string) => void;
-}) {
-  return (
-    <div>
-      <label className="block text-black text-sm mb-1">{label}</label>
-      <textarea
-        rows={2}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className="w-full border-b border-black outline-none resize-none"
-      />
-    </div>
-  );
-}
-
-function Select({
-  label,
-  value,
-  options,
-  onChange,
-}: {
-  label: string;
-  value: string;
-  options: string[];
-  onChange: (v: string) => void;
-}) {
-  return (
-    <div>
-      <label className="block text-black text-sm mb-1">{label}</label>
-      <select
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className="w-full border-b border-black outline-none py-1.5 bg-transparent"
-      >
-        <option value="">Select</option>
-        {options.map((opt) => (
-          <option key={opt} value={opt}>
-            {opt}
-          </option>
-        ))}
-      </select>
     </div>
   );
 }

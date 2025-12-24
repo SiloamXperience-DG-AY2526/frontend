@@ -15,7 +15,7 @@ export interface SignupData {
   address: string;
 
   duration: string;
-  interest: string;
+  interest: string[];
   availability: string;
   donation: string;
 }

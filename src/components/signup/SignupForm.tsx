@@ -23,7 +23,7 @@ const initialData: SignupData = {
   address: "",
 
   duration: "",
-  interest: "",
+  interest: [],
   availability: "",
   donation: "",
 };
