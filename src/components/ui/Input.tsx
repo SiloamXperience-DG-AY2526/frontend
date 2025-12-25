@@ -15,14 +15,27 @@ export default function Input({
 }) {
   return (
     <div>
-      <label className="block text-black text-sm mb-1 font-semibold ">
-        {label} :
+      <label className="block text-black text-sm mb-2 font-semibold">
+        {label}
       </label>
+
       <input
         type={type}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full border-b border-black outline-none py-1.5"
+        className="
+          w-full
+          rounded-md
+          border
+          border-green-700
+          px-3
+          py-2
+          outline-none
+          transition
+          focus:border-green-800
+          focus:ring-1
+          focus:ring-green-800
+        "
       />
     </div>
   );

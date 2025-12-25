@@ -16,34 +16,83 @@ interface Props {
   back: () => void;
 }
 
+//cache to avoid reloading and flickering
+
+const CACHE_KEY = "more_details_meta_v1";
+
+function getCachedMeta(): { countries: string[]; languages: string[] } | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const cached = sessionStorage.getItem(CACHE_KEY);
+    return cached ? JSON.parse(cached) : null;
+  } catch {
+    return null;
+  }
+}
+
 export default function AboutYou({ data, setData, next, back }: Props) {
-  const [countries, setCountries] = useState<string[]>([]);
-  const [languages, setLanguages] = useState<string[]>([]);
-  const [loading, setLoading] = useState(true);
+  const cachedMeta = getCachedMeta();
+
+  const [countries, setCountries] = useState<string[]>(
+    cachedMeta?.countries ?? []
+  );
+  const [languages, setLanguages] = useState<string[]>(
+    cachedMeta?.languages ?? []
+  );
+  const [loading, setLoading] = useState(!cachedMeta);
 
   useEffect(() => {
+    if (cachedMeta) return;
+
     const load = async () => {
-      const [c, l] = await Promise.all([
-        fetchNationalities(),
-        fetchLanguages(),
-      ]);
-      setCountries(c);
-      setLanguages(l);
-      setLoading(false);
+      try {
+        const [c, l] = await Promise.all([
+          fetchNationalities(),
+          fetchLanguages(),
+        ]);
+
+        setCountries(c);
+        setLanguages(l);
+
+        sessionStorage.setItem(
+          CACHE_KEY,
+          JSON.stringify({ countries: c, languages: l })
+        );
+      } finally {
+        setLoading(false);
+      }
     };
+
     load();
   }, []);
-
   if (loading) {
-    return <p className="text-black">Loading...</p>;
+    return (
+      <div className="animate-pulse space-y-8">
+        <div className="h-8 bg-black/10 rounded w-1/3 mx-auto" />
+
+        <div className="grid grid-cols-2 gap-6">
+          <div className="h-10 bg-black/10 rounded" />
+          <div className="h-10 bg-black/10 rounded" />
+        </div>
+
+        <div className="grid grid-cols-2 gap-6">
+          <div className="h-10 bg-black/10 rounded" />
+          <div className="h-10 bg-black/10 rounded" />
+        </div>
+
+        <div className="h-20 bg-black/10 rounded" />
+      </div>
+    );
   }
 
   return (
     <div>
-      <h2 className="text-3xl font-bold text-center text-black mb-8">More About You</h2>
+      <h2 className="text-3xl font-bold text-center text-black mb-8 mt-3">
+        More About You
+      </h2>
 
-      <div className="space-y-15">
-        {/* ROW 1 */}
+      <div className="space-y-4">
+        {/*nationality  */}
         <div className="grid grid-cols-2 gap-6">
           <Select
             label="Nationality"
@@ -53,7 +102,9 @@ export default function AboutYou({ data, setData, next, back }: Props) {
           />
 
           <div>
-            <label className="block text-black text-sm font-semibold mb-2">Gender :</label>
+            <label className="block text-black text-sm font-semibold mb-2">
+              Gender :
+            </label>
             <div className="flex gap-6">
               {["Male", "Female", "Others"].map((g) => (
                 <label key={g} className="flex items-center gap-2">
@@ -69,7 +120,7 @@ export default function AboutYou({ data, setData, next, back }: Props) {
           </div>
         </div>
 
-        {/* ROW 2 */}
+        {/* dob and occupation */}
         <div className="grid grid-cols-2 gap-6">
           <Input
             label="Date of Birth"
@@ -85,8 +136,7 @@ export default function AboutYou({ data, setData, next, back }: Props) {
           />
         </div>
 
-        {/* ROW 3 */}
-        <div className="grid grid-cols-2 gap-6">
+        {/* language and qualification */}
           <div>
             <MultiSelect
               label="Languages Spoken"
@@ -95,24 +145,23 @@ export default function AboutYou({ data, setData, next, back }: Props) {
               onChange={(v) => setData({ ...data, languages: v })}
             />
           </div>
-<div className="mt-4">
-          <Select
-            label="Highest Qualification"
-            value={data.qualification}
-            options={[
-              "Secondary School",
-              "Diploma",
-              "Bachelor's Degree",
-              "Master's Degree",
-              "Doctorate",
-              "Others",
-            ]}
-            onChange={(v) => setData({ ...data, qualification: v })}
-          />
-</div>
-        </div>
+          <div className="mt-4">
+            <Select
+              label="Highest Qualification"
+              value={data.qualification}
+              options={[
+                "Secondary School",
+                "Diploma",
+                "Bachelor's Degree",
+                "Master's Degree",
+                "Doctorate",
+                "Others",
+              ]}
+              onChange={(v) => setData({ ...data, qualification: v })}
+            />
+          </div>
 
-        {/* ROW 4 */}
+        {/*Address*/}
         <Textarea
           label="Address"
           value={data.address}
@@ -120,7 +169,7 @@ export default function AboutYou({ data, setData, next, back }: Props) {
         />
       </div>
 
-      <div className="mt-12 flex justify-between">
+      <div className="mt-5 flex justify-between">
         <Button label="Back" variant="secondary" onClick={back} />
         <Button label="NEXT →" onClick={next} />
       </div>

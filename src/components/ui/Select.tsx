@@ -1,7 +1,5 @@
 "use client";
 
-import { useState } from "react";
-
 export default function Select({
   label,
   value,
@@ -15,13 +13,30 @@ export default function Select({
 }) {
   return (
     <div>
-      <label className="block text-black font-semibold text-sm mb-1">{label} :</label>
+      <label className="block text-black font-semibold text-sm mb-2">
+        {label} :
+      </label>
+
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full border-b border-black outline-none py-1.5 bg-transparent"
+        className="
+          w-full
+          rounded-md
+          border
+          border-green-700
+          px-3
+          py-2
+          bg-white
+          outline-none
+          transition
+          focus:border-green-800
+          focus:ring-1
+          focus:ring-green-800
+        "
       >
         <option value="">Select</option>
+
         {options.map((opt) => (
           <option key={opt} value={opt}>
             {opt}

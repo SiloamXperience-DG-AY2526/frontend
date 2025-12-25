@@ -2,6 +2,7 @@ import { SignupData } from "@/types/SignUpData";
 import Button from "@/components/ui/Button";
 import Input from "../ui/Input";
 import MultiSelect from "../ui/MultiSelect";
+import Textarea from "../ui/Textarea";
 
 interface Props {
   data: SignupData;
@@ -33,16 +34,16 @@ export default function VolunteerInterest({ data, setData, back }: Props) {
 
   return (
     <div>
-      <h2 className="text-3xl font-bold text-black text-center mb-8">
+      <h2 className="text-3xl font-bold text-black text-center mb-8 mt-3">
         Volunteer Interest
       </h2>
 
-      <div className="space-y-10">
+      <div className="space-y-10 mt-3">
         <div>
           <label className="block text-black font-semibold  text-sm mb-2">
             Volunteering Duration :
           </label>
-          <div className="flex gap-6">
+          <div className="flex gap-24">
             {["Ad Hoc", "Short Term", "Long Term"].map((v) => (
               <label key={v} className="flex items-center gap-2 mt-4">
                 <input
@@ -69,14 +70,14 @@ export default function VolunteerInterest({ data, setData, back }: Props) {
           onChange={(v) => setData({ ...data, availability: v })}
         />
 
-        <Input
+        <Textarea
           label="Preferred Cause for Donation"
           value={data.donation}
           onChange={(v) => setData({ ...data, donation: v })}
         />
       </div>
 
-      <div className="mt-12 flex justify-between">
+      <div className="mt-5 flex justify-between">
         <Button label="Back" variant="secondary" onClick={back} />
         <Button label="SIGN UP →" onClick={submit} />
       </div>

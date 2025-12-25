@@ -1,7 +1,5 @@
 "use client";
 
-import { useState } from "react";
-
 export default function Textarea({
   label,
   value,
@@ -13,12 +11,28 @@ export default function Textarea({
 }) {
   return (
     <div>
-      <label className="block text-black font-semibold text-sm mb-1">{label} :</label>
+      <label className="block text-black font-semibold text-sm mb-2">
+        {label} :
+      </label>
+
       <textarea
-        rows={2}
+        rows={3}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full border-b border-black outline-none resize-none"
+        className="
+          w-full
+          rounded-md
+          border
+          border-green-700
+          px-3
+          py-2
+          outline-none
+          resize-none
+          transition
+          focus:border-green-800
+          focus:ring-1
+          focus:ring-green-800
+        "
       />
     </div>
   );

@@ -11,9 +11,14 @@ interface Props {
 export default function PersonalDetails({ data, setData, next }: Props) {
   return (
     <div>
-      <h2 className="text-3xl text-center font-bold text-black mb-5">Personal Details</h2>
-
-      <div className="space-y-7">
+      <div className="text-start mb-5 mt-3">
+        <h1 className="text-3xl font-bold  text-black">Create an Account</h1>
+        <p className="text-sm text-gray-500 mt-1">
+          Already have an account?{" "}
+          <span className="underline cursor-pointer text-blue-500 font-semibold ">Log In</span>
+        </p>
+      </div>
+      <div className="space-y-3">
         <Input
           label="Name:"
           value={data.name}
@@ -58,4 +63,3 @@ export default function PersonalDetails({ data, setData, next }: Props) {
     </div>
   );
 }
-
