@@ -15,7 +15,7 @@ export default function Input({
 }) {
   return (
     <div>
-      <label className="block text-black text-sm mb-2 font-semibold">
+      <label className="block text-black text-md mb-2 font-semibold">
         {label}
       </label>
 

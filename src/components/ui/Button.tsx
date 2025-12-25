@@ -16,10 +16,10 @@ export default function Button({
       type={type}
       onClick={onClick}
       className={`
-        px-8 py-3 rounded-md font-semibold transition
+        px-8 py-3 rounded-md font-medium transition cursor-pointer
         ${
           variant === "primary"
-            ? "bg-gray-100 text-black hover:bg-gray-200"
+            ? "bg-[#195D4B] text-white hover:bg-green-800"
             : "text-black hover:underline"
         }
       `}

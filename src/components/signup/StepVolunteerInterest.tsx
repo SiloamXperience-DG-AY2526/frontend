@@ -78,7 +78,7 @@ export default function VolunteerInterest({ data, setData, back }: Props) {
       </div>
 
       <div className="mt-5 flex justify-between">
-        <Button label="Back" variant="secondary" onClick={back} />
+        <Button label="Back"  onClick={back} />
         <Button label="SIGN UP →" onClick={submit} />
       </div>
     </div>

@@ -37,7 +37,7 @@ export default function MultiSelect({
 
   return (
     <div className="relative">
-      <label className="block text-black font-semibold text-sm mb-2">
+      <label className="block text-black font-semibold text-md mb-2">
         {label} :
       </label>
 

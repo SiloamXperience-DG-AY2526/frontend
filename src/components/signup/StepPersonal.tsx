@@ -1,6 +1,7 @@
 import { SignupData } from "@/types/SignUpData";
 import Button from "@/components/ui/Button";
 import Input from "../ui/Input";
+import Link from "next/link";
 
 interface Props {
   data: SignupData;
@@ -15,7 +16,12 @@ export default function PersonalDetails({ data, setData, next }: Props) {
         <h1 className="text-3xl font-bold  text-black">Create an Account</h1>
         <p className="text-sm text-gray-500 mt-1">
           Already have an account?{" "}
-          <span className="underline cursor-pointer text-blue-500 font-semibold ">Log In</span>
+          <Link
+            href="/login"
+            className="text-blue-500 font-bold hover:underline"
+          >
+            Log In
+          </Link>{" "}
         </p>
       </div>
       <div className="space-y-3">

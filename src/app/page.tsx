@@ -1,6 +1,7 @@
 import Link from "next/link";
 export default function LandingPage() {
   return (
+    // original color to be added after discussion
     <div className="relative min-h-screen bg-white overflow-hidden">
       {/* right abstract */}
       <div
@@ -54,6 +55,7 @@ export default function LandingPage() {
           </h1>
 
           <div className="mt-8 flex gap-5">
+            
             <Link href="/login">
               <button className="px-12 py-2.5 bg-[#D9D9D9] cursor-pointer text-black rounded-md text-lg font-bold">
                 Log In

@@ -170,7 +170,7 @@ export default function AboutYou({ data, setData, next, back }: Props) {
       </div>
 
       <div className="mt-5 flex justify-between">
-        <Button label="Back" variant="secondary" onClick={back} />
+        <Button label="Back"  onClick={back} />
         <Button label="NEXT →" onClick={next} />
       </div>
     </div>
