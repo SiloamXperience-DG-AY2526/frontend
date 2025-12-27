@@ -15,17 +15,30 @@ export default function StepCommunication({ data, setData, back }: Props) {
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async () => {
+    // validation (page-specific)
+    if (!data.agreeUpdates) {
+      alert("You must agree to receive updates to continue.");
+      return;
+    }
+
+    if (!data.preferredContactMethod) {
+      alert("Please select a preferred contact method.");
+      return;
+    }
+
     setLoading(true);
+
+    const payload: SignupData = {
+      ...data,
+    };
+
     try {
-      const res = await fetch("/api/signup", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
+      // frontend test
+      console.log("Signup data:", payload);
 
-      if (!res.ok) throw new Error("Failed to submit");
+      await new Promise((resolve) => setTimeout(resolve, 1500));
 
-      alert("Form submitted successfully!");
+      alert("Signup completed successfully!");
     } catch (error) {
       console.error(error);
       alert("There was an error submitting the form.");
@@ -36,7 +49,9 @@ export default function StepCommunication({ data, setData, back }: Props) {
 
   return (
     <div>
-      <h2 className="text-3xl font-bold text-black text-center mb-2">Stay Connected</h2>
+      <h2 className="text-3xl font-bold text-black text-center mb-2">
+        Stay Connected
+      </h2>
       <p className="text-sm text-gray-600 text-center mb-8">
         We promise not to spam! Just updates and opportunities that matter.
       </p>
@@ -45,7 +60,14 @@ export default function StepCommunication({ data, setData, back }: Props) {
         <Select
           label="How did you hear about us?"
           value={data.foundUsThrough || ""}
-          options={["Friend", "Social Media", "Church", "Website", "Event", "Other"]}
+          options={[
+            "Friend",
+            "Social Media",
+            "Church",
+            "Website",
+            "Event",
+            "Other",
+          ]}
           onChange={(v) => setData({ ...data, foundUsThrough: v })}
         />
 
@@ -61,7 +83,9 @@ export default function StepCommunication({ data, setData, back }: Props) {
             <input
               type="checkbox"
               checked={data.agreeUpdates || false}
-              onChange={(e) => setData({ ...data, agreeUpdates: e.target.checked })}
+              onChange={(e) =>
+                setData({ ...data, agreeUpdates: e.target.checked })
+              }
             />
             I agree to receive updates and communications (required)
           </label>
@@ -70,15 +94,18 @@ export default function StepCommunication({ data, setData, back }: Props) {
             <input
               type="checkbox"
               checked={data.joinMailingList || false}
-              onChange={(e) => setData({ ...data, joinMailingList: e.target.checked })}
+              onChange={(e) =>
+                setData({ ...data, joinMailingList: e.target.checked })
+              }
             />
-            I'd like to join your mailing list for newsletters and event invitations (optional)
+            I'd like to join your mailing list for newsletters and event
+            invitations (optional)
           </label>
         </div>
       </div>
 
       <div className="mt-8 flex justify-between">
-        <Button label="Back"  onClick={back} />
+        <Button label="Back" onClick={back} />
         <Button
           label={loading ? "Submitting..." : "SUBMIT →"}
           onClick={handleSubmit}

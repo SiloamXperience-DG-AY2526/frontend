@@ -65,7 +65,7 @@ export default function VolunteerInterest({
 
           <div className="grid grid-cols-3 gap-3">
             <Input
-              label="Full Name (as per passport)"
+              label="Name (as per passport)"
               value={data.passportName || ""}
               onChange={(v) => setData({ ...data, passportName: v })}
             />
