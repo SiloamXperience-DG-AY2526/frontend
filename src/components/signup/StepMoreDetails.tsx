@@ -93,20 +93,28 @@ export default function AboutYou({ data, setData, next, back }: Props) {
 
       <div className="space-y-4">
         {/*nationality  */}
-        <div className="grid grid-cols-2 gap-6">
+        <div className="grid grid-cols-3 gap-6">
           <Select
             label="Nationality"
             value={data.nationality}
             options={countries}
             onChange={(v) => setData({ ...data, nationality: v })}
           />
-
+          <Input
+            label={
+              data.nationality.toLowerCase().includes("singaporean")
+                ? "NRIC"
+                : "Identification Number"
+            }
+            value={data.identificationNumber}
+            onChange={(v) => setData({ ...data, identificationNumber: v })}
+          />
           <div>
             <label className="block text-black text-sm font-semibold mb-2">
               Gender :
             </label>
             <div className="flex gap-6">
-              {["Male", "Female", "Others"].map((g) => (
+              {["Male", "Female"].map((g) => (
                 <label key={g} className="flex items-center gap-2">
                   <input
                     type="radio"
@@ -119,7 +127,6 @@ export default function AboutYou({ data, setData, next, back }: Props) {
             </div>
           </div>
         </div>
-
         {/* dob and occupation */}
         <div className="grid grid-cols-2 gap-6">
           <Input
@@ -137,29 +144,29 @@ export default function AboutYou({ data, setData, next, back }: Props) {
         </div>
 
         {/* language and qualification */}
-          <div>
-            <MultiSelect
-              label="Languages Spoken"
-              options={languages}
-              value={data.languages}
-              onChange={(v) => setData({ ...data, languages: v })}
-            />
-          </div>
-          <div className="mt-4">
-            <Select
-              label="Highest Qualification"
-              value={data.qualification}
-              options={[
-                "Secondary School",
-                "Diploma",
-                "Bachelor's Degree",
-                "Master's Degree",
-                "Doctorate",
-                "Others",
-              ]}
-              onChange={(v) => setData({ ...data, qualification: v })}
-            />
-          </div>
+        <div>
+          <MultiSelect
+            label="Languages Spoken"
+            options={languages}
+            value={data.languages}
+            onChange={(v) => setData({ ...data, languages: v })}
+          />
+        </div>
+        <div className="mt-4">
+          <Select
+            label="Highest Qualification"
+            value={data.qualification}
+            options={[
+              "Secondary School",
+              "Diploma",
+              "Bachelor's Degree",
+              "Master's Degree",
+              "Doctorate",
+              "Others",
+            ]}
+            onChange={(v) => setData({ ...data, qualification: v })}
+          />
+        </div>
 
         {/*Address*/}
         <Textarea
@@ -170,7 +177,7 @@ export default function AboutYou({ data, setData, next, back }: Props) {
       </div>
 
       <div className="mt-5 flex justify-between">
-        <Button label="Back"  onClick={back} />
+        <Button label="Back" onClick={back} />
         <Button label="NEXT →" onClick={next} />
       </div>
     </div>

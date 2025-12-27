@@ -71,3 +71,24 @@ export async function fetchLanguages(): Promise<string[]> {
     return [];
   }
 }
+// Fetch country calling codes
+export async function fetchCountryCodes(): Promise<string[]> {
+  try {
+    const res = await fetch("https://restcountries.com/v3.1/all?fields=idd");
+
+    const data = await res.json();
+    const codes = new Set<string>();
+
+    data.forEach((c: any) => {
+      if (c?.idd?.root && Array.isArray(c.idd.suffixes)) {
+        c.idd.suffixes.forEach((s: string) => {
+          codes.add(`${c.idd.root}${s}`);
+        });
+      }
+    });
+
+    return Array.from(codes).sort();
+  } catch {
+    return [];
+  }
+}

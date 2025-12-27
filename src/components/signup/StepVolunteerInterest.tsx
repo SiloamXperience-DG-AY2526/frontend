@@ -8,29 +8,29 @@ interface Props {
   data: SignupData;
   setData: (d: SignupData) => void;
   back: () => void;
+  next: () => void;
 }
 const VOLUNTEER_INTERESTS = [
-  "Education",
-  "Elderly Care",
-  "Children & Youth",
-  "Healthcare",
-  "Mental Health",
-  "Environment",
-  "Animal Welfare",
-  "Disaster Relief",
-  "Community Development",
-  "Fundraising",
+  "Organizing fundraising events",
+  "Planning trips for your organization/group",
+  "Short-term mission trips (up to 14 days)",
+  "Long-term commitments (6 months or more)",
+  "Behind-the-scenes administration",
+  "Marketing & social media magic",
+  "Teaching & mentoring",
+  "Training & program development",
+  "Agriculture projects",
+  "Building & facilities work",
+  "Other",
 ];
 
-export default function VolunteerInterest({ data, setData, back }: Props) {
-  const submit = async () => {
-    await fetch("/api/signup", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
-    });
-    alert("Submitted");
-  };
+export default function VolunteerInterest({
+  data,
+  setData,
+  next,
+  back,
+}: Props) {
+  const showOther = data.interest.includes("Other");
 
   return (
     <div>
@@ -38,48 +38,65 @@ export default function VolunteerInterest({ data, setData, back }: Props) {
         Volunteer Interest
       </h2>
 
-      <div className="space-y-10 mt-3">
-        <div>
-          <label className="block text-black font-semibold  text-sm mb-2">
-            Volunteering Duration :
-          </label>
-          <div className="flex gap-24">
-            {["Ad Hoc", "Short Term", "Long Term"].map((v) => (
-              <label key={v} className="flex items-center gap-2 mt-4">
-                <input
-                  type="radio"
-                  checked={data.duration === v}
-                  onChange={() => setData({ ...data, duration: v })}
-                />
-                {v}
-              </label>
-            ))}
-          </div>
-        </div>
-
+      <div className="space-y-8">
+        {/* Interests */}
         <MultiSelect
-          label="Volunteer Interests"
+          label="Volunteering Interests (Select all that apply)"
           options={VOLUNTEER_INTERESTS}
           value={data.interest}
           onChange={(v) => setData({ ...data, interest: v })}
         />
 
-        <Input
-          label="Availability"
-          value={data.availability}
-          onChange={(v) => setData({ ...data, availability: v })}
-        />
+        {/* Other interest (conditional) */}
+        {showOther && (
+          <Input
+            label="Other (please specify)"
+            value={data.otherInterest || ""}
+            onChange={(v) => setData({ ...data, otherInterest: v })}
+          />
+        )}
 
+        {/* Trip details (optional, always visible) */}
+        <div className="space-y-4">
+          <p className="text-md font-semibold text-green-900">
+            If you're interested in trips, answer the following (optional):
+          </p>
+          
+
+          <div className="grid grid-cols-3 gap-3">
+            <Input
+              label="Full Name (as per passport)"
+              value={data.passportName || ""}
+              onChange={(v) => setData({ ...data, passportName: v })}
+            />
+
+            <Input
+              label="Passport Number"
+              value={data.passportNumber || ""}
+              onChange={(v) => setData({ ...data, passportNumber: v })}
+            />
+
+            <Input
+              label="Passport Expiry Date"
+              type="date"
+              value={data.passportExpiry || ""}
+              onChange={(v) => setData({ ...data, passportExpiry: v })}
+            />
+          </div>
+        </div>
+
+        {/* Health notes */}
         <Textarea
-          label="Preferred Cause for Donation"
-          value={data.donation}
-          onChange={(v) => setData({ ...data, donation: v })}
+          label="Do you have any health conditions we should know about?"
+          value={data.healthNotes || ""}
+          onChange={(v) => setData({ ...data, healthNotes: v })}
         />
       </div>
 
-      <div className="mt-5 flex justify-between">
-        <Button label="Back"  onClick={back} />
-        <Button label="SIGN UP →" onClick={submit} />
+      {/* Navigation */}
+      <div className="mt-8 flex justify-between">
+        <Button label="Back" onClick={back} />
+        <Button label="NEXT →" onClick={next} />
       </div>
     </div>
   );

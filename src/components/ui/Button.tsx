@@ -3,6 +3,7 @@ interface ButtonProps {
   onClick?: () => void;
   variant?: "primary" | "secondary";
   type?: "button" | "submit";
+  disabled?: boolean;
 }
 
 export default function Button({
@@ -10,11 +11,13 @@ export default function Button({
   onClick,
   variant = "primary",
   type = "button",
+  disabled = false,
 }: ButtonProps) {
   return (
     <button
       type={type}
       onClick={onClick}
+      disabled={disabled}
       className={`
         px-8 py-3 rounded-md font-medium transition cursor-pointer
         ${
