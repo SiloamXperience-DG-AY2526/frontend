@@ -61,15 +61,13 @@ export default function VolunteerInterest({
           <p className="text-md font-semibold text-green-900">
             If you're interested in trips, answer the following (optional):
           </p>
-          
 
-          <div className="grid grid-cols-3 gap-3">
-            <Input
-              label="Name (as per passport)"
-              value={data.passportName || ""}
-              onChange={(v) => setData({ ...data, passportName: v })}
-            />
-
+          <Input
+            label="Full Name (as per passport)"
+            value={data.passportName || ""}
+            onChange={(v) => setData({ ...data, passportName: v })}
+          />
+          <div className="grid grid-cols-2 gap-3">
             <Input
               label="Passport Number"
               value={data.passportNumber || ""}
