@@ -5,6 +5,7 @@ import Image from "next/image";
 import Input from "@/components/ui/Input";
 import Button from "@/components/ui/Button";
 import Link from "next/link";
+import { login } from "@/lib/api/auth";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -12,7 +13,15 @@ export default function Login() {
   const [remember, setRemember] = useState(false);
 
   const handleLogin = () => {
-    console.log({ email, password, remember });
+    // console.log({ email, password, remember });
+    const loginData = { email, password };
+    login(loginData)
+      .then((data) => {
+        console.log("Login successful:", data);
+      })
+      .catch((error) => {
+        console.error("Login failed:", error);
+      });
   };
 
   return (
