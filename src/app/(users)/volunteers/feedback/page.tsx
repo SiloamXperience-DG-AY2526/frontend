@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import Sidebar from "@/components/sidebar";
-import StarRating from "@/components/ui/star_rating";
-import Textarea from "@/components/ui/Textarea";
+import StarRating from "@/components/ui/StarRating";
+import Textarea from "@/components/ui/TextArea";
 import Button from "@/components/ui/Button";
 import { FeedbackPayload } from "@/types/VolunteerFeedback";
 
