@@ -119,10 +119,9 @@ export default function MoreAboutYou({ data, setData, next, back }: Props) {
             </div>
           </div>
         </div>
-     
+
         {/* dob and occupation */}
         <div className="grid grid-cols-2 gap-6">
-          
           <Input
             label="Date of Birth"
             type="date"
@@ -147,7 +146,7 @@ export default function MoreAboutYou({ data, setData, next, back }: Props) {
               onChange={(v) => setData({ ...data, languages: v })}
             />
           </div>
-          <div >
+          <div>
             <Select
               label="Highest Qualification"
               value={data.qualification}
