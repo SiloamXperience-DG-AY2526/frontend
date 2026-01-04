@@ -5,7 +5,7 @@ import { SignupData } from "@/types/SignUpData";
 import Button from "@/components/ui/Button";
 import Input from "../ui/Input";
 import Link from "next/link";
-import { fetchCountryCodes } from "@/lib/country_lang.api";
+import { fetchCountryCodes } from "@/lib/countries";
 import Select from "../ui/Select";
 
 interface Props {

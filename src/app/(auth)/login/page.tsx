@@ -6,22 +6,46 @@ import Input from "@/components/ui/Input";
 import Button from "@/components/ui/Button";
 import Link from "next/link";
 import { login } from "@/lib/api/auth";
+import { useRouter } from "next/navigation";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [remember, setRemember] = useState(false);
 
-  const handleLogin = () => {
+  const router = useRouter();
+
+  const handleLogin = async () => {
     // console.log({ email, password, remember });
-    const loginData = { email, password };
-    login(loginData)
-      .then((data) => {
-        console.log("Login successful:", data);
-      })
-      .catch((error) => {
-        console.error("Login failed:", error);
-      });
+    const loginData = { email: email, password: password };
+
+    // token handling for various roles
+    const { userId, roles } = await login(loginData);
+
+    console.log("Logged in user:", { userId, roles });
+
+    // redirect based on roles
+    const ROLE_HOME: Record<string, string> = {
+      superAdmin: "/super-admin/home",
+      generalManager: "/general-manager/home",
+      financeManager: "/finance-manager/home",
+      partner: "/partner/home",
+    };
+
+    const ROLE_PRIORITY = [
+      "superAdmin",
+      "generalManager",
+      "financeManager",
+      "partner",
+    ];
+
+    const home =
+      ROLE_PRIORITY
+        .map((r) => (roles?.includes(r) ? ROLE_HOME[r] : null))
+        .find(Boolean) ?? "/login-error";
+
+    router.push(home);
+    
   };
 
   return (
@@ -88,6 +112,7 @@ export default function Login() {
           src="/assets/login.png"
           alt="Login Image"
           fill
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           className="p-3"
           priority
         />

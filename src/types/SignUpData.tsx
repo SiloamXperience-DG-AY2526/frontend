@@ -1,4 +1,4 @@
-export interface SignupData {
+export type SignUpData = {
   //page 1 - Personal Details
   salutation: string;
   firstName: string;
@@ -9,7 +9,7 @@ export interface SignupData {
   password: string;
   confirmPassword: string;
 
-  // //page 3 - more about user
+  //page 3 - more about user
   nationality: string;
   identificationNumber: string;
   gender: "Male" | "Female";
@@ -19,7 +19,7 @@ export interface SignupData {
   qualification: string;
   address: string;
 
-  //page 3 - volunteer interest
+  //page 4 - volunteer interest
   interest: string[];
   otherInterest?: string;
   passportName?: string;
@@ -27,14 +27,14 @@ export interface SignupData {
   passportExpiry?: string;
   healthNotes?: string;
 
-  //page 4 - Emergency
+  //page 5 - Emergency
   emergencyContactName?: string;
   emergencyContactNumber?: string;
- skills?: string;
-  volunteeredBefore?: "Yes" | "No" ;
+  skills?: string;
+  volunteeredBefore?: "Yes" | "No";
   availability?: string;
 
-  // page 5 - Communication Preferences
+  // page 6 - Communication Preferences
   foundUsThrough?: string;
   preferredContactMethod?: string;
   agreeUpdates?: boolean;

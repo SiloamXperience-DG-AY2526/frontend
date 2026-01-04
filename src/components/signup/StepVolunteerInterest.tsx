@@ -1,12 +1,12 @@
-import { SignupData } from "@/types/SignUpData";
+import { SignUpData } from "@/types/SignUpData";
 import Button from "@/components/ui/Button";
 import Input from "../ui/Input";
 import MultiSelect from "../ui/MultiSelect";
-import Textarea from "../ui/Textarea";
+import Textarea from "../ui/TextArea";
 
 interface Props {
-  data: SignupData;
-  setData: (d: SignupData) => void;
+  data: SignUpData;
+  setData: (d: SignUpData) => void;
   back: () => void;
   next: () => void;
 }
@@ -59,7 +59,7 @@ export default function VolunteerInterest({
         {/* Trip details (optional, always visible) */}
         <div className="space-y-4">
           <p className="text-md font-semibold text-green-900">
-            If you're interested in trips, answer the following (optional):
+            If you&apos;re interested in trips, answer the following (optional):
           </p>
 
           <Input

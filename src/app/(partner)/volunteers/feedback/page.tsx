@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import Sidebar from "@/components/sidebar";
+import Sidebar from "@/components/Sidebar";
 import StarRating from "@/components/ui/StarRating";
 import Textarea from "@/components/ui/TextArea";
 import Button from "@/components/ui/Button";
@@ -20,7 +20,9 @@ export default function FeedbackPage() {
     improvement: "",
     comments: "",
   });
+  
   const [loading, setLoading] = useState(false);
+
   const handleSubmit = async () => {
     // basic frontend validation
     if (

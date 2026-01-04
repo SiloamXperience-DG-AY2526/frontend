@@ -4,15 +4,15 @@ import { useState } from "react";
 import StepPersonal from "./StepPersonal";
 import StepAbout from "./StepMoreDetails";
 import StepVolunteer from "./StepVolunteerInterest";
-import { SignupData } from "@/types/SignUpData";
+import { SignUpData } from "@/types/SignUpData";
 import StepEmergency from "./StepEmergency";
 import StepCommunication from "./StepCommunication";
 
-const initialData: SignupData = {
+const initialData: SignUpData = {
   // Page 1 - Personal Details
   salutation: "",
   firstName: "",
-  lastName: "",
+  lastName: "", 
   email: "",
   countryCode: "",
   contact: "",
@@ -53,7 +53,7 @@ const initialData: SignupData = {
 
 export default function SignupForm() {
   const [step, setStep] = useState<number>(1);
-  const [data, setData] = useState<SignupData>(initialData);
+  const [data, setData] = useState<SignUpData>(initialData);
 
   const next = () => setStep((prev) => Math.min(prev + 1, 5));
   const back = () => setStep((prev) => Math.max(prev - 1, 1));
