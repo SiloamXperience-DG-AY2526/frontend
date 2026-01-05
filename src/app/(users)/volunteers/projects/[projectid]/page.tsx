@@ -10,6 +10,12 @@ import {
   MapPinIcon,
 } from "@heroicons/react/24/outline";
 import type { VolunteerProjectDetail } from "@/types/Volunteer";
+import TargetIcon from "@/components/icons/TargetIcon";
+import Link from "next/link";
+function capitalizeFirst(s?: string | null) {
+  if (!s) return "";
+  return s.charAt(0).toUpperCase() + s.slice(1);
+}
 
 function InfoRow({
   icon: Icon,
@@ -46,13 +52,30 @@ function Section({
     </section>
   );
 }
+function ObjectiveList({ text }: { text: string }) {
+  const items = text
+    .split("\n")
+    .map((i) => i.replace(/^•\s*/, "").trim())
+    .filter(Boolean);
 
+  return (
+    <ul className="mt-4 space-y-4">
+      {items.map((item, idx) => (
+        <li key={idx} className="flex items-start gap-3">
+          <TargetIcon className="mt-0.5 shrink-0" />
+          <span className="text-sm md:text-[15px] text-gray-800 leading-6">
+            {item}
+          </span>
+        </li>
+      ))}
+    </ul>
+  );
+}
 export default function VolunteerProjectDetailPage({
   params,
 }: {
   params: Promise<{ projectid: string }>;
 }) {
-  // ✅ Next.js new params Promise behavior
   const { projectid } = use(params);
 
   const [data, setData] = useState<VolunteerProjectDetail | null>(null);
@@ -89,7 +112,11 @@ export default function VolunteerProjectDetailPage({
 
   const timeText = useMemo(() => {
     if (!data) return "—";
-    return formatTimeRange(data.startTime, data.endTime);
+
+    const freq = data.frequency ? capitalizeFirst(data.frequency) : null; 
+    const time = formatTimeRange(data.startTime, data.endTime);
+
+    return freq ? `${freq}, ${time}` : time;
   }, [data]);
 
   const scrollToPositions = () => {
@@ -158,82 +185,93 @@ export default function VolunteerProjectDetailPage({
             <Section title="Organiser">{data.initiatorName ?? "—"}</Section>
             <Section title="About">{data.aboutDesc ?? "—"}</Section>
             <Section title="Objectives/ Goals">
-              {data.objectives ?? "—"}
+              {data.objectives ? <ObjectiveList text={data.objectives} /> : "—"}
             </Section>
+
             <Section title="Beneficiary Details">
               {data.beneficiaries ?? "—"}
             </Section>
 
             {/* Volunteer positions */}
-            <div
-              id="positions"
-              className="mt-10 rounded-2xl bg-teal-50 p-6 scroll-mt-24"
-            >
-              <h2 className="text-lg font-bold text-gray-900">
-                Volunteer positions
-              </h2>
-
-              <div className="mt-4 grid gap-5 md:grid-cols-2">
-                {data.positions?.map((pos) => (
-                  <div
-                    key={pos.id}
-                    className="rounded-2xl bg-white p-5 shadow-sm border"
-                  >
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="font-semibold text-gray-900">
-                        {pos.role}
-                      </div>
-                      <span className="rounded-full bg-teal-100 px-3 py-1 text-xs font-semibold text-teal-800">
-                        {pos.slotsAvailable} spots left
-                      </span>
-                    </div>
-
-                    <div className="mt-3 text-sm text-gray-700">
-                      <div className="font-semibold text-teal-700">
-                        Description:
-                      </div>
-                      <div className="mt-1">{pos.description}</div>
-                    </div>
-
-                    <div className="mt-4 text-sm text-gray-700">
-                      <div className="font-semibold text-teal-700">
-                        Skills needed:
-                      </div>
-                      {pos.skills?.length ? (
-                        <ul className="mt-2 list-disc pl-5">
-                          {pos.skills.map((s: string, idx: number) => (
-                            <li key={idx}>{s}</li>
-                          ))}
-                        </ul>
-                      ) : (
-                        <div className="mt-1">—</div>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
           </div>
 
           {/* RIGHT card */}
           <aside className="w-full lg:w-[340px]">
             <div className="mt-20">
-              <div className="max-h-[calc(100vh-48px)] overflow-auto rounded-2xl border bg-white p-5 shadow-sm">
-                <div className="space-y-4">
+              <div className="h-[280px] rounded-2xl border bg-white p-6 shadow-sm flex flex-col justify-center">
+                {/* Info rows */}
+                <div className="space-y-5">
                   <InfoRow icon={CalendarIcon} text={dateText} />
                   <InfoRow icon={ClockIcon} text={timeText} />
                   <InfoRow icon={MapPinIcon} text={data.location ?? "—"} />
                 </div>
 
+                {/* Button */}
                 <button
                   onClick={scrollToPositions}
-                  className="mt-5 w-full rounded-lg bg-teal-600 px-4 py-3 text-sm font-semibold text-white hover:bg-teal-700 active:bg-teal-800"
+                  className="
+          mt-8 w-full rounded-lg
+          bg-teal-600 px-4 py-3
+          text-sm font-semibold text-white
+          hover:bg-teal-700 active:bg-teal-800
+        "
                 >
                   I want to volunteer
                 </button>
               </div>
             </div>
           </aside>
+        </div>
+        <div
+          id="positions"
+          className="mt-12 rounded-2xl bg-[#E3F0EC] p-8 scroll-mt-24"
+        >
+          <h2 className="text-xl font-bold text-gray-900">
+            Volunteer positions
+          </h2>
+
+          <div className="mt-6 grid gap-6 grid-cols-1 sm:grid-cols-2 xl:grid-cols-3">
+            {data.positions?.map((pos) => (
+              <Link
+                key={pos.id}
+                href={`/volunteers/projects/${data.id}/apply?positionId=${pos.id}`}
+                className="
+          relative block min-h-[340px]
+          rounded-2xl bg-white border border-gray-200
+          p-7 shadow-sm
+          transition hover:shadow-md hover:-translate-y-[2px]
+          active:scale-[0.99]
+        "
+              >
+                {/* badge */}
+                <span className="absolute top-5 right-5 rounded-full bg-[#7EDDC3] px-4 py-1.5 text-xs  text-black">
+                  {pos.slotsAvailable} spots left
+                </span>
+
+                <h3 className="text-lg font-bold text-gray-900 pr-19">
+                  {pos.role}
+                </h3>
+
+                <div className="mt-5 text-sm text-gray-700">
+                  <div className="font-semibold text-teal-700 mb-1">
+                    Description:
+                  </div>
+                  {pos.description}
+                </div>
+
+                <div className="mt-6 text-sm text-gray-700">
+                  <div className="font-semibold text-teal-700 mb-2">
+                    Skills needed:
+                  </div>
+                  <ul className="list-disc pl-5 space-y-1">
+                    {pos.skills.map((s, i) => (
+                      <li key={i}>{s}</li>
+                    ))}
+                  </ul>
+                </div>
+              </Link>
+            ))}
+          </div>
         </div>
       </main>
     </div>

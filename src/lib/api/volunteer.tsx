@@ -37,3 +37,28 @@ export async function getVolunteerProjectDetail(projectId: string) {
 
   return (await res.json()) as VolunteerProjectDetailResponse;
 }
+
+export async function submitVolunteerApplication(args: {
+  userId: string;
+  projectId: string;
+  positionId: string;
+  sessionId?: string;
+}) {
+  const res = await fetch(
+    `${API_BASE}/api/v1/volunteer/projects/${args.projectId}/application`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        userId: args.userId,
+        positionId: args.positionId,
+        sessionId: args.sessionId,
+      }),
+    }
+  );
+
+  const bodyText = await res.text();
+  if (!res.ok) throw new Error(`HTTP ${res.status} - ${bodyText}`);
+
+  return JSON.parse(bodyText) as any;
+}

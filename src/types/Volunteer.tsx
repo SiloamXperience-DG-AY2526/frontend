@@ -12,6 +12,26 @@ export type FeedbackPayload = {
   };
   submittedAt: string;
 };
+export type VolunteerProjectListPosition = {
+  id: string;
+  role: string;
+  description: string;
+  totalSlots: number;
+  slotsFilled: number;
+  slotsAvailable: number;
+};
+
+export type VolunteerProjectListSession = {
+  id: string;
+  name: string;
+  sessionDate: string;
+  startTime: string | null;
+  endTime: string | null;
+  totalSlots: number;
+  slotsFilled: number;
+  slotsAvailable: number;
+};
+
 export type VolunteerProject = {
   id: string;
   title: string;
@@ -23,12 +43,16 @@ export type VolunteerProject = {
   startTime?: string | null;
   endTime?: string | null;
 
-  availableSpots?: number | null;
-  totalSpots?: number | null;
-
   aboutDesc?: string | null;
-};
 
+  // ✅ PROJECT-LEVEL (THIS SOLVES EVERYTHING)
+  projectTotalSlots: number;
+  projectAvailableSlots: number;
+
+  // Optional details for list view
+  positions?: VolunteerProjectListPosition[];
+  sessions?: VolunteerProjectListSession[];
+};
 export type VolunteerProjectsResponse = {
   status: "success" | "error";
   data: VolunteerProject[];

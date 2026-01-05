@@ -1,17 +1,19 @@
 "use client";
 
-import { useState } from "react";
-
 export default function Input({
   label,
   value,
   onChange,
   type = "text",
+  readOnly = false,
+  disabled = false,
 }: {
   label: string;
   value: string;
-  onChange: (v: string) => void;
+  onChange?: (v: string) => void; // ✅ MUST be optional here
   type?: string;
+  readOnly?: boolean;
+  disabled?: boolean;
 }) {
   return (
     <div>
@@ -22,7 +24,9 @@ export default function Input({
       <input
         type={type}
         value={value}
-        onChange={(e) => onChange(e.target.value)}
+        readOnly={readOnly}
+        disabled={disabled}
+        onChange={(e) => onChange?.(e.target.value)} 
         className="
           w-full
           rounded-md
@@ -35,6 +39,8 @@ export default function Input({
           focus:border-green-800
           focus:ring-1
           focus:ring-green-800
+          disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed
+          read-only:bg-gray-50
         "
       />
     </div>
