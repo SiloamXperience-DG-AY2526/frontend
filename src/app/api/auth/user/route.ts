@@ -9,22 +9,22 @@ export async function GET() {
 
   console.log("Retrieved token:", token);
 
-  if (!token) return NextResponse.json({ user: null }, { status: 200 });
+  if (!token) return NextResponse.json({ user: null, role: null }, { status: 200 });
 
   try {
     const payload = jwtDecode<AuthPayload>(token);
 
     // token expiry check
     if (payload.exp && payload.exp * 1000 < Date.now()) {
-      return NextResponse.json({ userId: null, roles: [] }, { status: 200 });
+      return NextResponse.json({ userId: null, role: null }, { status: 200 });
     }
 
     console.log("Decoded token payload:", payload);
     return NextResponse.json(
-      { userId: payload.userId, roles: payload.roles },
+      { userId: payload.userId, role: payload.role },
       { status: 200 }
     );
   } catch {
-    return NextResponse.json({ userId: null, roles: [] }, { status: 200 });
+    return NextResponse.json({ userId: null, role: null }, { status: 200 });
   }
 }

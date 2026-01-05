@@ -5,12 +5,12 @@ export type LoginInputData = {
 
 export type UserCredentials = {
   userId: string;
-  roles: string[];
+  role: string;
 };
 
 export type AuthPayload = {
   userId: string;
-  roles: { roleName: string }[];
+  role: string;
   exp?: number;
 };
 

@@ -20,11 +20,16 @@ export default function Login() {
     const loginData = { email: email, password: password };
 
     // token handling for various roles
-    const { userId, roles } = await login(loginData);
+    const { userId, role } = await login(loginData);
 
-    console.log("Logged in user:", { userId, roles });
+    if (!userId || !role) { 
+      alert("Login failed. Please try again."); 
+      return; 
+    }
 
-    // redirect based on roles
+    console.log("Logged in user:", { userId, role });
+
+    // redirect based on role
     const ROLE_HOME: Record<string, string> = {
       superAdmin: "/super-admin/home",
       generalManager: "/general-manager/home",
@@ -32,19 +37,9 @@ export default function Login() {
       partner: "/partner/home",
     };
 
-    const ROLE_PRIORITY = [
-      "superAdmin",
-      "generalManager",
-      "financeManager",
-      "partner",
-    ];
+    const home = ROLE_HOME[role] || "/login-error"; 
 
-    const home =
-      ROLE_PRIORITY
-        .map((r) => (roles?.includes(r) ? ROLE_HOME[r] : null))
-        .find(Boolean) ?? "/login-error";
-
-    router.push(home);
+    router.push(home); 
     
   };
 
