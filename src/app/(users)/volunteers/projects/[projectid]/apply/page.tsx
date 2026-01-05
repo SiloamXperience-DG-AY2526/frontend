@@ -121,7 +121,7 @@ export default function VolunteerApplication({
       setToastMsg("We’ll contact you soon with the next steps.");
       setToastOpen(true);
       setTimeout(() => {
-        window.location.href = "/volunteers/projects";
+        window.location.href = `/volunteers/projects/${projectid}`;
       }, 2000);
     } catch (e: any) {
       console.error(e);

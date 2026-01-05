@@ -8,9 +8,29 @@ export type FeedbackPayload = {
   feedback: {
     experience: string;
     improvement: string;
-    comments: string;
+    comments?: string;
   };
-  submittedAt: string;
+  submittedAt?: string;
+};
+
+export type FeedbackSubmitResponse = {
+  status: "success";
+  message: string;
+  data: {
+    feedback: {
+      id: string;
+      projectId: string;
+      overallRating: number;
+      managementRating: number;
+      planningRating: number;
+      resourcesRating: number;
+      enjoyMost: string;
+      improvements: string;
+      otherComments?: string | null;
+      createdAt: string;
+    };
+    linkedSignupId: string;
+  };
 };
 export type VolunteerProjectListPosition = {
   id: string;

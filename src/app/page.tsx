@@ -1,4 +1,5 @@
 import Link from "next/link";
+
 export default function LandingPage() {
   return (
     // original color to be added after discussion

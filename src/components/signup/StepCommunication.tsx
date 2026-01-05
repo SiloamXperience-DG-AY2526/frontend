@@ -1,13 +1,13 @@
 "use client";
 
-import { SignupData } from "@/types/SignUpData";
+import { SignUpData } from "@/types/SignUpData";
 import Button from "@/components/ui/Button";
 import Select from "../ui/Select";
 import { useState } from "react";
 
 interface Props {
-  data: SignupData;
-  setData: (d: SignupData) => void;
+  data: SignUpData;
+  setData: (d: SignUpData) => void;
   back: () => void;
 }
 
@@ -28,7 +28,7 @@ export default function StepCommunication({ data, setData, back }: Props) {
 
     setLoading(true);
 
-    const payload: SignupData = {
+    const payload: SignUpData = {
       ...data,
     };
 
@@ -98,7 +98,7 @@ export default function StepCommunication({ data, setData, back }: Props) {
                 setData({ ...data, joinMailingList: e.target.checked })
               }
             />
-            I'd like to join your mailing list for newsletters and event
+            I&apos;d like to join your mailing list for newsletters and event
             invitations (optional)
           </label>
         </div>

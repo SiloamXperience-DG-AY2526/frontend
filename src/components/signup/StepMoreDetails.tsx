@@ -1,17 +1,17 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { SignupData } from "@/types/SignUpData";
+import { SignUpData } from "@/types/SignUpData";
 import Button from "@/components/ui/Button";
-import { fetchNationalities, fetchLanguages } from "@/lib/country_lang.api";
+import { fetchNationalities, fetchLanguages } from "@/lib/countries";
 import Textarea from "../ui/TextArea";
 import Select from "../ui/Select";
 import Input from "../ui/Input";
 import MultiSelect from "../ui/MultiSelect";
 
 interface Props {
-  data: SignupData;
-  setData: (d: SignupData) => void;
+  data: SignUpData;
+  setData: (d: SignUpData) => void;
   next: () => void;
   back: () => void;
 }

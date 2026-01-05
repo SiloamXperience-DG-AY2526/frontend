@@ -1,16 +1,16 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { SignupData } from "@/types/SignUpData";
+import { SignUpData } from "@/types/SignUpData";
 import Button from "@/components/ui/Button";
 import Input from "../ui/Input";
 import Link from "next/link";
-import { fetchCountryCodes } from "@/lib/country_lang.api";
+import { fetchCountryCodes } from "@/lib/countries";
 import Select from "../ui/Select";
 
 interface Props {
-  data: SignupData;
-  setData: (d: SignupData) => void;
+  data: SignUpData;
+  setData: (d: SignUpData) => void;
   next: () => void;
 }
 
@@ -25,8 +25,8 @@ const salutations = [
 ];
 
 interface Props {
-  data: SignupData;
-  setData: (d: SignupData) => void;
+  data: SignUpData;
+  setData: (d: SignUpData) => void;
   next: () => void;
 }
 

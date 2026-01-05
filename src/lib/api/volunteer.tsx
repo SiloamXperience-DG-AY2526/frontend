@@ -1,4 +1,6 @@
 import {
+    FeedbackPayload,
+    FeedbackSubmitResponse,
   VolunteerProjectDetailResponse,
   VolunteerProjectsResponse,
 } from "../../types/Volunteer";
@@ -61,4 +63,27 @@ export async function submitVolunteerApplication(args: {
   if (!res.ok) throw new Error(`HTTP ${res.status} - ${bodyText}`);
 
   return JSON.parse(bodyText) as any;
+}
+
+export async function submitVolunteerFeedback(args: {
+  userId: string;
+  projectId: string;
+  payload: FeedbackPayload;
+}): Promise<FeedbackSubmitResponse> {
+  const res = await fetch(
+    `${API_BASE}/api/v1/volunteer/projects/${args.projectId}/feedback`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        userId: args.userId,
+        ...args.payload,
+      }),
+    }
+  );
+
+  const bodyText = await res.text();
+  if (!res.ok) throw new Error(`HTTP ${res.status} - ${bodyText}`);
+
+  return JSON.parse(bodyText) as FeedbackSubmitResponse;
 }
