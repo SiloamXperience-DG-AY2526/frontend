@@ -26,7 +26,7 @@ export default function VolunteerApplication({
   const { projectid } = use(params);
   const { positionId } = use(searchParams);
 
-  const USER_ID_TEMP = "ccecd54a-a56c-588a0d197fec"; //temporary (need auth)
+  const USER_ID_TEMP = "ccecd54a-b014-4a4c-a56c-588a0d197fec"; //temporary (need auth)
 
   const [data, setData] = useState<VolunteerProjectDetail | null>(null);
   const [loading, setLoading] = useState(true);
@@ -124,21 +124,18 @@ export default function VolunteerApplication({
         window.location.href = "/volunteers/projects";
       }, 2000);
     } catch (e: any) {
-      console.error("Submit error:", e);
+      console.error(e);
 
       const msg =
         e?.name === "ApiError"
           ? e.message
-          : typeof e === "string"
-          ? e
-          : e?.message || "Failed to submit application";
+          : e?.message ?? "Failed to submit application";
 
       setToastType("error");
       setToastTitle("Submission failed");
+      setSubmitting(false);
       setToastMsg(msg);
       setToastOpen(true);
-    } finally {
-      setSubmitting(false);
     }
   }
 
