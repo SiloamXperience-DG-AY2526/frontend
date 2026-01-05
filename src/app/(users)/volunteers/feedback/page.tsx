@@ -5,7 +5,7 @@ import Sidebar from "@/components/sidebar";
 import StarRating from "@/components/ui/StarRating";
 import Textarea from "@/components/ui/TextArea";
 import Button from "@/components/ui/Button";
-import { FeedbackPayload } from "@/types/VolunteerFeedback";
+import { FeedbackPayload } from "@/types/Volunteer";
 
 export default function FeedbackPage() {
   const [ratings, setRatings] = useState({
