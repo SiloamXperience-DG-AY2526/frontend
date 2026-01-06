@@ -22,7 +22,7 @@ const initialData: SignUpData = {
   // Page 2 - More About You
   nationality: '',
   identificationNumber: '',
-  gender: 'Male',
+  gender: 'male',
   dob: '',
   occupation: '',
   languages: [],

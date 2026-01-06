@@ -1,20 +1,13 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { SignUpData } from '@/types/SignUpData';
+import { SignUpPageProps } from '@/types/SignUpData';
 import Button from '@/components/ui/Button';
 import { fetchNationalities, fetchLanguages } from '@/lib/countries';
 import Textarea from '../ui/Textarea';
 import Select from '../ui/Select';
 import Input from '../ui/Input';
 import MultiSelect from '../ui/MultiSelect';
-
-interface Props {
-  data: SignUpData;
-  setData: (d: SignUpData) => void;
-  next: () => void;
-  back: () => void;
-}
 
 const genderOptions = [
   { label: 'Male', value: 'male' },
@@ -35,7 +28,7 @@ function getCachedMeta(): { countries: string[]; languages: string[] } | null {
   }
 }
 
-export default function MoreAboutYou({ data, setData, next, back }: Props) {
+export default function MoreAboutYou({ data, setData, next, back }: SignUpPageProps) {
   const cachedMeta = getCachedMeta();
 
   const [countries, setCountries] = useState<string[]>(

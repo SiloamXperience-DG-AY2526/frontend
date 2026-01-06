@@ -36,8 +36,9 @@ export default function PersonalDetails({ data, setData, next }: Props) {
   useEffect(() => {
     fetchCountryCodes().then(setCountryCodes);
   }, []);
+
   return (
-    <div>
+    <div className="flex-1">
       <div className="text-start mb-5 mt-3">
         <h1 className="text-3xl font-bold  text-black">Create an Account</h1>
         <p className="text-sm text-gray-500 mt-1">

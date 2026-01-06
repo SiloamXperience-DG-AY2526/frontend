@@ -1,17 +1,13 @@
 'use client';
 
-import { SignUpData } from '@/types/SignUpData';
+import { LastSignUpPageProps, SignUpData } from '@/types/SignUpData';
 import Button from '@/components/ui/Button';
 import Select from '../ui/Select';
 import { useState } from 'react';
 
-interface Props {
-  data: SignUpData;
-  setData: (d: SignUpData) => void;
-  back: () => void;
-}
 
-export default function StepCommunication({ data, setData, back }: Props) {
+
+export default function StepCommunication({ data, setData, back }: LastSignUpPageProps) {
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async () => {

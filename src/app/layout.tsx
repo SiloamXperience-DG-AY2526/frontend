@@ -7,14 +7,13 @@ export const metadata: Metadata = {
   description: 'Welcome to SiloamXperience',
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
-      <body>{children}</body>
+    <html lang="en" className="h-full">
+      <body className="h-full">
+        <div className="min-h-dvh flex flex-col">{children}</div>
+      </body>
     </html>
   );
 }
+
