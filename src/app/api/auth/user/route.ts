@@ -1,13 +1,13 @@
-import { NextResponse } from "next/server";
-import { cookies } from "next/headers";
-import { jwtDecode } from "jwt-decode";
-import { AuthPayload } from "@/types/AuthData";
+import { NextResponse } from 'next/server';
+import { cookies } from 'next/headers';
+import { jwtDecode } from 'jwt-decode';
+import { AuthPayload } from '@/types/AuthData';
 
 export async function GET() {
   const cookieStore = await cookies();
-  const token = cookieStore.get("access_token")?.value;
+  const token = cookieStore.get('access_token')?.value;
 
-  console.log("Retrieved token:", token);
+  console.log('Retrieved token:', token);
 
   if (!token) return NextResponse.json({ user: null, role: null }, { status: 200 });
 
@@ -19,7 +19,7 @@ export async function GET() {
       return NextResponse.json({ userId: null, role: null }, { status: 200 });
     }
 
-    console.log("Decoded token payload:", payload);
+    console.log('Decoded token payload:', payload);
     return NextResponse.json(
       { userId: payload.userId, role: payload.role },
       { status: 200 }

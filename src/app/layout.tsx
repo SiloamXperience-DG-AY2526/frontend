@@ -1,10 +1,10 @@
-import type { Metadata } from "next";
+import type { Metadata } from 'next';
 
-import "./globals.css";
+import './globals.css';
 
 export const metadata: Metadata = {
-  title: "SiloamXperience",
-  description: "Welcome to SiloamXperience",
+  title: 'SiloamXperience',
+  description: 'Welcome to SiloamXperience',
 };
 
 export default function RootLayout({

@@ -1,13 +1,13 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import { SignUpData } from "@/types/SignUpData";
-import Button from "@/components/ui/Button";
-import { fetchNationalities, fetchLanguages } from "@/lib/countries";
-import Textarea from "../ui/TextArea";
-import Select from "../ui/Select";
-import Input from "../ui/Input";
-import MultiSelect from "../ui/MultiSelect";
+import { useEffect, useState } from 'react';
+import { SignUpData } from '@/types/SignUpData';
+import Button from '@/components/ui/Button';
+import { fetchNationalities, fetchLanguages } from '@/lib/countries';
+import Textarea from '../ui/Textarea';
+import Select from '../ui/Select';
+import Input from '../ui/Input';
+import MultiSelect from '../ui/MultiSelect';
 
 interface Props {
   data: SignUpData;
@@ -16,12 +16,17 @@ interface Props {
   back: () => void;
 }
 
+const genderOptions = [
+  { label: 'Male', value: 'male' },
+  { label: 'Female', value: 'female' },
+] as const;
+
 //cache to avoid reloading and flickering
 
-const CACHE_KEY = "more_details_meta_v1";
+const CACHE_KEY = 'more_details_meta_v1';
 
 function getCachedMeta(): { countries: string[]; languages: string[] } | null {
-  if (typeof window === "undefined") return null;
+  if (typeof window === 'undefined') return null;
   try {
     const cached = sessionStorage.getItem(CACHE_KEY);
     return cached ? JSON.parse(cached) : null;
@@ -64,7 +69,7 @@ export default function MoreAboutYou({ data, setData, next, back }: Props) {
     };
 
     load();
-  }, []);
+  }, [cachedMeta]);
   if (loading) {
     return (
       <div className="animate-pulse space-y-8">
@@ -106,14 +111,14 @@ export default function MoreAboutYou({ data, setData, next, back }: Props) {
               Gender :
             </label>
             <div className="flex gap-6">
-              {["Male", "Female"].map((g) => (
-                <label key={g} className="flex items-center gap-2">
+              {genderOptions.map(({ label, value }) => (
+                <label key={value} className="flex items-center gap-2">
                   <input
                     type="radio"
-                    checked={data.gender === g}
-                    onChange={() => setData({ ...data, gender: g as any })}
+                    checked={data.gender === value}
+                    onChange={() => setData({ ...data, gender: value })}
                   />
-                  {g}
+                  {label}
                 </label>
               ))}
             </div>
@@ -151,12 +156,12 @@ export default function MoreAboutYou({ data, setData, next, back }: Props) {
               label="Highest Qualification"
               value={data.qualification}
               options={[
-                "Secondary School",
-                "Diploma",
-                "Bachelor's Degree",
-                "Master's Degree",
-                "Doctorate",
-                "Others",
+                'Secondary School',
+                'Diploma',
+                'Bachelor\'s Degree',
+                'Master\'s Degree',
+                'Doctorate',
+                'Others',
               ]}
               onChange={(v) => setData({ ...data, qualification: v })}
             />

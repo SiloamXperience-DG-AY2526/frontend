@@ -1,35 +1,46 @@
+type DemonymsResponseItem = {
+  demonyms?: {
+    eng?: {
+      m?: string;
+      f?: string;
+    };
+  };
+};
+
+type LanguagesResponseItem = {
+  languages?: Record<string, string>;
+};
+
+type IddResponseItem = {
+  idd?: {
+    root?: string;
+    suffixes?: string[];
+  };
+};
+
 // Fetch nationalities
 export async function fetchNationalities(): Promise<string[]> {
   try {
     const res = await fetch(
-      "https://restcountries.com/v3.1/all?fields=demonyms"
+      'https://restcountries.com/v3.1/all?fields=demonyms'
     );
+    if (!res.ok) return [];
 
-    if (!res.ok) {
-      console.error("Failed to fetch nationalities");
-      return [];
-    }
-
-    const data = await res.json();
-
-    if (!Array.isArray(data)) {
-      console.error("Nationalities API did not return an array", data);
-      return [];
-    }
+    const data: unknown = await res.json();
+    if (!Array.isArray(data)) return [];
 
     const nationalitySet = new Set<string>();
 
-    data.forEach((c: any) => {
-      // Use 'eng' key for English demonyms
-      if (c?.demonyms?.eng) {
-        if (c.demonyms.eng.m) nationalitySet.add(c.demonyms.eng.m);
-        if (c.demonyms.eng.f) nationalitySet.add(c.demonyms.eng.f);
-      }
+    (data as DemonymsResponseItem[]).forEach((c) => {
+      const eng = c.demonyms?.eng;
+      if (!eng) return;
+
+      if (eng.m) nationalitySet.add(eng.m);
+      if (eng.f) nationalitySet.add(eng.f);
     });
 
     return Array.from(nationalitySet).sort();
-  } catch (error) {
-    console.error("Error fetching nationalities:", error);
+  } catch {
     return [];
   }
 }
@@ -38,53 +49,48 @@ export async function fetchNationalities(): Promise<string[]> {
 export async function fetchLanguages(): Promise<string[]> {
   try {
     const res = await fetch(
-      "https://restcountries.com/v3.1/all?fields=languages"
+      'https://restcountries.com/v3.1/all?fields=languages'
     );
+    if (!res.ok) return [];
 
-    if (!res.ok) {
-      console.error("Failed to fetch languages");
-      return [];
-    }
-
-    const data = await res.json();
-
-    if (!Array.isArray(data)) {
-      console.error("Languages API did not return array", data);
-      return [];
-    }
+    const data: unknown = await res.json();
+    if (!Array.isArray(data)) return [];
 
     const langSet = new Set<string>();
 
-    data.forEach((c: any) => {
-      if (c?.languages && typeof c.languages === "object") {
-        Object.values(c.languages).forEach((l) => {
-          if (typeof l === "string") {
-            langSet.add(l);
-          }
-        });
-      }
+    (data as LanguagesResponseItem[]).forEach((c) => {
+      if (!c.languages) return;
+
+      Object.values(c.languages).forEach((l) => {
+        if (typeof l === 'string') langSet.add(l);
+      });
     });
 
     return Array.from(langSet).sort();
-  } catch (error) {
-    console.error("Error fetching languages:", error);
+  } catch {
     return [];
   }
 }
+
 // Fetch country calling codes
 export async function fetchCountryCodes(): Promise<string[]> {
   try {
-    const res = await fetch("https://restcountries.com/v3.1/all?fields=idd");
+    const res = await fetch('https://restcountries.com/v3.1/all?fields=idd');
+    if (!res.ok) return [];
 
-    const data = await res.json();
+    const data: unknown = await res.json();
+    if (!Array.isArray(data)) return [];
+
     const codes = new Set<string>();
 
-    data.forEach((c: any) => {
-      if (c?.idd?.root && Array.isArray(c.idd.suffixes)) {
-        c.idd.suffixes.forEach((s: string) => {
-          codes.add(`${c.idd.root}${s}`);
-        });
-      }
+    (data as IddResponseItem[]).forEach((c) => {
+      const root = c.idd?.root;
+      const suffixes = c.idd?.suffixes;
+      if (!root || !Array.isArray(suffixes)) return;
+
+      suffixes.forEach((s) => {
+        codes.add(`${root}${s}`);
+      });
     });
 
     return Array.from(codes).sort();
