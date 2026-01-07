@@ -89,7 +89,7 @@ export default function FeedbackPage() {
       setRatings({ overall: 0, management: 0, planning: 0, facilities: 0 });
       setFeedback({ experience: "", improvement: "", comments: "" });
       setTimeout(() => {
-        window.location.href = "/volunteers/projectTab";
+        window.location.href = "/volunteers";
       }, 2000);
 
       console.log("Feedback response:", resp);
@@ -125,10 +125,7 @@ export default function FeedbackPage() {
         <div className="mb-8 flex items-start gap-3">
           <div className="w-[5px] h-[39px] bg-[#56E0C2] mt-1" />
           <div>
-            <h1 className="text-3xl font-bold">
-              Volunteer Feedback{" "}
-              Form
-            </h1>
+            <h1 className="text-3xl font-bold">Volunteer Feedback Form</h1>
             <p className="text-sm text-gray-500">
               Track your volunteer activities, donations, and applications
             </p>
@@ -186,9 +183,7 @@ export default function FeedbackPage() {
 
         {/* Your Feedback */}
         <div className="rounded-lg border bg-white p-6">
-          <h2 className="text-xl font-bold mb-1">
-            Your Feedback
-          </h2>
+          <h2 className="text-xl font-bold mb-1">Your Feedback</h2>
           <p className="text-sm text-gray-500 mb-6">
             Help us understand your experience better
           </p>

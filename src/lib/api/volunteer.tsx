@@ -1,6 +1,7 @@
 import {
   FeedbackPayload,
   FeedbackSubmitResponse,
+  ProposeVolunteerProjectPayload,
   VolunteerApplicationDTO,
   VolunteerProjectDetailResponse,
   VolunteerProjectsResponse,
@@ -113,4 +114,18 @@ export async function fetchVolunteerApplications(args: {
 
   const result = await res.json();
   return result.data as VolunteerApplicationDTO[];
+}
+export async function proposeVolunteerProject(
+  payload: ProposeVolunteerProjectPayload
+) {
+  const res = await fetch(`${API_BASE}/api/v1/volunteer/project/proposal`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+
+  const bodyText = await res.text();
+  if (!res.ok) throw new Error(`HTTP ${res.status} - ${bodyText}`);
+
+  return JSON.parse(bodyText);
 }

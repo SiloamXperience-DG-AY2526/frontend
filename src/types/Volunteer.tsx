@@ -167,3 +167,41 @@ export type VolunteerApplicationDTO = {
     role: string;
   };
 };
+
+export type ProjectFrequency = "once" | "daily" | "weekly" | "monthly" | "yearly";
+
+export type ProposeVolunteerProjectPayload = {
+  userId: string;
+
+  title: string;
+  initiatorName?: string;
+  location: string;
+
+  // project plan fields
+  aboutDesc: string;        
+  beneficiaries: string;    
+  proposedPlan?: string;    
+
+
+  objectives: string;
+
+  startDate: string; 
+  endDate: string;   
+  startTime: string; 
+  endTime: string;   
+
+  frequency: ProjectFrequency;
+  interval?: number | null;
+  dayOfWeek?: string | null;
+
+  positions: Array<{
+    role: string;
+    description: string;
+    skills: string[];
+  }>;
+
+
+  attachments?: string;
+  image?: string;
+  organisingTeam?: string;
+};
