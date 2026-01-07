@@ -125,8 +125,8 @@ export default function FeedbackPage() {
         <div className="mb-8 flex items-start gap-3">
           <div className="w-[5px] h-[39px] bg-[#56E0C2] mt-1" />
           <div>
-            <h1 className="text-2xl font-bold">
-              Volunteer <span className="bg-yellow-300 px-1">Feedback</span>{" "}
+            <h1 className="text-3xl font-bold">
+              Volunteer Feedback{" "}
               Form
             </h1>
             <p className="text-sm text-gray-500">
@@ -187,7 +187,7 @@ export default function FeedbackPage() {
         {/* Your Feedback */}
         <div className="rounded-lg border bg-white p-6">
           <h2 className="text-xl font-bold mb-1">
-            Your <span className="bg-yellow-300 px-1">Feedback</span>
+            Your Feedback
           </h2>
           <p className="text-sm text-gray-500 mb-6">
             Help us understand your experience better

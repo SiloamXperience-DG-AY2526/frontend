@@ -65,11 +65,9 @@ export type VolunteerProject = {
 
   aboutDesc?: string | null;
 
-  // ✅ PROJECT-LEVEL (THIS SOLVES EVERYTHING)
   projectTotalSlots: number;
   projectAvailableSlots: number;
 
-  // Optional details for list view
   positions?: VolunteerProjectListPosition[];
   sessions?: VolunteerProjectListSession[];
 };
@@ -97,7 +95,7 @@ export type VolunteerPosition = {
 export type VolunteerSession = {
   id: string;
   name: string;
-  sessionDate: string; // ISO
+  sessionDate: string;
   startTime: string | null;
   endTime: string | null;
 };
@@ -138,4 +136,34 @@ export type VolunteerProjectDetail = {
 export type VolunteerProjectDetailResponse = {
   status: "success";
   data: VolunteerProjectDetail;
+};
+export type VolunteerProjectPositionStatus =
+  | "reviewing"
+  | "approved"
+  | "rejected"
+  | "active"
+  | "inactive";
+
+export type OperationStatus = "ongoing" | "paused" | "cancelled" | "completed";
+
+export type VolunteerApplicationDTO = {
+  applicationId: string;
+  status: VolunteerProjectPositionStatus;
+  appliedAt: string;
+  feedbackGiven: boolean;
+  project: {
+    id: string;
+    title: string;
+    description: string;
+    location: string;
+    startDate: string;
+    startTime: string;
+    endTime: string;
+    endDate: string;
+    operationStatus: OperationStatus;
+  };
+  position: {
+    id: string;
+    role: string;
+  };
 };

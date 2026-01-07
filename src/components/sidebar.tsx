@@ -1,20 +1,24 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
+import Link from "next/link";
 import {
   HomeIcon,
   HeartIcon,
   UserIcon,
   HandRaisedIcon,
   ClipboardDocumentListIcon,
-} from '@heroicons/react/24/outline';
-
+} from "@heroicons/react/24/outline";
+const USER_ID_TEMP = "ccecd54a-b014-4a4c-a56c-588a0d197fec";
 const menu = [
-  { name: 'Home', icon: HomeIcon, href: '/' },
-  { name: 'Volunteer', icon: HandRaisedIcon, href: '/volunteer' },
-  { name: 'Donate', icon: HeartIcon, href: '/donate' },
-  { name: 'My Contributions', icon: ClipboardDocumentListIcon, href: '/contributions' },
-  { name: 'My Profile', icon: UserIcon, href: '/profile' },
+  { name: "Home", icon: HomeIcon, href: "/" },
+  { name: "Volunteer", icon: HandRaisedIcon, href: "/volunteer" },
+  { name: "Donate", icon: HeartIcon, href: "/donate" },
+  {
+    name: "My Contributions",
+    icon: ClipboardDocumentListIcon,
+    href: `/contributions/${USER_ID_TEMP}`,
+  },
+  { name: "My Profile", icon: UserIcon, href: "/profile" },
 ];
 
 export default function Sidebar() {

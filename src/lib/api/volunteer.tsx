@@ -1,6 +1,7 @@
 import {
-    FeedbackPayload,
-    FeedbackSubmitResponse,
+  FeedbackPayload,
+  FeedbackSubmitResponse,
+  VolunteerApplicationDTO,
   VolunteerProjectDetailResponse,
   VolunteerProjectsResponse,
 } from "../../types/Volunteer";
@@ -86,4 +87,30 @@ export async function submitVolunteerFeedback(args: {
   if (!res.ok) throw new Error(`HTTP ${res.status} - ${bodyText}`);
 
   return JSON.parse(bodyText) as FeedbackSubmitResponse;
+}
+
+export async function fetchVolunteerApplications(args: {
+  userId: string;
+  status?: string;
+}): Promise<VolunteerApplicationDTO[]> {
+  const query = args.status ? `?status=${args.status}` : "";
+
+  const res = await fetch(
+    `${API_BASE}/api/v1/volunteer/${args.userId}/volunteer-applications${query}`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      cache: "no-store",
+    }
+  );
+
+  if (!res.ok) {
+    const bodyText = await res.text();
+    throw new Error(`HTTP ${res.status} - ${bodyText}`);
+  }
+
+  const result = await res.json();
+  return result.data as VolunteerApplicationDTO[];
 }
