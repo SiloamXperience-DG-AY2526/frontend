@@ -20,6 +20,7 @@ export default function FeedbackPage() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
+        // basic frontend validation
         if (!feedbackType) {
             alert("Please select a feedback type.");
             return;
