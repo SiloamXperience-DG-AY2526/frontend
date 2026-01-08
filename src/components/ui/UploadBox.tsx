@@ -112,9 +112,9 @@ export default function UploadBox({
             <path
               d="M31.75 21.75V28.4167C31.75 29.3007 31.3988 30.1486 30.7737 30.7737C30.1486 31.3988 29.3007 31.75 28.4167 31.75H5.08333C4.19928 31.75 3.35143 31.3988 2.72631 30.7737C2.10119 30.1486 1.75 29.3007 1.75 28.4167V21.75M25.0833 10.0833L16.75 1.75M16.75 1.75L8.41667 10.0833M16.75 1.75V21.75"
               stroke="#1E1E1E"
-              stroke-width="3.5"
-              stroke-linecap="round"
-              stroke-linejoin="round"
+              strokeWidth={3.5}
+              strokeLinecap="round"
+              strokeLinejoin="round"
             />
           </svg>
         </div>

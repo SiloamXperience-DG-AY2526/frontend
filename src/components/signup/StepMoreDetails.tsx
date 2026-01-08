@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { SignUpData } from "@/types/SignUpData";
+import { SignUpFormProps } from "@/types/SignUpData";
 import Button from "@/components/ui/Button";
 import { fetchNationalities, fetchLanguages } from "@/lib/countries";
 import Textarea from "../ui/TextArea";
@@ -9,12 +9,10 @@ import Select from "../ui/Select";
 import Input from "../ui/Input";
 import MultiSelect from "../ui/MultiSelect";
 
-interface Props {
-  data: SignUpData;
-  setData: (d: SignUpData) => void;
-  next: () => void;
-  back: () => void;
-}
+const genderOptions = [
+  { label: "Male", value: "male" },
+  { label: "Female", value: "female" },
+] as const;
 
 //cache to avoid reloading and flickering
 
@@ -30,7 +28,12 @@ function getCachedMeta(): { countries: string[]; languages: string[] } | null {
   }
 }
 
-export default function MoreAboutYou({ data, setData, next, back }: Props) {
+export default function MoreAboutYou({
+  data,
+  setData,
+  next,
+  back,
+}: SignUpFormProps) {
   const cachedMeta = getCachedMeta();
 
   const [countries, setCountries] = useState<string[]>(
@@ -64,7 +67,7 @@ export default function MoreAboutYou({ data, setData, next, back }: Props) {
     };
 
     load();
-  }, []);
+  }, [cachedMeta]);
   if (loading) {
     return (
       <div className="animate-pulse space-y-8">
@@ -106,14 +109,14 @@ export default function MoreAboutYou({ data, setData, next, back }: Props) {
               Gender :
             </label>
             <div className="flex gap-6">
-              {["Male", "Female"].map((g) => (
-                <label key={g} className="flex items-center gap-2">
+              {genderOptions.map(({ label, value }) => (
+                <label key={value} className="flex items-center gap-2">
                   <input
                     type="radio"
-                    checked={data.gender === g}
-                    onChange={() => setData({ ...data, gender: g as any })}
+                    checked={data.gender === value}
+                    onChange={() => setData({ ...data, gender: value })}
                   />
-                  {g}
+                  {label}
                 </label>
               ))}
             </div>

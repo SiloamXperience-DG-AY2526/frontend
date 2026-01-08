@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { useState } from "react";
 import Sidebar from "@/components/sidebar";
@@ -26,9 +26,9 @@ export default function FeedbackPage() {
   });
 
   const [feedback, setFeedback] = useState({
-    experience: "",
-    improvement: "",
-    comments: "",
+    experience: '',
+    improvement: '',
+    comments: '',
   });
 
   const [loading, setLoading] = useState(false);
@@ -46,7 +46,7 @@ export default function FeedbackPage() {
       !ratings.planning ||
       !ratings.facilities
     ) {
-      alert("Please rate all categories before submitting.");
+      alert('Please rate all categories before submitting.');
       return;
     }
 
@@ -212,7 +212,7 @@ export default function FeedbackPage() {
         {/* Submit */}
         <div className="mt-6 flex justify-end">
           <Button
-            label={loading ? "Submitting..." : "SUBMIT"}
+            label={loading ? 'Submitting...' : 'SUBMIT'}
             onClick={handleSubmit}
             disabled={loading}
           />

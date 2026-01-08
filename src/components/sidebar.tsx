@@ -11,7 +11,7 @@ import {
 const USER_ID_TEMP = "ccecd54a-b014-4a4c-a56c-588a0d197fec";
 const menu = [
   { name: "Home", icon: HomeIcon, href: "/" },
-  { name: "Volunteer", icon: HandRaisedIcon, href: "/volunteer" },
+  { name: "Volunteer", icon: HandRaisedIcon, href: "/volunteers" },
   { name: "Donate", icon: HeartIcon, href: "/donate" },
   {
     name: "My Contributions",

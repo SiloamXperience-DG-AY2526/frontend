@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { useState } from "react";
+import { useState } from 'react';
 
 interface Props {
   label: string;
@@ -15,9 +15,9 @@ export default function MultiSelect({
   options,
   value,
   onChange,
-  placeholder = "Select All Applicable",
+  placeholder = 'Select All Applicable',
 }: Props) {
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState('');
   const [open, setOpen] = useState(false);
 
   const filtered = options.filter(
@@ -27,7 +27,7 @@ export default function MultiSelect({
 
   const add = (opt: string) => {
     onChange([...value, opt]);
-    setQuery("");
+    setQuery('');
     setOpen(false);
   };
 

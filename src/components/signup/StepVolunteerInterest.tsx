@@ -1,15 +1,9 @@
-import { SignUpData } from "@/types/SignUpData";
+import { SignUpFormProps } from "@/types/SignUpData";
 import Button from "@/components/ui/Button";
 import Input from "../ui/Input";
 import MultiSelect from "../ui/MultiSelect";
 import Textarea from "../ui/TextArea";
 
-interface Props {
-  data: SignUpData;
-  setData: (d: SignUpData) => void;
-  back: () => void;
-  next: () => void;
-}
 const VOLUNTEER_INTERESTS = [
   "Organizing fundraising events",
   "Planning trips for your organization/group",
@@ -29,7 +23,7 @@ export default function VolunteerInterest({
   setData,
   next,
   back,
-}: Props) {
+}: SignUpFormProps) {
   const showOther = data.interest.includes("Other");
 
   return (
