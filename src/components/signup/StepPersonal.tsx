@@ -1,32 +1,32 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import { SignupData } from "@/types/SignUpData";
-import Button from "@/components/ui/Button";
-import Input from "../ui/Input";
-import Link from "next/link";
-import { fetchCountryCodes } from "@/lib/countries";
-import Select from "../ui/Select";
+import { useEffect, useState } from 'react';
+import { SignUpData } from '@/types/SignUpData';
+import Button from '@/components/ui/Button';
+import Input from '../ui/Input';
+import Link from 'next/link';
+import { fetchCountryCodes } from '@/lib/countries';
+import Select from '../ui/Select';
 
 interface Props {
-  data: SignupData;
-  setData: (d: SignupData) => void;
+  data: SignUpData;
+  setData: (d: SignUpData) => void;
   next: () => void;
 }
 
 const salutations = [
-  "Mr.",
-  "Ms.",
-  "Mrs.",
-  "Mx.",
-  "Dr.",
-  "Rev.",
-  "Prefer not to say",
+  'Mr.',
+  'Ms.',
+  'Mrs.',
+  'Mx.',
+  'Dr.',
+  'Rev.',
+  'Prefer not to say',
 ];
 
 interface Props {
-  data: SignupData;
-  setData: (d: SignupData) => void;
+  data: SignUpData;
+  setData: (d: SignUpData) => void;
   next: () => void;
 }
 
@@ -36,18 +36,19 @@ export default function PersonalDetails({ data, setData, next }: Props) {
   useEffect(() => {
     fetchCountryCodes().then(setCountryCodes);
   }, []);
+
   return (
-    <div>
+    <div className="flex-1">
       <div className="text-start mb-5 mt-3">
         <h1 className="text-3xl font-bold  text-black">Create an Account</h1>
         <p className="text-sm text-gray-500 mt-1">
-          Already have an account?{" "}
+          Already have an account?{' '}
           <Link
             href="/login"
             className="text-blue-500 font-bold hover:underline"
           >
             Log In
-          </Link>{" "}
+          </Link>{' '}
         </p>
       </div>
       <div className="space-y-4">

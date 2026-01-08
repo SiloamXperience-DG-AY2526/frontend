@@ -1,20 +1,22 @@
-import type { Metadata } from "next";
+import type { Metadata } from 'next';
 
-import "./globals.css";
+import './globals.css';
+import { AuthProvider } from '@/contexts/AuthContext';
 
 export const metadata: Metadata = {
-  title: "SiloamXperience",
-  description: "Welcome to SiloamXperience",
+  title: 'SiloamXperience',
+  description: 'Welcome to SiloamXperience',
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
-      <body>{children}</body>
+    <html lang="en" className="h-full">
+      <body className="h-full">
+        <AuthProvider>
+          <div className="min-h-dvh flex flex-col">{children}</div>
+        </AuthProvider>
+      </body>
     </html>
   );
 }
+

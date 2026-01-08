@@ -1,16 +1,52 @@
+// eslint.config.mjs
 import { defineConfig, globalIgnores } from "eslint/config";
+import js from "@eslint/js";
+import tseslint from "typescript-eslint";
 import nextVitals from "eslint-config-next/core-web-vitals";
 
-const eslintConfig = defineConfig([
+export default defineConfig([
+  // Next.js rules (core web vitals)
   ...nextVitals,
-  // Override default ignores of eslint-config-next.
+
+  // JS recommended
+  js.configs.recommended,
+
+  // TS recommended (brings parser + plugin configs)
+  ...tseslint.configs.recommended,
+
+  // Custom rules
+  {
+    files: ["**/*.{js,jsx,ts,tsx}"],
+    rules: {
+      indent: ["error", 2],
+      "linebreak-style": ["error", "unix"],
+      quotes: ["error", "single"],
+      semi: ["error", "always"],
+
+      "@typescript-eslint/no-unused-vars": [
+        "error",
+        { argsIgnorePattern: "^_" },
+      ],
+      "no-unused-vars": ["error", { argsIgnorePattern: "^_" }],
+    },
+  },
+
+  // disable base no-unused-vars in TS files (avoids duplicate reports)
+  {
+    files: ["**/*.{ts,tsx}"],
+    rules: {
+      "no-unused-vars": "off",
+    },
+  },
+
+  // ignores
   globalIgnores([
-    // Default ignores of eslint-config-next:
     ".next/**",
     "out/**",
     "build/**",
+    "dist/**",
+    "node_modules/**",
+    "coverage/**",
     "next-env.d.ts",
   ]),
 ]);
-
-export default eslintConfig;

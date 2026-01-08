@@ -1,27 +1,21 @@
-import { SignUpData } from "@/types/SignUpData";
-import Button from "@/components/ui/Button";
-import Input from "../ui/Input";
-import MultiSelect from "../ui/MultiSelect";
-import Textarea from "../ui/TextArea";
+import { SignUpFormProps } from '@/types/SignUpData';
+import Button from '@/components/ui/Button';
+import Input from '../ui/Input';
+import MultiSelect from '../ui/MultiSelect';
+import Textarea from '../ui/Textarea';
 
-interface Props {
-  data: SignUpData;
-  setData: (d: SignUpData) => void;
-  back: () => void;
-  next: () => void;
-}
 const VOLUNTEER_INTERESTS = [
-  "Organizing fundraising events",
-  "Planning trips for your organization/group",
-  "Short-term mission trips (up to 14 days)",
-  "Long-term commitments (6 months or more)",
-  "Behind-the-scenes administration",
-  "Marketing & social media magic",
-  "Teaching & mentoring",
-  "Training & program development",
-  "Agriculture projects",
-  "Building & facilities work",
-  "Other",
+  'Organizing fundraising events',
+  'Planning trips for your organization/group',
+  'Short-term mission trips (up to 14 days)',
+  'Long-term commitments (6 months or more)',
+  'Behind-the-scenes administration',
+  'Marketing & social media magic',
+  'Teaching & mentoring',
+  'Training & program development',
+  'Agriculture projects',
+  'Building & facilities work',
+  'Other',
 ];
 
 export default function VolunteerInterest({
@@ -29,8 +23,8 @@ export default function VolunteerInterest({
   setData,
   next,
   back,
-}: Props) {
-  const showOther = data.interest.includes("Other");
+}: SignUpFormProps) {
+  const showOther = data.interest.includes('Other');
 
   return (
     <div>
@@ -51,7 +45,7 @@ export default function VolunteerInterest({
         {showOther && (
           <Input
             label="Other (please specify)"
-            value={data.otherInterest || ""}
+            value={data.otherInterest || ''}
             onChange={(v) => setData({ ...data, otherInterest: v })}
           />
         )}
@@ -64,20 +58,20 @@ export default function VolunteerInterest({
 
           <Input
             label="Full Name (as per passport)"
-            value={data.passportName || ""}
+            value={data.passportName || ''}
             onChange={(v) => setData({ ...data, passportName: v })}
           />
           <div className="grid grid-cols-2 gap-3">
             <Input
               label="Passport Number"
-              value={data.passportNumber || ""}
+              value={data.passportNumber || ''}
               onChange={(v) => setData({ ...data, passportNumber: v })}
             />
 
             <Input
               label="Passport Expiry Date"
               type="date"
-              value={data.passportExpiry || ""}
+              value={data.passportExpiry || ''}
               onChange={(v) => setData({ ...data, passportExpiry: v })}
             />
           </div>
@@ -86,7 +80,7 @@ export default function VolunteerInterest({
         {/* Health notes */}
         <Textarea
           label="Do you have any health conditions we should know about?"
-          value={data.healthNotes || ""}
+          value={data.healthNotes || ''}
           onChange={(v) => setData({ ...data, healthNotes: v })}
         />
       </div>
