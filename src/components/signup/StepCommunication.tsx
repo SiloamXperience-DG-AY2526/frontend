@@ -1,28 +1,24 @@
-"use client";
+'use client';
 
-import { SignUpData } from "@/types/SignUpData";
-import Button from "@/components/ui/Button";
-import Select from "../ui/Select";
-import { useState } from "react";
+import { LastSignUpPageProps, SignUpData } from '@/types/SignUpData';
+import Button from '@/components/ui/Button';
+import Select from '../ui/Select';
+import { useState } from 'react';
 
-interface Props {
-  data: SignUpData;
-  setData: (d: SignUpData) => void;
-  back: () => void;
-}
 
-export default function StepCommunication({ data, setData, back }: Props) {
+
+export default function StepCommunication({ data, setData, back }: LastSignUpPageProps) {
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async () => {
     // validation (page-specific)
     if (!data.agreeUpdates) {
-      alert("You must agree to receive updates to continue.");
+      alert('You must agree to receive updates to continue.');
       return;
     }
 
     if (!data.preferredContactMethod) {
-      alert("Please select a preferred contact method.");
+      alert('Please select a preferred contact method.');
       return;
     }
 
@@ -34,14 +30,14 @@ export default function StepCommunication({ data, setData, back }: Props) {
 
     try {
       // frontend test
-      console.log("Signup data:", payload);
+      console.log('Signup data:', payload);
 
       await new Promise((resolve) => setTimeout(resolve, 1500));
 
-      alert("Signup completed successfully!");
+      alert('Signup completed successfully!');
     } catch (error) {
       console.error(error);
-      alert("There was an error submitting the form.");
+      alert('There was an error submitting the form.');
     } finally {
       setLoading(false);
     }
@@ -59,22 +55,22 @@ export default function StepCommunication({ data, setData, back }: Props) {
       <div className="space-y-6">
         <Select
           label="How did you hear about us?"
-          value={data.foundUsThrough || ""}
+          value={data.foundUsThrough || ''}
           options={[
-            "Friend",
-            "Social Media",
-            "Church",
-            "Website",
-            "Event",
-            "Other",
+            'Friend',
+            'Social Media',
+            'Church',
+            'Website',
+            'Event',
+            'Other',
           ]}
           onChange={(v) => setData({ ...data, foundUsThrough: v })}
         />
 
         <Select
           label="What's the best way to stay in touch?"
-          value={data.preferredContactMethod || ""}
-          options={["Email", "WhatsApp", "Telegram", "Messenger", "Phone Call"]}
+          value={data.preferredContactMethod || ''}
+          options={['Email', 'WhatsApp', 'Telegram', 'Messenger', 'Phone Call']}
           onChange={(v) => setData({ ...data, preferredContactMethod: v })}
         />
 
@@ -107,7 +103,7 @@ export default function StepCommunication({ data, setData, back }: Props) {
       <div className="mt-8 flex justify-between">
         <Button label="Back" onClick={back} />
         <Button
-          label={loading ? "Submitting..." : "SUBMIT →"}
+          label={loading ? 'Submitting...' : 'SUBMIT →'}
           onClick={handleSubmit}
           disabled={loading}
         />

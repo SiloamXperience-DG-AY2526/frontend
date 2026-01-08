@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import Sidebar from "@/components/Sidebar";
-import StarRating from "@/components/ui/StarRating";
-import Textarea from "@/components/ui/TextArea";
-import Button from "@/components/ui/Button";
-import { FeedbackPayload } from "@/types/VolunteerFeedback";
+import { useState } from 'react';
+import Sidebar from '@/components/Sidebar';
+import StarRating from '@/components/ui/StarRating';
+import Textarea from '@/components/ui/Textarea';
+import Button from '@/components/ui/Button';
+import { FeedbackPayload } from '@/types/VolunteerFeedback';
 
 export default function FeedbackPage() {
   const [ratings, setRatings] = useState({
@@ -16,9 +16,9 @@ export default function FeedbackPage() {
   });
 
   const [feedback, setFeedback] = useState({
-    experience: "",
-    improvement: "",
-    comments: "",
+    experience: '',
+    improvement: '',
+    comments: '',
   });
   
   const [loading, setLoading] = useState(false);
@@ -31,7 +31,7 @@ export default function FeedbackPage() {
       !ratings.planning ||
       !ratings.facilities
     ) {
-      alert("Please rate all categories before submitting.");
+      alert('Please rate all categories before submitting.');
       return;
     }
 
@@ -54,11 +54,11 @@ export default function FeedbackPage() {
 
     try {
       // test call
-      console.log("Submitting feedback payload:", payload);
+      console.log('Submitting feedback payload:', payload);
 
       await new Promise((resolve) => setTimeout(resolve, 1200));
 
-      alert("Feedback submitted successfully!");
+      alert('Feedback submitted successfully!');
 
       // reset form
       setRatings({
@@ -69,13 +69,13 @@ export default function FeedbackPage() {
       });
 
       setFeedback({
-        experience: "",
-        improvement: "",
-        comments: "",
+        experience: '',
+        improvement: '',
+        comments: '',
       });
     } catch (error) {
       console.error(error);
-      alert("Something went wrong. Please try again.");
+      alert('Something went wrong. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -91,7 +91,7 @@ export default function FeedbackPage() {
           <div className="w-[5px] h-[39px] bg-[#56E0C2] mt-1" />
           <div>
             <h1 className="text-2xl font-bold">
-              Volunteer <span className="bg-yellow-300 px-1">Feedback</span>{" "}
+              Volunteer <span className="bg-yellow-300 px-1">Feedback</span>{' '}
               Form
             </h1>
             <p className="text-sm text-gray-500">
@@ -182,7 +182,7 @@ export default function FeedbackPage() {
         {/* Submit */}
         <div className="mt-6 flex justify-end">
           <Button
-            label={loading ? "Submitting..." : "SUBMIT"}
+            label={loading ? 'Submitting...' : 'SUBMIT'}
             onClick={handleSubmit}
             disabled={loading}
           />

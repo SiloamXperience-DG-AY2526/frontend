@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { StarIcon } from "@heroicons/react/24/solid";
-import { useState } from "react";
+import { StarIcon } from '@heroicons/react/24/solid';
+import { useState } from 'react';
 
 interface StarRatingProps {
   value?: number;
@@ -17,7 +17,7 @@ export default function StarRating({ value = 0, onChange }: StarRatingProps) {
         <StarIcon
           key={star}
           className={`h-5 w-5 cursor-pointer transition
-            ${(hover ?? value) >= star ? "text-gray-700" : "text-gray-300"}
+            ${(hover ?? value) >= star ? 'text-gray-700' : 'text-gray-300'}
           `}
           onClick={() => onChange?.(star)}
           onMouseEnter={() => setHover(star)}
