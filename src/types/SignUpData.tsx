@@ -1,19 +1,18 @@
 // props
-export type SignUpPageProps = {
+export type SignUpFormProps = {
   data: SignUpData;
   setData: (d: SignUpData) => void;
   back: () => void;
   next: () => void;
 }
 
-export type LastSignUpPageProps = {
+export type LastSignUpFormProps = {
   data: SignUpData;
   setData: (d: SignUpData) => void;
   back: () => void;
 }
 
 // data
-
 export type SignUpData = {
   //page 1 - Personal Details
   salutation: string;

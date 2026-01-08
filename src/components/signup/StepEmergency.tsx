@@ -1,13 +1,13 @@
 'use client';
 
-import { SignUpPageProps } from '@/types/SignUpData';
+import { SignUpFormProps } from '@/types/SignUpData';
 import Button from '@/components/ui/Button';
 import Input from '../ui/Input';
 import Select from '../ui/Select';
 
 // const SKILLS = ['Teaching', 'Administration', 'Marketing', 'Medical', 'Other'];
 
-export default function StepEmergency({ data, setData, back, next }: SignUpPageProps) {
+export default function StepEmergency({ data, setData, back, next }: SignUpFormProps) {
 //   const showOtherSkill = data.skills === "Other";
 
   return (

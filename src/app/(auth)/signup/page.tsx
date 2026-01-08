@@ -1,6 +1,6 @@
 import SignupForm from '@/components/signup/SignupForm';
 
-export default function SignUp() {
+export default function SignUpPage() {
   return (
     <div className="h-dvh overflow-hidden flex flex-col md:flex-row">
       {/* left */}

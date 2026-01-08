@@ -1,4 +1,4 @@
-import { SignUpPageProps } from '@/types/SignUpData';
+import { SignUpFormProps } from '@/types/SignUpData';
 import Button from '@/components/ui/Button';
 import Input from '../ui/Input';
 import MultiSelect from '../ui/MultiSelect';
@@ -23,7 +23,7 @@ export default function VolunteerInterest({
   setData,
   next,
   back,
-}: SignUpPageProps) {
+}: SignUpFormProps) {
   const showOther = data.interest.includes('Other');
 
   return (

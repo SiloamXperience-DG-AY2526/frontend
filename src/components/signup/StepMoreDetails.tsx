@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { SignUpPageProps } from '@/types/SignUpData';
+import { SignUpFormProps } from '@/types/SignUpData';
 import Button from '@/components/ui/Button';
 import { fetchNationalities, fetchLanguages } from '@/lib/countries';
 import Textarea from '../ui/Textarea';
@@ -28,7 +28,7 @@ function getCachedMeta(): { countries: string[]; languages: string[] } | null {
   }
 }
 
-export default function MoreAboutYou({ data, setData, next, back }: SignUpPageProps) {
+export default function MoreAboutYou({ data, setData, next, back }: SignUpFormProps) {
   const cachedMeta = getCachedMeta();
 
   const [countries, setCountries] = useState<string[]>(
