@@ -1,2 +1,56 @@
 'use client';
 
+import { getAuthUser, login } from '@/lib/api/auth';
+import { AuthUser, AuthPayload, AuthContextValue } from '@/types/AuthData';
+import { createContext, useCallback, useContext, useMemo, useState } from 'react';
+
+const AuthContext = createContext<AuthContextValue | null>(null);
+
+// auth hook to use in pages
+export function useAuth() {
+  const authCtx = useContext(AuthContext);
+
+  if (!authCtx) throw new Error('useAuth must be used within <AuthProvider />');
+
+  return authCtx;
+};
+
+// auth provider
+export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const [user, setUser] = useState<AuthUser | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const authLogin = useCallback(async (payload: AuthPayload): Promise<AuthUser> => { 
+    const authUser = await login(payload);
+
+    setUser(authUser);
+
+    return authUser;
+  }, []);
+
+  const authLogout = useCallback( async () => {
+    // TODO:
+    // await apiLogout();
+    setUser(null);
+  }, []);
+
+  const authRefresh = useCallback(async () => {
+
+    setIsLoading(true);
+
+    const authUser = await getAuthUser();
+    setUser(authUser);
+
+    setIsLoading(false);
+  }, []);
+
+  const value = useMemo(
+    () => ({ user, isLoading, authLogin, authLogout, authRefresh }),
+    [user, isLoading, authLogin, authLogout, authRefresh]
+  );
+
+  return <AuthContext.Provider value={value}>{ children }</AuthContext.Provider>;
+} 
+
+
+

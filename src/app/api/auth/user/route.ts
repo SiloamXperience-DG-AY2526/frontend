@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { jwtDecode } from 'jwt-decode';
-import { AuthPayload } from '@/types/AuthData';
+import { JwtPayload } from '@/types/AuthData';
 
 export async function GET() {
   const cookieStore = await cookies();
@@ -12,7 +12,7 @@ export async function GET() {
   if (!token) return NextResponse.json({ user: null, role: null }, { status: 200 });
 
   try {
-    const payload = jwtDecode<AuthPayload>(token);
+    const payload = jwtDecode<JwtPayload>(token);
 
     // token expiry check
     if (payload.exp && payload.exp * 1000 < Date.now()) {

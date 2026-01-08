@@ -1,0 +1,27 @@
+export type UserProfile = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  dob: string;
+  countryCode: string;
+  contactNumber: string;
+  emergencyCountryCode: string;
+  emergencyContactNumber: string;
+  identificationNumber: string;
+  nationality: string;
+  occupation: string;
+  gender: string;
+  residentialAddress: string;
+  otherInterests: string;
+  otherReferrers: string;
+  otherContactModes: string;
+  hasVolunteerExperience: string;
+  volunteerAvailability: string;
+  isActive: string;
+  consentUpdatesCommunications: string;
+  subscribeNewsletterEvents: string;
+  skills: string[];
+  languages: string[];
+  contactModes: string[];
+  interests: string[];
+};

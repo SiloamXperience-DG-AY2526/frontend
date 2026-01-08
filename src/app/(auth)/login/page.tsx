@@ -5,8 +5,8 @@ import Image from 'next/image';
 import Input from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
 import Link from 'next/link';
-import { login } from '@/lib/api/auth';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -14,32 +14,37 @@ export default function Login() {
   const [remember, setRemember] = useState(false);
 
   const router = useRouter();
+  const { authLogin } = useAuth();
 
   const handleLogin = async () => {
-    // console.log({ email, password, remember });
-    const loginData = { email: email, password: password };
-
-    // token handling for various roles
-    const { userId, role } = await login(loginData);
-
-    if (!userId || !role) { 
-      alert('Login failed. Please try again.'); 
-      return; 
-    }
-
-    console.log('Logged in user:', { userId, role });
-
-    // redirect based on role
-    const ROLE_HOME: Record<string, string> = {
-      superAdmin: '/super-admin/home',
-      generalManager: '/general-manager/home',
-      financeManager: '/finance-manager/home',
-      partner: '/partner/home',
+    
+    const loginData = { 
+      email: email, 
+      password: password 
     };
 
-    const home = ROLE_HOME[role] || '/login-error'; 
+    try {
+      const authUser = await authLogin(loginData);
 
-    router.push(home); 
+      const role = authUser.role;
+
+      // redirect based on role
+      const ROLE_HOME: Record<string, string> = {
+        superAdmin: '/super-admin/home',
+        generalManager: '/general-manager/home',
+        financeManager: '/finance-manager/home',
+        partner: '/partner/home',
+      };
+
+      const home = ROLE_HOME[role] || '/login-error'; 
+
+      router.push(home); 
+
+    } catch (e: unknown) {
+      alert(`Login failed. Please try again. \n${e}`);
+      return;
+    }
+
     
   };
 

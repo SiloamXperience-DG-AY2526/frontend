@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 
 import './globals.css';
+import { AuthProvider } from '@/contexts/AuthContext';
 
 export const metadata: Metadata = {
   title: 'SiloamXperience',
@@ -11,7 +12,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className="h-full">
       <body className="h-full">
-        <div className="min-h-dvh flex flex-col">{children}</div>
+        <AuthProvider>
+          <div className="min-h-dvh flex flex-col">{children}</div>
+        </AuthProvider>
       </body>
     </html>
   );

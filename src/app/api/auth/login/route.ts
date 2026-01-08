@@ -14,6 +14,8 @@ export async function POST(req: Request) {
 
   const data = await res.json();
 
+  console.log(data);
+
   if (!res.ok) return NextResponse.json(data, { status: res.status });
 
   console.log('Login successful, setting token cookie...');
