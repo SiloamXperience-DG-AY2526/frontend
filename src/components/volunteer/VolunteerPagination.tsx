@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import React from "react";
+import React from 'react';
 
 export default function VolunteerPagination({
   page,
@@ -24,7 +24,7 @@ export default function VolunteerPagination({
       </button>
 
       <div className="text-sm text-gray-600">
-        Page <span className="font-semibold text-gray-900">{page}</span> of{" "}
+        Page <span className="font-semibold text-gray-900">{page}</span> of{' '}
         <span className="font-semibold text-gray-900">{totalPages}</span>
       </div>
 

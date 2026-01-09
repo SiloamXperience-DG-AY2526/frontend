@@ -14,7 +14,7 @@ export type FeedbackPayload = {
 };
 
 export type FeedbackSubmitResponse = {
-  status: "success";
+  status: 'success';
   message: string;
   data: {
     feedback: {
@@ -32,6 +32,24 @@ export type FeedbackSubmitResponse = {
     linkedSignupId: string;
   };
 };
+
+export type SubmitVolunteerApplicationResult = {
+  application: {
+    id: string;
+    volunteerId: string;
+    positionId: string;
+    status: string;
+    hasConsented: boolean;
+    createdAt: string; 
+  };
+  volunteer: {
+    userId: string;
+    name: string;
+    gender: string;
+    contactNumber: string;
+  };
+};
+
 export type VolunteerProjectListPosition = {
   id: string;
   role: string;
@@ -72,7 +90,7 @@ export type VolunteerProject = {
   sessions?: VolunteerProjectListSession[];
 };
 export type VolunteerProjectsResponse = {
-  status: "success" | "error";
+  status: 'success' | 'error';
   data: VolunteerProject[];
   pagination?: {
     page: number;
@@ -134,17 +152,17 @@ export type VolunteerProjectDetail = {
 };
 
 export type VolunteerProjectDetailResponse = {
-  status: "success";
+  status: 'success';
   data: VolunteerProjectDetail;
 };
 export type VolunteerProjectPositionStatus =
-  | "reviewing"
-  | "approved"
-  | "rejected"
-  | "active"
-  | "inactive";
+  | 'reviewing'
+  | 'approved'
+  | 'rejected'
+  | 'active'
+  | 'inactive';
 
-export type OperationStatus = "ongoing" | "paused" | "cancelled" | "completed";
+export type OperationStatus = 'ongoing' | 'paused' | 'cancelled' | 'completed';
 
 export type VolunteerApplicationDTO = {
   applicationId: string;
@@ -168,7 +186,12 @@ export type VolunteerApplicationDTO = {
   };
 };
 
-export type ProjectFrequency = "once" | "daily" | "weekly" | "monthly" | "yearly";
+export type ProjectFrequency =
+  | 'once'
+  | 'daily'
+  | 'weekly'
+  | 'monthly'
+  | 'yearly';
 
 export type ProposeVolunteerProjectPayload = {
   userId: string;
@@ -178,17 +201,16 @@ export type ProposeVolunteerProjectPayload = {
   location: string;
 
   // project plan fields
-  aboutDesc: string;        
-  beneficiaries: string;    
-  proposedPlan?: string;    
-
+  aboutDesc: string;
+  beneficiaries: string;
+  proposedPlan?: string;
 
   objectives: string;
 
-  startDate: string; 
-  endDate: string;   
-  startTime: string; 
-  endTime: string;   
+  startDate: string;
+  endDate: string;
+  startTime: string;
+  endTime: string;
 
   frequency: ProjectFrequency;
   interval?: number | null;
@@ -199,7 +221,6 @@ export type ProposeVolunteerProjectPayload = {
     description: string;
     skills: string[];
   }>;
-
 
   attachments?: string;
   image?: string;

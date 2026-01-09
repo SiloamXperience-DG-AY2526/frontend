@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
 export default function Input({
   label,
   value,
   onChange,
-  type = "text",
+  type = 'text',
   placeholder,         
   readOnly = false,
   disabled = false,

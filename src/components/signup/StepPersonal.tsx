@@ -1,12 +1,12 @@
 'use client';
 
-import { useEffect, useState } from "react";
-import { SignUpData } from "@/types/SignUpData";
-import Button from "@/components/ui/Button";
-import Input from "../ui/Input";
-import Link from "next/link";
-import { fetchCountryCodes } from "@/lib/countries";
-import Select from "../ui/Select";
+import { useEffect, useState } from 'react';
+import { SignUpData } from '@/types/SignUpData';
+import Button from '@/components/ui/Button';
+import Input from '../ui/Input';
+import Link from 'next/link';
+import { fetchCountryCodes } from '@/lib/countries';
+import Select from '../ui/Select';
 
 interface Props {
   data: SignUpData;

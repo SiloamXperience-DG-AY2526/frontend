@@ -1,81 +1,85 @@
-"use client";
+'use client';
 
-import React, { useMemo, useState } from "react";
-import Sidebar from "@/components/sidebar";
-import Input from "@/components/ui/Input";
-import TextArea from "@/components/ui/TextArea";
-import { proposeVolunteerProject } from "@/lib/api/volunteer";
+import React, { useMemo, useState } from 'react';
+import Sidebar from '@/components/sidebar';
+import Input from '@/components/ui/Input';
+import TextArea from '@/components/ui/TextArea';
+import { proposeVolunteerProject } from '@/lib/api/volunteer';
 import {
   ProjectFrequency,
   ProposeVolunteerProjectPayload,
-} from "@/types/Volunteer";
-import RadioGroup from "@/components/ui/RadioGroup";
-import SectionTitle from "@/components/ui/FormSectionTitle";
-import UploadBox from "@/components/ui/UploadBox";
+} from '@/types/Volunteer';
+import RadioGroup from '@/components/ui/RadioGroup';
+import SectionTitle from '@/components/ui/FormSectionTitle';
+import UploadBox from '@/components/ui/UploadBox';
 
-const USER_ID_TEMP = "ccecd54a-b014-4a4c-a56c-588a0d197fec";
+const USER_ID_TEMP = 'ccecd54a-b014-4a4c-a56c-588a0d197fec';
 
-type TimePeriod = "one-time" | "ongoing";
-type FrequencyUI = "weekly" | "monthly" | "ad-hoc";
+type TimePeriod = 'one-time' | 'ongoing';
+type FrequencyUI = 'weekly' | 'monthly' | 'ad-hoc';
 
 type PositionForm = {
   role: string;
   description: string;
   skills: string[];
 };
-const TEMP_PDF_URL = "https://example.com/sample-proposal.pdf";
+const TEMP_PDF_URL = 'https://example.com/sample-proposal.pdf';
 const TEMP_IMAGE_URL =
-  "https://nvpc.org.sg/wp-content/uploads/2025/04/two-women-gardening-1024x682.jpg";
+  'https://nvpc.org.sg/wp-content/uploads/2025/04/two-women-gardening-1024x682.jpg';
 
 export default function VolunteerProjectProposalPage() {
   // Project details
-  const [title, setTitle] = useState("");
-  const [initiatorName, setInitiatorName] = useState("");
-  const [location, setLocation] = useState("");
+  const [title, setTitle] = useState('');
+  const [initiatorName, setInitiatorName] = useState('');
+  const [location, setLocation] = useState('');
 
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
-  const [startTime, setStartTime] = useState("");
-  const [endTime, setEndTime] = useState("");
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
+  const [startTime, setStartTime] = useState('');
+  const [endTime, setEndTime] = useState('');
 
-  const [timePeriod, setTimePeriod] = useState<TimePeriod>("one-time");
-  const [frequencyUI, setFrequencyUI] = useState<FrequencyUI>("weekly");
-  const [frequencyNotes, setFrequencyNotes] = useState("");
+  const [timePeriod, setTimePeriod] = useState<TimePeriod>('one-time');
+  const [frequencyUI, setFrequencyUI] = useState<FrequencyUI>('weekly');
+  const [frequencyNotes, setFrequencyNotes] = useState('');
 
   // Project plan
-  const [aboutDesc, setAboutDesc] = useState("");
-  const [beneficiaries, setBeneficiaries] = useState("");
-  const [proposedPlan, setProposedPlan] = useState("");
+  const [aboutDesc, setAboutDesc] = useState('');
+  const [beneficiaries, setBeneficiaries] = useState('');
+  const [proposedPlan, setProposedPlan] = useState('');
 
   // Objectives as points
-  const [objectives, setObjectives] = useState<string[]>([""]);
+  const [objectives, setObjectives] = useState<string[]>(['']);
 
   // Positions
   const [positions, setPositions] = useState<PositionForm[]>([
-    { role: "", description: "", skills: [""] },
+    { role: '', description: '', skills: [''] },
   ]);
-  const [supportingDocs, setSupportingDocs] = useState<File[]>([]);
-  const [coverImage, setCoverImage] = useState<File[]>([]);
+  //used when s3 set up
+  // const [supportingDocs, setSupportingDocs] = useState<File[]>([]);
+  // const [coverImage, setCoverImage] = useState<File[]>([]);
+  const [, setSupportingDocs] = useState<File[]>([]);
+  const [, setCoverImage] = useState<File[]>([]);
+
   // submit state
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
   const frequency: ProjectFrequency = useMemo(() => {
-    if (timePeriod === "one-time") return "once";
-    if (frequencyUI === "weekly") return "weekly";
-    if (frequencyUI === "monthly") return "monthly";
-    return "once"; // ad-hoc fallback
+    if (timePeriod === 'one-time') return 'once';
+    if (frequencyUI === 'weekly') return 'weekly';
+    if (frequencyUI === 'monthly') return 'monthly';
+    return 'once'; // ad-hoc fallback
   }, [timePeriod, frequencyUI]);
 
   const toISODateOnly = (dateYYYYMMDD: string) => {
-    const [y, m, d] = dateYYYYMMDD.split("-").map(Number);
+    const [y, m, d] = dateYYYYMMDD.split('-').map(Number);
     return new Date(y, m - 1, d, 0, 0, 0).toISOString();
   };
 
   const toISODateTime = (dateYYYYMMDD: string, timeHHMM: string) => {
-    const [y, m, d] = dateYYYYMMDD.split("-").map(Number);
-    const [hh, mm] = timeHHMM.split(":").map(Number);
+    const [y, m, d] = dateYYYYMMDD.split('-').map(Number);
+    const [hh, mm] = timeHHMM.split(':').map(Number);
     return new Date(y, m - 1, d, hh, mm, 0).toISOString();
   };
 
@@ -108,7 +112,7 @@ export default function VolunteerProjectProposalPage() {
   ]);
 
   // Objectives handlers
-  const addObjective = () => setObjectives((prev) => [...prev, ""]);
+  const addObjective = () => setObjectives((prev) => [...prev, '']);
   const removeObjective = (idx: number) =>
     setObjectives((prev) => prev.filter((_, i) => i !== idx));
 
@@ -116,7 +120,7 @@ export default function VolunteerProjectProposalPage() {
   const addPosition = () =>
     setPositions((prev) => [
       ...prev,
-      { role: "", description: "", skills: [""] },
+      { role: '', description: '', skills: [''] },
     ]);
 
   const removePosition = (idx: number) =>
@@ -125,7 +129,7 @@ export default function VolunteerProjectProposalPage() {
   const addSkill = (posIdx: number) =>
     setPositions((prev) =>
       prev.map((p, i) =>
-        i === posIdx ? { ...p, skills: [...p.skills, ""] } : p
+        i === posIdx ? { ...p, skills: [...p.skills, ''] } : p
       )
     );
 
@@ -159,7 +163,7 @@ export default function VolunteerProjectProposalPage() {
           .map((o) => o.trim())
           .filter(Boolean)
           .map((o) => `- ${o}`)
-          .join("\n"),
+          .join('\n'),
 
         startDate: toISODateOnly(startDate),
         endDate: toISODateOnly(endDate),
@@ -178,9 +182,10 @@ export default function VolunteerProjectProposalPage() {
       };
 
       await proposeVolunteerProject(payload);
-      setSuccessMsg("Project proposal submitted successfully.");
-    } catch (e: any) {
-      setError(e?.message || "Submit failed");
+      setSuccessMsg('Project proposal submitted successfully.');
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : 'Submit failed';
+      setError(msg);
     } finally {
       setSubmitting(false);
     }
@@ -255,8 +260,8 @@ export default function VolunteerProjectProposalPage() {
           <RadioGroup
             label="Time Period *"
             options={[
-              { value: "one-time", label: "One-time" },
-              { value: "ongoing", label: "Ongoing" },
+              { value: 'one-time', label: 'One-time' },
+              { value: 'ongoing', label: 'Ongoing' },
             ]}
             value={timePeriod}
             onChange={(v) => setTimePeriod(v as TimePeriod)}
@@ -266,9 +271,9 @@ export default function VolunteerProjectProposalPage() {
             <RadioGroup
               label="Frequency *"
               options={[
-                { value: "weekly", label: "Weekly" },
-                { value: "monthly", label: "Monthly" },
-                { value: "ad-hoc", label: "Ad Hoc" },
+                { value: 'weekly', label: 'Weekly' },
+                { value: 'monthly', label: 'Monthly' },
+                { value: 'ad-hoc', label: 'Ad Hoc' },
               ]}
               value={frequencyUI}
               onChange={(v) => setFrequencyUI(v as FrequencyUI)}
@@ -469,11 +474,11 @@ export default function VolunteerProjectProposalPage() {
                                   prev.map((x, i) =>
                                     i === pIdx
                                       ? {
-                                          ...x,
-                                          skills: x.skills.map((sv, si) =>
-                                            si === sIdx ? v : sv
-                                          ),
-                                        }
+                                        ...x,
+                                        skills: x.skills.map((sv, si) =>
+                                          si === sIdx ? v : sv
+                                        ),
+                                      }
                                       : x
                                   )
                                 )
@@ -545,12 +550,12 @@ export default function VolunteerProjectProposalPage() {
             disabled={!canSubmit || submitting}
             onClick={onSubmit}
             className={[
-              "rounded-xl px-10 py-4 text-white font-bold",
-              "bg-[#0E5A4A] hover:opacity-95 transition",
-              !canSubmit || submitting ? "opacity-50 cursor-not-allowed" : "",
-            ].join(" ")}
+              'rounded-xl px-10 py-4 text-white font-bold',
+              'bg-[#0E5A4A] hover:opacity-95 transition',
+              !canSubmit || submitting ? 'opacity-50 cursor-not-allowed' : '',
+            ].join(' ')}
           >
-            {submitting ? "Submitting..." : "Submit Project"}
+            {submitting ? 'Submitting...' : 'Submit Project'}
           </button>
         </div>
 

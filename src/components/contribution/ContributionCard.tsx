@@ -1,14 +1,14 @@
-"use client";
+'use client';
 
-import React from "react";
-import Link from "next/link";
+import React from 'react';
+import Link from 'next/link';
 import {
   MapPinIcon,
   CalendarDaysIcon,
   UserIcon,
-} from "@heroicons/react/24/outline";
-import { StatusBadge, formatProjectDateTime } from "./ui";
-import { VolunteerApplicationDTO } from "@/types/Volunteer";
+} from '@heroicons/react/24/outline';
+import { StatusBadge, formatProjectDateTime } from './ui';
+import { VolunteerApplicationDTO } from '@/types/Volunteer';
 
 export default function ContributionCard({
   item,
@@ -18,7 +18,7 @@ export default function ContributionCard({
   item: VolunteerApplicationDTO;
   badge: {
     label: string;
-    tone: "upcoming" | "active" | "completed" | "pending";
+    tone: 'upcoming' | 'active' | 'completed' | 'pending';
   };
   showGiveFeedback?: boolean;
 }) {

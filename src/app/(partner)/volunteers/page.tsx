@@ -1,20 +1,20 @@
-"use client";
+'use client';
 
-import Sidebar from "@/components/sidebar";
-import React, { useEffect, useState } from "react";
+import Sidebar from '@/components/sidebar';
+import React, { useEffect, useState } from 'react';
 
 // import { UserIcon, ClockIcon, HeartIcon } from "@heroicons/react/24/solid";
-import VolunteerSearch from "@/components/volunteer/Search";
-import VolunteerProjectGrid from "@/components/volunteer/VolunteerProjectGrid";
-import VolunteerPagination from "@/components/volunteer/VolunteerPagination";
+import VolunteerSearch from '@/components/volunteer/Search';
+import VolunteerProjectGrid from '@/components/volunteer/VolunteerProjectGrid';
+import VolunteerPagination from '@/components/volunteer/VolunteerPagination';
 
-import { getAvailableVolunteerProjects } from "@/lib/api/volunteer";
-import { VolunteerProject } from "@/types/Volunteer";
-import StatCard from "@/components/volunteer/StatCard";
-import HumanStatIcon from "@/components/icons/HumanIcon";
-import ClockIcon from "@/components/icons/ClockIcon";
-import HeartIcon from "@/components/icons/HeartIcon";
-import Link from "next/link";
+import { getAvailableVolunteerProjects } from '@/lib/api/volunteer';
+import { VolunteerProject } from '@/types/Volunteer';
+import StatCard from '@/components/volunteer/StatCard';
+import HumanStatIcon from '@/components/icons/HumanIcon';
+import ClockIcon from '@/components/icons/ClockIcon';
+import HeartIcon from '@/components/icons/HeartIcon';
+import Link from 'next/link';
 
 function useDebouncedValue<T>(value: T, delayMs = 450) {
   const [debounced, setDebounced] = useState(value);
@@ -26,24 +26,24 @@ function useDebouncedValue<T>(value: T, delayMs = 450) {
 }
 const stats = [
   {
-    value: "6000+",
-    label: "Volunteers Currently Engaged",
+    value: '6000+',
+    label: 'Volunteers Currently Engaged',
     Icon: HumanStatIcon,
   },
   {
-    value: "200+",
-    label: "Total Hours Volunteered",
+    value: '200+',
+    label: 'Total Hours Volunteered',
     Icon: ClockIcon,
   },
   {
-    value: "450+",
-    label: "Lives Touched",
+    value: '450+',
+    label: 'Lives Touched',
     Icon: HeartIcon,
   },
 ] as const;
 
 export default function VolunteerPage() {
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState('');
   const debouncedSearch = useDebouncedValue(search, 450);
 
   const [page, setPage] = useState(1);
@@ -70,8 +70,13 @@ export default function VolunteerPage() {
 
         setProjects(Array.isArray(json.data) ? json.data : []);
         setTotalPages(json.pagination?.totalPages ?? 1);
-      } catch (e) {
-        if ((e as any)?.name !== "AbortError") {
+      } catch (e: unknown) {
+        if (
+          typeof e === 'object' &&
+          e !== null &&
+          'name' in e &&
+          (e as { name?: unknown }).name !== 'AbortError'
+        ) {
           console.error(e);
           setProjects([]);
           setTotalPages(1);
@@ -94,7 +99,7 @@ export default function VolunteerPage() {
         <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">Volunteer</h1>
-            <p className="mt-1 text-gray-600">Join our volunteer community.</p>
+            <p className="mt-1 text-gray-600">Join our volunteer community</p>
           </div>
 
           <Link

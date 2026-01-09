@@ -1,15 +1,15 @@
-"use client";
+'use client';
 
-import React, { useEffect, useMemo, useState } from "react";
-import ContributionCard from "../contribution/ContributionCard";
-import { fetchVolunteerApplications } from "@/lib/api/volunteer";
-import { VolunteerApplicationDTO } from "@/types/Volunteer";
-import { Pill } from "./ui";
+import React, { useEffect, useMemo, useState } from 'react';
+import ContributionCard from '../contribution/ContributionCard';
+import { fetchVolunteerApplications } from '@/lib/api/volunteer';
+import { VolunteerApplicationDTO } from '@/types/Volunteer';
+import { Pill } from './ui';
 
-type FilterKey = "all" | "upcoming" | "active" | "completed" | "pending";
+type FilterKey = 'all' | 'upcoming' | 'active' | 'completed' | 'pending';
 
 export default function VolunteeringTab({ userId }: { userId: string }) {
-  const [filter, setFilter] = useState<FilterKey>("all");
+  const [filter, setFilter] = useState<FilterKey>('all');
   const [loading, setLoading] = useState(true);
   const [items, setItems] = useState<VolunteerApplicationDTO[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -26,17 +26,18 @@ export default function VolunteeringTab({ userId }: { userId: string }) {
         // fetch only approved from backend
         const data = await fetchVolunteerApplications({
           userId,
-          status: "approved",
+          status: 'approved',
         });
 
         if (!mounted) return;
         setItems(data);
-      } catch (e: any) {
+      } catch (e: unknown) {
         if (!mounted) return;
-        setError(e?.message || "Failed to load volunteering");
+        const msg =
+          e instanceof Error ? e.message : 'Failed to load volunteering';
+        setError(msg);
       } finally {
-        if (!mounted) return;
-        setLoading(false);
+        if (mounted) setLoading(false);
       }
     })();
 
@@ -45,20 +46,20 @@ export default function VolunteeringTab({ userId }: { userId: string }) {
     };
   }, [userId]);
 
-  const now = new Date();
-
   const computed = useMemo(() => {
+    const now = new Date(); 
+
     const getBucket = (a: VolunteerApplicationDTO) => {
       const start = new Date(a.project.startDate);
       const end = new Date(a.project.endDate);
 
       if (end.getTime() < now.getTime()) {
-        return { key: "completed" as const };
+        return { key: 'completed' as const };
       }
       if (start.getTime() > now.getTime()) {
-        return { key: "upcoming" as const };
+        return { key: 'upcoming' as const };
       }
-      return { key: "active" as const };
+      return { key: 'active' as const };
     };
 
     const decorated = items.map((a) => ({
@@ -67,57 +68,57 @@ export default function VolunteeringTab({ userId }: { userId: string }) {
     }));
 
     const filtered =
-      filter === "all"
+      filter === 'all'
         ? decorated
-        : filter === "pending"
-        ? []
-        : decorated.filter((x) => x.bucket.key === filter);
+        : filter === 'pending'
+          ? []
+          : decorated.filter((x) => x.bucket.key === filter);
 
     return filtered.map(({ a, bucket }) => {
       const badge =
-        bucket.key === "upcoming"
-          ? { label: "Upcoming", tone: "upcoming" as const }
-          : bucket.key === "active"
-          ? { label: "Active", tone: "active" as const }
-          : { label: "Completed", tone: "completed" as const };
+        bucket.key === 'upcoming'
+          ? { label: 'Upcoming', tone: 'upcoming' as const }
+          : bucket.key === 'active'
+            ? { label: 'Active', tone: 'active' as const }
+            : { label: 'Completed', tone: 'completed' as const };
 
       // feedback
       const showGiveFeedback =
-        bucket.key === "completed" && a.feedbackGiven === false;
+        bucket.key === 'completed' && a.feedbackGiven === false;
 
       return { item: a, badge, showGiveFeedback };
     });
-  }, [items, filter, now]);
+  }, [items, filter]); 
 
   return (
     <div>
       {/* Filters  */}
       <div className="mb-6 grid grid-cols-5 gap-3 w-full">
-        <Pill active={filter === "all"} onClick={() => setFilter("all")}>
+        <Pill active={filter === 'all'} onClick={() => setFilter('all')}>
           All events
         </Pill>
 
         <Pill
-          active={filter === "upcoming"}
-          onClick={() => setFilter("upcoming")}
+          active={filter === 'upcoming'}
+          onClick={() => setFilter('upcoming')}
         >
           Upcoming
         </Pill>
 
-        <Pill active={filter === "active"} onClick={() => setFilter("active")}>
+        <Pill active={filter === 'active'} onClick={() => setFilter('active')}>
           Active
         </Pill>
 
         <Pill
-          active={filter === "completed"}
-          onClick={() => setFilter("completed")}
+          active={filter === 'completed'}
+          onClick={() => setFilter('completed')}
         >
           Completed
         </Pill>
 
         <Pill
-          active={filter === "pending"}
-          onClick={() => setFilter("pending")}
+          active={filter === 'pending'}
+          onClick={() => setFilter('pending')}
         >
           Pending
         </Pill>

@@ -1,6 +1,6 @@
 export default function SectionTitle({
   children,
-  className = "",
+  className = '',
 }: {
   children: React.ReactNode;
   className?: string;
@@ -8,9 +8,9 @@ export default function SectionTitle({
   return (
     <h2
       className={[
-        "text-3xl font-bold text-gray-700 underline underline-offset-4 mb-6",
+        'text-3xl font-bold text-gray-700 underline underline-offset-4 mb-6',
         className,
-      ].join(" ")}
+      ].join(' ')}
     >
       {children}
     </h2>

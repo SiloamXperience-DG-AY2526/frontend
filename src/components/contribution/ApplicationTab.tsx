@@ -1,14 +1,14 @@
-"use client";
+'use client';
 
-import React, { useEffect, useState } from "react";
-import { fetchVolunteerApplications } from "@/lib/api/volunteer";
-import { VolunteerApplicationDTO } from "@/types/Volunteer";
-import { StatusBadge, formatProjectDateTime } from "./ui";
+import React, { useEffect, useState } from 'react';
+import { fetchVolunteerApplications } from '@/lib/api/volunteer';
+import { VolunteerApplicationDTO } from '@/types/Volunteer';
+import { StatusBadge, formatProjectDateTime } from './ui';
 import {
   MapPinIcon,
   CalendarDaysIcon,
   UserIcon,
-} from "@heroicons/react/24/outline";
+} from '@heroicons/react/24/outline';
 
 export default function ApplicationsTab({ userId }: { userId: string }) {
   const [loading, setLoading] = useState(true);
@@ -22,11 +22,14 @@ export default function ApplicationsTab({ userId }: { userId: string }) {
       try {
         const data = await fetchVolunteerApplications({
           userId,
-          status: "reviewing",
+          status: 'reviewing',
         });
         if (mounted) setItems(data);
-      } catch (e: any) {
-        if (mounted) setError(e.message);
+      } catch (e: unknown) {
+        if (!mounted) return;
+
+        const msg = e instanceof Error ? e.message : 'Unknown error';
+        setError(msg);
       } finally {
         if (mounted) setLoading(false);
       }
@@ -91,11 +94,11 @@ export default function ApplicationsTab({ userId }: { userId: string }) {
 
             {/* BOTTOM ROW */}
             <div className="text-sm text-black">
-              Applied on{" "}
+              Applied on{' '}
               {new Date(item.appliedAt).toLocaleDateString(undefined, {
-                day: "2-digit",
-                month: "long",
-                year: "numeric",
+                day: '2-digit',
+                month: 'long',
+                year: 'numeric',
               })}
             </div>
           </div>

@@ -1,22 +1,22 @@
 'use client';
 
-import { useState } from "react";
-import Sidebar from "@/components/sidebar";
-import StarRating from "@/components/ui/StarRating";
-import Textarea from "@/components/ui/TextArea";
-import Button from "@/components/ui/Button";
-import { useParams, useRouter } from "next/navigation";
-import { FeedbackPayload } from "@/types/Volunteer";
-import { submitVolunteerFeedback } from "@/lib/api/volunteer";
-import Toast from "@/components/ui/Toast";
-const USER_ID_TEMP = "ccecd54a-b014-4a4c-a56c-588a0d197fec";
+import { useState } from 'react';
+import Sidebar from '@/components/sidebar';
+import StarRating from '@/components/ui/StarRating';
+import Textarea from '@/components/ui/TextArea';
+import Button from '@/components/ui/Button';
+import { useParams } from 'next/navigation';
+import { FeedbackPayload } from '@/types/Volunteer';
+import { submitVolunteerFeedback } from '@/lib/api/volunteer';
+import Toast from '@/components/ui/Toast';
+const USER_ID_TEMP = 'ccecd54a-b014-4a4c-a56c-588a0d197fec';
 export default function FeedbackPage() {
   const params = useParams<{ projectid: string }>();
-  const router = useRouter();
+
   const projectId = params.projectid;
   const [toastOpen, setToastOpen] = useState(false);
-  const [toastType, setToastType] = useState<"success" | "error">("success");
-  const [toastTitle, setToastTitle] = useState("");
+  const [toastType, setToastType] = useState<'success' | 'error'>('success');
+  const [toastTitle, setToastTitle] = useState('');
   const [toastMsg, setToastMsg] = useState<string | undefined>(undefined);
   const [ratings, setRatings] = useState({
     overall: 0,
@@ -35,7 +35,7 @@ export default function FeedbackPage() {
 
   const handleSubmit = async () => {
     if (!projectId) {
-      alert("Missing projectId in URL.");
+      alert('Missing projectId in URL.');
       return;
     }
 
@@ -50,9 +50,9 @@ export default function FeedbackPage() {
       return;
     }
 
-    // optional validation for text fields
+    //  validation for text fields
     if (!feedback.experience.trim() || !feedback.improvement.trim()) {
-      alert("Please fill in the experience and improvement fields.");
+      alert('Please fill in the experience and improvement fields.');
       return;
     }
 
@@ -80,28 +80,42 @@ export default function FeedbackPage() {
         payload,
       });
 
-      setToastType("success");
-      setToastTitle("Application submitted");
-      setToastMsg("We’ll contact you soon with the next steps.");
+      setToastType('success');
+      setToastTitle('Application submitted');
+      setToastMsg('We’ll contact you soon with the next steps.');
       setToastOpen(true);
 
       // reset form
       setRatings({ overall: 0, management: 0, planning: 0, facilities: 0 });
-      setFeedback({ experience: "", improvement: "", comments: "" });
+      setFeedback({ experience: '', improvement: '', comments: '' });
       setTimeout(() => {
-        window.location.href = "/volunteers";
+        window.location.href = '/volunteers';
       }, 2000);
 
-      console.log("Feedback response:", resp);
-    } catch (e: any) {
+      console.log('Feedback response:', resp);
+    } catch (e: unknown) {
       console.error(e);
-      const msg =
-        e?.name === "ApiError"
-          ? e.message
-          : e?.message ?? "Failed to submit application";
+      const msg = (() => {
+        if (
+          typeof e === 'object' &&
+          e !== null &&
+          'name' in e &&
+          (e as { name?: unknown }).name === 'ApiError' &&
+          'message' in e &&
+          typeof (e as { message?: unknown }).message === 'string'
+        ) {
+          return (e as { message: string }).message;
+        }
 
-      setToastType("error");
-      setToastTitle("Submission failed");
+        // Normal Error
+        if (e instanceof Error) return e.message;
+
+        // Fallback
+        return 'Failed to submit application';
+      })();
+
+      setToastType('error');
+      setToastTitle('Submission failed');
       setToastMsg(msg);
       setToastOpen(true);
     } finally {

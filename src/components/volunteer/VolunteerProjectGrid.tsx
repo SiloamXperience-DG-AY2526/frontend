@@ -1,6 +1,6 @@
-import React from "react";
-import { VolunteerProject } from "@/types/Volunteer";
-import VolunteerProjectCard from "./VolunteerProjectCard";
+import React from 'react';
+import { VolunteerProject } from '@/types/Volunteer';
+import VolunteerProjectCard from './VolunteerProjectCard';
 
 export default function VolunteerProjectGrid({
   loading,

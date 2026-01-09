@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import React, { useId, useRef, useState } from "react";
+import React, { useId, useRef, useState } from 'react';
 
 type UploadBoxProps = {
   title: string;
@@ -63,7 +63,7 @@ export default function UploadBox({
     onFilesChange?.(next);
 
     // allow re-uploading same file name
-    if (inputRef.current) inputRef.current.value = "";
+    if (inputRef.current) inputRef.current.value = '';
   };
 
   return (
@@ -87,18 +87,18 @@ export default function UploadBox({
         tabIndex={0}
         onClick={openPicker}
         onKeyDown={(e) => {
-          if (e.key === "Enter" || e.key === " ") openPicker();
+          if (e.key === 'Enter' || e.key === ' ') openPicker();
         }}
         onDragOver={onDragOver}
         onDragLeave={onDragLeave}
         onDrop={onDrop}
         className={[
-          "rounded-xl border border-green-700 p-12 text-center cursor-pointer transition",
-          "focus:outline-none focus:ring-2 focus:ring-green-800",
+          'rounded-xl border border-green-700 p-12 text-center cursor-pointer transition',
+          'focus:outline-none focus:ring-2 focus:ring-green-800',
           isDragging
-            ? "bg-green-50 ring-2 ring-green-700"
-            : "bg-white hover:bg-gray-50",
-        ].join(" ")}
+            ? 'bg-green-50 ring-2 ring-green-700'
+            : 'bg-white hover:bg-gray-50',
+        ].join(' ')}
       >
         {/* icon */}
         <div className="mx-auto mb-4 flex h-10 w-10 items-center justify-center ">

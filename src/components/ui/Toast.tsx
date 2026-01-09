@@ -1,13 +1,13 @@
-"use client";
+'use client';
 
-import React, { useEffect } from "react";
+import React, { useEffect } from 'react';
 import {
   CheckCircleIcon,
   XCircleIcon,
   XMarkIcon,
-} from "@heroicons/react/24/solid";
+} from '@heroicons/react/24/solid';
 
-export type ToastType = "success" | "error";
+export type ToastType = 'success' | 'error';
 
 export default function Toast({
   open,
@@ -32,7 +32,7 @@ export default function Toast({
 
   if (!open) return null;
 
-  const isSuccess = type === "success";
+  const isSuccess = type === 'success';
   const Icon = isSuccess ? CheckCircleIcon : XCircleIcon;
 
   return (
@@ -41,13 +41,13 @@ export default function Toast({
         className={`
           w-[360px] rounded-xl border px-4 py-3 shadow-lg
           bg-white
-          ${isSuccess ? "border-green-200" : "border-red-200"}
+          ${isSuccess ? 'border-green-200' : 'border-red-200'}
         `}
       >
         <div className="flex items-start gap-3">
           <Icon
             className={`h-6 w-6 ${
-              isSuccess ? "text-green-600" : "text-red-600"
+              isSuccess ? 'text-green-600' : 'text-red-600'
             }`}
           />
 

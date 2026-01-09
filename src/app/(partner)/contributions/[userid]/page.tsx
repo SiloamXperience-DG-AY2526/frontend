@@ -1,22 +1,22 @@
-"use client";
+'use client';
 
-import React, { useMemo, useState } from "react";
-import Sidebar from "@/components/sidebar";
-import VolunteeringTab from "@/components/contribution/VolunteeringTab";
-import ApplicationTab from "@/components/contribution/ApplicationTab";
+import React, { useMemo, useState } from 'react';
+import Sidebar from '@/components/sidebar';
+import VolunteeringTab from '@/components/contribution/VolunteeringTab';
+import ApplicationTab from '@/components/contribution/ApplicationTab';
 
-const USER_ID_TEMP = "ccecd54a-b014-4a4c-a56c-588a0d197fec";
+const USER_ID_TEMP = 'ccecd54a-b014-4a4c-a56c-588a0d197fec';
 
-type TabKey = "volunteering" | "donations" | "applications";
+type TabKey = 'volunteering' | 'donations' | 'applications';
 
 export default function MyContributions() {
-  const [activeTab, setActiveTab] = useState<TabKey>("volunteering");
+  const [activeTab, setActiveTab] = useState<TabKey>('volunteering');
 
   const tabs = useMemo(
     () => [
-      { key: "volunteering" as const, label: "VOLUNTEERING" },
-      { key: "donations" as const, label: "DONATIONS" },
-      { key: "applications" as const, label: "APPLICATIONS" },
+      { key: 'volunteering' as const, label: 'VOLUNTEERING' },
+      { key: 'donations' as const, label: 'DONATIONS' },
+      { key: 'applications' as const, label: 'APPLICATIONS' },
     ],
     []
   );
@@ -43,12 +43,12 @@ export default function MyContributions() {
                   key={t.key}
                   onClick={() => setActiveTab(t.key)}
                   className={[
-                    "relative py-4 text-center transition",
-                    "text-base font-semibold tracking-wide",
+                    'relative py-4 text-center transition',
+                    'text-base font-semibold tracking-wide',
                     isActive
-                      ? "text-gray-900"
-                      : "text-gray-400 hover:text-gray-700",
-                  ].join(" ")}
+                      ? 'text-gray-900'
+                      : 'text-gray-400 hover:text-gray-700',
+                  ].join(' ')}
                 >
                   {t.label}
 
@@ -62,15 +62,15 @@ export default function MyContributions() {
         </div>
 
         {/* Content */}
-        {activeTab === "volunteering" && (
+        {activeTab === 'volunteering' && (
           <VolunteeringTab userId={USER_ID_TEMP} />
         )}
 
-        {activeTab === "applications" && (
+        {activeTab === 'applications' && (
           <ApplicationTab userId={USER_ID_TEMP} />
         )}
 
-        {activeTab === "donations" && (
+        {activeTab === 'donations' && (
           <div className="text-sm text-gray-500 mt-6">
             No donation records yet.
           </div>

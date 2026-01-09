@@ -1,19 +1,19 @@
-"use client";
+'use client';
 
-import React, { use, useEffect, useMemo, useState } from "react";
-import Sidebar from "@/components/sidebar";
-import { getVolunteerProjectDetail } from "@/lib/api/volunteer";
-import { formatShortDate, formatTimeRange } from "@/lib/utils/date";
+import React, { use, useEffect, useMemo, useState } from 'react';
+import Sidebar from '@/components/sidebar';
+import { getVolunteerProjectDetail } from '@/lib/api/volunteer';
+import { formatShortDate, formatTimeRange } from '@/lib/utils/date';
 import {
   CalendarIcon,
   ClockIcon,
   MapPinIcon,
-} from "@heroicons/react/24/outline";
-import type { VolunteerProjectDetail } from "@/types/Volunteer";
-import TargetIcon from "@/components/icons/TargetIcon";
-import Link from "next/link";
+} from '@heroicons/react/24/outline';
+import type { VolunteerProjectDetail } from '@/types/Volunteer';
+import TargetIcon from '@/components/icons/TargetIcon';
+import Link from 'next/link';
 function capitalizeFirst(s?: string | null) {
-  if (!s) return "";
+  if (!s) return '';
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
@@ -54,8 +54,8 @@ function Section({
 }
 function ObjectiveList({ text }: { text: string }) {
   const items = text
-    .split("\n")
-    .map((i) => i.replace(/^•\s*/, "").trim())
+    .split('\n')
+    .map((i) => i.replace(/^•\s*/, '').trim())
     .filter(Boolean);
 
   return (
@@ -88,8 +88,8 @@ export default function VolunteerProjectDetailPage({
       try {
         setLoading(true);
         const res = await getVolunteerProjectDetail(projectid);
-        if (mounted) setData(res.data as any);
-      } catch (e) {
+        if (mounted) setData(res.data as VolunteerProjectDetail);
+      } catch (e: unknown) {
         console.error(e);
         if (mounted) setData(null);
       } finally {
@@ -104,24 +104,24 @@ export default function VolunteerProjectDetailPage({
   }, [projectid]);
 
   const dateText = useMemo(() => {
-    if (!data) return "—";
+    if (!data) return '—';
     return data.startDate && data.endDate
       ? `${formatShortDate(data.startDate)} - ${formatShortDate(data.endDate)}`
       : formatShortDate(data.startDate);
   }, [data]);
 
   const timeText = useMemo(() => {
-    if (!data) return "—";
+    if (!data) return '—';
 
-    const freq = data.frequency ? capitalizeFirst(data.frequency) : null; 
+    const freq = data.frequency ? capitalizeFirst(data.frequency) : null;
     const time = formatTimeRange(data.startTime, data.endTime);
 
     return freq ? `${freq}, ${time}` : time;
   }, [data]);
 
   const scrollToPositions = () => {
-    const el = document.getElementById("positions");
-    el?.scrollIntoView({ behavior: "smooth", block: "start" });
+    const el = document.getElementById('positions');
+    el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
   if (loading) {
@@ -182,14 +182,14 @@ export default function VolunteerProjectDetailPage({
             </div>
 
             {/* Content sections */}
-            <Section title="Organiser">{data.initiatorName ?? "—"}</Section>
-            <Section title="About">{data.aboutDesc ?? "—"}</Section>
+            <Section title="Organiser">{data.initiatorName ?? '—'}</Section>
+            <Section title="About">{data.aboutDesc ?? '—'}</Section>
             <Section title="Objectives/ Goals">
-              {data.objectives ? <ObjectiveList text={data.objectives} /> : "—"}
+              {data.objectives ? <ObjectiveList text={data.objectives} /> : '—'}
             </Section>
 
             <Section title="Beneficiary Details">
-              {data.beneficiaries ?? "—"}
+              {data.beneficiaries ?? '—'}
             </Section>
 
             {/* Volunteer positions */}
@@ -203,7 +203,7 @@ export default function VolunteerProjectDetailPage({
                 <div className="space-y-5">
                   <InfoRow icon={CalendarIcon} text={dateText} />
                   <InfoRow icon={ClockIcon} text={timeText} />
-                  <InfoRow icon={MapPinIcon} text={data.location ?? "—"} />
+                  <InfoRow icon={MapPinIcon} text={data.location ?? '—'} />
                 </div>
 
                 {/* Button */}

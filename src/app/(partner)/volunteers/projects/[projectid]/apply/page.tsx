@@ -1,18 +1,18 @@
-"use client";
+'use client';
 
-import React, { use, useEffect, useMemo, useState } from "react";
-import Sidebar from "@/components/sidebar";
-import Input from "@/components/ui/Input";
-import Toast from "@/components/ui/Toast";
+import React, { use, useEffect, useMemo, useState } from 'react';
+import Sidebar from '@/components/sidebar';
+import Input from '@/components/ui/Input';
+import Toast from '@/components/ui/Toast';
 import {
   getVolunteerProjectDetail,
   submitVolunteerApplication,
-} from "@/lib/api/volunteer";
-import { formatShortDate, formatTimeRange } from "@/lib/utils/date";
-import type { VolunteerProjectDetail } from "@/types/Volunteer";
+} from '@/lib/api/volunteer';
+import { formatShortDate, formatTimeRange } from '@/lib/utils/date';
+import type { VolunteerProjectDetail } from '@/types/Volunteer';
 
 function capitalizeFirst(s?: string | null) {
-  if (!s) return "";
+  if (!s) return '';
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
@@ -26,19 +26,19 @@ export default function VolunteerApplication({
   const { projectid } = use(params);
   const { positionId } = use(searchParams);
 
-  const USER_ID_TEMP = "ccecd54a-b014-4a4c-a56c-588a0d197fec"; //temporary (need auth)
+  const USER_ID_TEMP = 'ccecd54a-b014-4a4c-a56c-588a0d197fec'; //temporary (need auth)
 
   const [data, setData] = useState<VolunteerProjectDetail | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const [sessionId, setSessionId] = useState<string | "">("");
+  const [sessionId, setSessionId] = useState<string | ''>('');
   const [consent, setConsent] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
   // Toast state
   const [toastOpen, setToastOpen] = useState(false);
-  const [toastType, setToastType] = useState<"success" | "error">("success");
-  const [toastTitle, setToastTitle] = useState("");
+  const [toastType, setToastType] = useState<'success' | 'error'>('success');
+  const [toastTitle, setToastTitle] = useState('');
   const [toastMsg, setToastMsg] = useState<string | undefined>(undefined);
 
   useEffect(() => {
@@ -49,7 +49,7 @@ export default function VolunteerApplication({
         setLoading(true);
 
         if (!positionId) {
-          throw new Error("Missing positionId in URL");
+          throw new Error('Missing positionId in URL');
         }
 
         const res = await getVolunteerProjectDetail(projectid);
@@ -60,14 +60,17 @@ export default function VolunteerApplication({
         if (res.data.sessions?.length) {
           setSessionId(res.data.sessions[0].id);
         }
-      } catch (e: any) {
+      } catch (e: unknown) {
         console.error(e);
         if (!mounted) return;
 
         setData(null);
-        setToastType("error");
-        setToastTitle("Failed to load");
-        setToastMsg(e?.message ?? "Unknown error");
+        setToastType('error');
+        setToastTitle('Failed to load');
+
+        const msg = e instanceof Error ? e.message : 'Unknown error';
+        setToastMsg(msg);
+
         setToastOpen(true);
       } finally {
         if (mounted) setLoading(false);
@@ -86,13 +89,13 @@ export default function VolunteerApplication({
   }, [data, positionId]);
 
   const dateTimeText = useMemo(() => {
-    if (!data) return "—";
+    if (!data) return '—';
 
     const date =
       data.startDate && data.endDate
         ? `${formatShortDate(data.startDate)} - ${formatShortDate(
-            data.endDate
-          )}`
+          data.endDate
+        )}`
         : formatShortDate(data.startDate);
 
     const time = formatTimeRange(data.startTime, data.endTime);
@@ -116,23 +119,30 @@ export default function VolunteerApplication({
         sessionId: sessionId,
       });
 
-      setToastType("success");
-      setToastTitle("Application submitted");
-      setToastMsg("We’ll contact you soon with the next steps.");
+      setToastType('success');
+      setToastTitle('Application submitted');
+      setToastMsg('We’ll contact you soon with the next steps.');
       setToastOpen(true);
       setTimeout(() => {
         window.location.href = `/volunteers/projects/${data.id}`;
       }, 2000);
-    } catch (e: any) {
+    } catch (e: unknown) {
       console.error(e);
 
       const msg =
-        e?.name === "ApiError"
-          ? e.message
-          : e?.message ?? "Failed to submit application";
+        typeof e === 'object' &&
+        e !== null &&
+        'name' in e &&
+        (e as { name?: unknown }).name === 'ApiError' &&
+        'message' in e &&
+        typeof (e as { message?: unknown }).message === 'string'
+          ? (e as { message: string }).message
+          : e instanceof Error
+            ? e.message
+            : 'Failed to submit application';
 
-      setToastType("error");
-      setToastTitle("Submission failed");
+      setToastType('error');
+      setToastTitle('Submission failed');
       setSubmitting(false);
       setToastMsg(msg);
       setToastOpen(true);
@@ -192,13 +202,13 @@ export default function VolunteerApplication({
             <div className="mt-6 space-y-6">
               <Input
                 label="Project"
-                value={data.title ?? "—"}
+                value={data.title ?? '—'}
                 readOnly
                 disabled
               />
               <Input
                 label="Volunteer Position"
-                value={selectedPosition.role ?? "—"}
+                value={selectedPosition.role ?? '—'}
                 readOnly
                 disabled
               />
@@ -262,7 +272,7 @@ export default function VolunteerApplication({
                       disabled:opacity-60 disabled:cursor-not-allowed
                     "
                   >
-                    {submitting ? "Registering..." : "Register"}
+                    {submitting ? 'Registering...' : 'Register'}
                   </button>
                 </div>
               ) : null}

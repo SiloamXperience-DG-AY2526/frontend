@@ -6,11 +6,11 @@ function safeDate(input?: string | null): Date | null {
 
 export function formatShortDate(input?: string | null): string {
   const d = safeDate(input);
-  if (!d) return "—";
+  if (!d) return '—';
   return d.toLocaleDateString(undefined, {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
   });
 }
 
@@ -25,15 +25,15 @@ export function formatTimeRange(
   // If they are ISO-like, format nicely
   if (sDate || eDate) {
     const s = sDate
-      ? sDate.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" })
-      : "—";
+      ? sDate.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' })
+      : '—';
     const e = eDate
-      ? eDate.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" })
-      : "—";
+      ? eDate.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' })
+      : '—';
     return `${s} - ${e}`;
   }
 
-  // Otherwise treat them as already-human strings
+ 
   if (start && end) return `${start} - ${end}`;
-  return "—";
+  return '—';
 }
