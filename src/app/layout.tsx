@@ -13,7 +13,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className="h-full">
       <body className="h-full">
         <AuthProvider>
-          <div className="min-h-dvh flex flex-col">{children}</div>
+          {children}
         </AuthProvider>
       </body>
     </html>

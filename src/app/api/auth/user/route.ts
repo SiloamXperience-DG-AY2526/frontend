@@ -7,24 +7,25 @@ export async function GET() {
   const cookieStore = await cookies();
   const token = cookieStore.get('access_token')?.value;
 
-  console.log('Retrieved token:', token);
-
-  if (!token) return NextResponse.json({ user: null, role: null }, { status: 200 });
-
-  try {
-    const payload = jwtDecode<JwtPayload>(token);
-
-    // token expiry check
-    if (payload.exp && payload.exp * 1000 < Date.now()) {
-      return NextResponse.json({ userId: null, role: null }, { status: 200 });
-    }
-
-    console.log('Decoded token payload:', payload);
+  if (!token) { 
     return NextResponse.json(
-      { userId: payload.userId, role: payload.role },
-      { status: 200 }
+      { user: null, role: null, errMsg: 'Missing access token.' }, 
+      { status: 401 },
     );
-  } catch {
-    return NextResponse.json({ userId: null, role: null }, { status: 200 });
   }
+
+  const payload = jwtDecode<JwtPayload>(token);
+
+  // check token expiry
+  if (payload.exp && payload.exp * 1000 < Date.now()) {
+    return NextResponse.json(
+      { userId: null, role: null, errMsg: 'User session expired.' }, 
+      { status: 401 }
+    );
+  }
+
+  return NextResponse.json(
+    { userId: payload.userId, role: payload.role },
+    { status: 200 }
+  );
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import { getAuthUser, login } from '@/lib/api/auth';
+import { getAuthUser, login, logout } from '@/lib/api/auth';
 import { AuthUser, AuthPayload, AuthContextValue } from '@/types/AuthData';
 import { createContext, useCallback, useContext, useMemo, useState } from 'react';
 
@@ -29,8 +29,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const authLogout = useCallback( async () => {
-    // TODO:
-    // await apiLogout();
+    await logout();
     setUser(null);
   }, []);
 

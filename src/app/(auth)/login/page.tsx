@@ -7,6 +7,7 @@ import Button from '@/components/ui/Button';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
+import { ROLE_HOME } from '@/lib/homeRoutes';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -29,16 +30,9 @@ export default function LoginPage() {
       const role = authUser.role;
 
       // redirect based on role
-      const ROLE_HOME: Record<string, string> = {
-        superAdmin: '/super-admin/home',
-        generalManager: '/general-manager/home',
-        financeManager: '/finance-manager/home',
-        partner: '/partner/home',
-      };
-
       const home = ROLE_HOME[role] || '/login-error'; 
 
-      router.push(home); 
+      router.replace(home); 
 
     } catch (e: unknown) {
       alert(`Login failed. Please try again. \n${e}`);
