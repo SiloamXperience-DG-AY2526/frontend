@@ -1,13 +1,20 @@
 'use client';
 
 import { useAuth } from '@/contexts/AuthContext';
+import { useRouter } from 'next/navigation';
 
 export default function PartnerHomePage() {
 
   // example usage
-  const { user } = useAuth();
+  const { user, authLogout } = useAuth();
+  const router = useRouter();
   if (!user) return;
   const { userId, firstName, lastName, email, role } = user;
+
+  const handleLogout = () => {
+    authLogout();
+    router.replace('/');
+  };
 
   return (
     <div>
@@ -16,6 +23,7 @@ export default function PartnerHomePage() {
       <div>Last Name: {lastName}</div>
       <div>Email: {email}</div>
       <div>Role: {role}</div>
+      <button onClick={handleLogout}>Logout</button>
     </div>
   );
 };

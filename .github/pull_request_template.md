@@ -9,4 +9,5 @@ Brief description of what this PR does.
 ## Checklist before requesting a review
 - [ ] My PR passes the CI build checks.
 - [ ] My code follows the data type abstraction & naming conventions.
-- [ ] _(If applicable)_ I have successfully tested the API integration.
+- [ ] _(API)_ I have successfully tested my API integration.
+- [ ] _(API)_ I have ensured type safety for my API functions.
