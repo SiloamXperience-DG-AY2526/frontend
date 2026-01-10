@@ -1,13 +1,23 @@
 'use client';
 
 import { useState } from 'react';
-import Sidebar from '@/components/Sidebar';
+import Sidebar from '@/components/sidebar';
 import StarRating from '@/components/ui/StarRating';
-import Textarea from '@/components/ui/Textarea';
+import Textarea from '@/components/ui/TextArea';
 import Button from '@/components/ui/Button';
-import { FeedbackPayload } from '@/types/VolunteerFeedback';
-
+import { useParams } from 'next/navigation';
+import { FeedbackPayload } from '@/types/Volunteer';
+import { submitVolunteerFeedback } from '@/lib/api/volunteer';
+import Toast from '@/components/ui/Toast';
+const USER_ID_TEMP = 'ccecd54a-b014-4a4c-a56c-588a0d197fec';
 export default function FeedbackPage() {
+  const params = useParams<{ projectid: string }>();
+
+  const projectId = params.projectid;
+  const [toastOpen, setToastOpen] = useState(false);
+  const [toastType, setToastType] = useState<'success' | 'error'>('success');
+  const [toastTitle, setToastTitle] = useState('');
+  const [toastMsg, setToastMsg] = useState<string | undefined>(undefined);
   const [ratings, setRatings] = useState({
     overall: 0,
     management: 0,
@@ -20,10 +30,15 @@ export default function FeedbackPage() {
     improvement: '',
     comments: '',
   });
-  
+
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async () => {
+    if (!projectId) {
+      alert('Missing projectId in URL.');
+      return;
+    }
+
     // basic frontend validation
     if (
       !ratings.overall ||
@@ -32,6 +47,12 @@ export default function FeedbackPage() {
       !ratings.facilities
     ) {
       alert('Please rate all categories before submitting.');
+      return;
+    }
+
+    //  validation for text fields
+    if (!feedback.experience.trim() || !feedback.improvement.trim()) {
+      alert('Please fill in the experience and improvement fields.');
       return;
     }
 
@@ -47,35 +68,56 @@ export default function FeedbackPage() {
       feedback: {
         experience: feedback.experience.trim(),
         improvement: feedback.improvement.trim(),
-        comments: feedback.comments.trim(),
+        comments: feedback.comments.trim() || undefined,
       },
       submittedAt: new Date().toISOString(),
     };
 
     try {
-      // test call
-      console.log('Submitting feedback payload:', payload);
+      const resp = await submitVolunteerFeedback({
+        userId: USER_ID_TEMP,
+        projectId,
+        payload,
+      });
 
-      await new Promise((resolve) => setTimeout(resolve, 1200));
-
-      alert('Feedback submitted successfully!');
+      setToastType('success');
+      setToastTitle('Application submitted');
+      setToastMsg('We’ll contact you soon with the next steps.');
+      setToastOpen(true);
 
       // reset form
-      setRatings({
-        overall: 0,
-        management: 0,
-        planning: 0,
-        facilities: 0,
-      });
+      setRatings({ overall: 0, management: 0, planning: 0, facilities: 0 });
+      setFeedback({ experience: '', improvement: '', comments: '' });
+      setTimeout(() => {
+        window.location.href = '/volunteers';
+      }, 2000);
 
-      setFeedback({
-        experience: '',
-        improvement: '',
-        comments: '',
-      });
-    } catch (error) {
-      console.error(error);
-      alert('Something went wrong. Please try again.');
+      console.log('Feedback response:', resp);
+    } catch (e: unknown) {
+      console.error(e);
+      const msg = (() => {
+        if (
+          typeof e === 'object' &&
+          e !== null &&
+          'name' in e &&
+          (e as { name?: unknown }).name === 'ApiError' &&
+          'message' in e &&
+          typeof (e as { message?: unknown }).message === 'string'
+        ) {
+          return (e as { message: string }).message;
+        }
+
+        // Normal Error
+        if (e instanceof Error) return e.message;
+
+        // Fallback
+        return 'Failed to submit application';
+      })();
+
+      setToastType('error');
+      setToastTitle('Submission failed');
+      setToastMsg(msg);
+      setToastOpen(true);
     } finally {
       setLoading(false);
     }
@@ -84,16 +126,20 @@ export default function FeedbackPage() {
   return (
     <div className="flex min-h-screen bg-gray-50">
       <Sidebar />
-
+      <Toast
+        open={toastOpen}
+        type={toastType}
+        title={toastTitle}
+        message={toastMsg}
+        duration={3500}
+        onClose={() => setToastOpen(false)}
+      />
       <main className="flex-1 px-10 py-8">
         {/* Header with green bar */}
         <div className="mb-8 flex items-start gap-3">
           <div className="w-[5px] h-[39px] bg-[#56E0C2] mt-1" />
           <div>
-            <h1 className="text-2xl font-bold">
-              Volunteer <span className="bg-yellow-300 px-1">Feedback</span>{' '}
-              Form
-            </h1>
+            <h1 className="text-3xl font-bold">Volunteer Feedback Form</h1>
             <p className="text-sm text-gray-500">
               Track your volunteer activities, donations, and applications
             </p>
@@ -151,9 +197,7 @@ export default function FeedbackPage() {
 
         {/* Your Feedback */}
         <div className="rounded-lg border bg-white p-6">
-          <h2 className="text-xl font-bold mb-1">
-            Your <span className="bg-yellow-300 px-1">Feedback</span>
-          </h2>
+          <h2 className="text-xl font-bold mb-1">Your Feedback</h2>
           <p className="text-sm text-gray-500 mb-6">
             Help us understand your experience better
           </p>

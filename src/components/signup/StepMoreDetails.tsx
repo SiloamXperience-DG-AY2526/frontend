@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { SignUpFormProps } from '@/types/SignUpData';
 import Button from '@/components/ui/Button';
 import { fetchNationalities, fetchLanguages } from '@/lib/countries';
-import Textarea from '../ui/Textarea';
+import Textarea from '../ui/TextArea';
 import Select from '../ui/Select';
 import Input from '../ui/Input';
 import MultiSelect from '../ui/MultiSelect';
@@ -28,7 +28,12 @@ function getCachedMeta(): { countries: string[]; languages: string[] } | null {
   }
 }
 
-export default function MoreAboutYou({ data, setData, next, back }: SignUpFormProps) {
+export default function MoreAboutYou({
+  data,
+  setData,
+  next,
+  back,
+}: SignUpFormProps) {
   const cachedMeta = getCachedMeta();
 
   const [countries, setCountries] = useState<string[]>(

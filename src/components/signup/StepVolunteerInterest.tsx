@@ -2,7 +2,7 @@ import { SignUpFormProps } from '@/types/SignUpData';
 import Button from '@/components/ui/Button';
 import Input from '../ui/Input';
 import MultiSelect from '../ui/MultiSelect';
-import Textarea from '../ui/Textarea';
+import Textarea from '../ui/TextArea';
 
 const VOLUNTEER_INTERESTS = [
   'Organizing fundraising events',
