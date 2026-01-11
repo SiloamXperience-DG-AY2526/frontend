@@ -3,14 +3,14 @@ import { ProjectApprovalStatus } from '@/types/ProjectData';
 
 const BACKEND_URL = process.env.BACKEND_URL!;
 
-type FeedbackType = "supervisor" | "peer" | "self";
+type FeedbackType = 'supervisor' | 'peer' | 'self';
 
 export const changeProposedProjectStatus = async (
     projectId: string,
     status: ProjectApprovalStatus
 ) => {
 
-    const response = await fetch(`${BACKEND_URL}/api/projects/${projectId}/status`, {
+    const response = await fetch(`${BACKEND_URL}/api/projects/${projectId}/ApplyStatus`, {
         method: 'PATCH',
         headers: {
             'Content-Type': 'application/json',
@@ -52,4 +52,4 @@ export const submitPeerFeedback = async (
         const error = await response.json();
         throw new Error(error.message || 'Failed to submit feedback');
     }
-}
+};

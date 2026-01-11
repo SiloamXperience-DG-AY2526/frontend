@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import { useAuth } from "@/contexts/AuthContext";
-import { submitPeerFeedback } from "@/lib/api/general/projects";
-import { useParams } from "next/navigation";
-import { useState } from "react";
+import { useAuth } from '@/contexts/AuthContext';
+import { submitPeerFeedback } from '@/lib/api/general/projects';
+import { useParams } from 'next/navigation';
+import { useState } from 'react';
 
-type FeedbackType = "supervisor" | "peer" | "self";
+type FeedbackType = 'supervisor' | 'peer' | 'self';
 
 export default function FeedbackPage() {
     const { user } = useAuth();
@@ -13,11 +13,11 @@ export default function FeedbackPage() {
     const [loading, setLoading] = useState(false);
     const [feedbackType, setFeedbackType] = useState<FeedbackType | null>(null);
     const [formData, setFormData] = useState({
-        reviewer: "",
-        reviewee: "",
-        score: "",
-        strengths: "",
-        improvements: "",
+        reviewer: '',
+        reviewee: '',
+        score: '',
+        strengths: '',
+        improvements: '',
     });
 
     if (!user) return null;
@@ -26,12 +26,12 @@ export default function FeedbackPage() {
         e.preventDefault();
 
         if (!feedbackType) {
-            alert("Please select a feedback type.");
+            alert('Please select a feedback type.');
             return;
         }
 
         if (!formData.reviewer || !formData.reviewee || !formData.score) {
-            alert("Please fill in all required fields.");
+            alert('Please fill in all required fields.');
             return;
         }
 
@@ -50,19 +50,19 @@ export default function FeedbackPage() {
 
         try {
             await submitPeerFeedback(payload);
-            alert("Feedback submitted successfully!");
+            alert('Feedback submitted successfully!');
 
             setFeedbackType(null);
             setFormData({
-                reviewer: "",
-                reviewee: "",
-                score: "",
-                strengths: "",
-                improvements: "",
+                reviewer: '',
+                reviewee: '',
+                score: '',
+                strengths: '',
+                improvements: '',
             });
         } catch (error) {
             console.error(error);
-            alert("Something went wrong. Please try again.");
+            alert('Something went wrong. Please try again.');
         } finally {
             setLoading(false);
         }
@@ -91,8 +91,8 @@ export default function FeedbackPage() {
                                 type="radio"
                                 name="feedbackType"
                                 value="supervisor"
-                                checked={feedbackType === "supervisor"}
-                                onChange={() => setFeedbackType("supervisor")}
+                                checked={feedbackType === 'supervisor'}
+                                onChange={() => setFeedbackType('supervisor')}
                                 className="peer sr-only"
                             />
                             <div className="w-4 h-4 rounded-full border-2 border-[#195D4B] peer-checked:border-[6px] peer-checked:border-eucalyptus-100" />
@@ -106,8 +106,8 @@ export default function FeedbackPage() {
                                 type="radio"
                                 name="feedbackType"
                                 value="peer"
-                                checked={feedbackType === "peer"}
-                                onChange={() => setFeedbackType("peer")}
+                                checked={feedbackType === 'peer'}
+                                onChange={() => setFeedbackType('peer')}
                                 className="peer sr-only"
                             />
                             <div className="w-4 h-4 rounded-full border-2 border-[#195D4B] peer-checked:border-[6px] peer-checked:border-eucalyptus-100" />
@@ -121,8 +121,8 @@ export default function FeedbackPage() {
                                 type="radio"
                                 name="feedbackType"
                                 value="self"
-                                checked={feedbackType === "self"}
-                                onChange={() => setFeedbackType("self")}
+                                checked={feedbackType === 'self'}
+                                onChange={() => setFeedbackType('self')}
                                 className="peer sr-only"
                             />
                             <div className="w-4 h-4 rounded-full border-2 border-[#195D4B] peer-checked:border-[6px] peer-checked:border-eucalyptus-100" />
@@ -210,10 +210,10 @@ export default function FeedbackPage() {
                         disabled={loading}
                         className="px-8 py-2.5 rounded-md text-slate-50 text-base font-semibold disabled:opacity-50"
                         style={{
-                            background: "linear-gradient(90deg, #015E4B 0%, #014F5E 100%)",
+                            background: 'linear-gradient(90deg, #015E4B 0%, #014F5E 100%)',
                         }}
                     >
-                        {loading ? "Submitting..." : "Submit"}
+                        {loading ? 'Submitting...' : 'Submit'}
                     </button>
                 </div>
             </form>

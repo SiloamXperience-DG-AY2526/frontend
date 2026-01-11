@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { ProjectApprovalStatus } from "@/types/ProjectData";
-import { changeProposedProjectStatus } from "@/lib/api/general/projects";
+import { useState } from 'react';
+import { ProjectApprovalStatus } from '@/types/ProjectData';
+import { changeProposedProjectStatus } from '@/lib/api/general/projects';
 
 interface Project {
     id: string;
@@ -17,33 +17,33 @@ interface Project {
 
 const projects: Project[] = [
     {
-        id: "1",
-        name: "Community Garden Initiative",
-        startDate: "2025-11-18",
-        endDate: "2025-12-19",
-        location: "Downtown Community Center",
-        organisingTeam: "Green Volunteers",
-        initiatorName: "John Smith",
+        id: '1',
+        name: 'Community Garden Initiative',
+        startDate: '2025-11-18',
+        endDate: '2025-12-19',
+        location: 'Downtown Community Center',
+        organisingTeam: 'Green Volunteers',
+        initiatorName: 'John Smith',
         approvalStatus: ProjectApprovalStatus.pending,
     },
     {
-        id: "2",
-        name: "Food Bank Drive",
-        startDate: "2025-11-18",
-        endDate: "2025-12-19",
-        location: "Central Food Hub",
-        organisingTeam: "Care Collective",
-        initiatorName: "Jane Doe",
+        id: '2',
+        name: 'Food Bank Drive',
+        startDate: '2025-11-18',
+        endDate: '2025-12-19',
+        location: 'Central Food Hub',
+        organisingTeam: 'Care Collective',
+        initiatorName: 'Jane Doe',
         approvalStatus: ProjectApprovalStatus.reviewing,
     },
     {
-        id: "3",
-        name: "Beach Cleanup Project",
-        startDate: "2025-11-18",
-        endDate: "2025-12-19",
-        location: "Sunset Beach",
-        organisingTeam: "Ocean Warriors",
-        initiatorName: "Mike Johnson",
+        id: '3',
+        name: 'Beach Cleanup Project',
+        startDate: '2025-11-18',
+        endDate: '2025-12-19',
+        location: 'Sunset Beach',
+        organisingTeam: 'Ocean Warriors',
+        initiatorName: 'Mike Johnson',
         approvalStatus: ProjectApprovalStatus.approved,
     },
 ];
@@ -69,10 +69,10 @@ export default function Projects() {
                 [projectId]: newStatus,
             }));
     
-            alert("Project status updated successfully!");
+            alert('Project status updated successfully!');
         } catch (error) {
-            console.error("Error updating project status:", error);
-            alert("Failed to update project status. Please try again.");
+            console.error('Error updating project status:', error);
+            alert('Failed to update project status. Please try again.');
         } finally {
             setLoading(null);
         }
@@ -81,20 +81,20 @@ export default function Projects() {
     const getStatusColor = (status: ProjectApprovalStatus) => {
         switch (status) {
             case ProjectApprovalStatus.approved:
-                return "text-green-600";
+                return 'text-green-600';
             case ProjectApprovalStatus.rejected:
-                return "text-red-600";
+                return 'text-red-600';
             case ProjectApprovalStatus.reviewing:
-                return "text-blue-600";
+                return 'text-blue-600';
             case ProjectApprovalStatus.pending:
-                return "text-orange-600";
+                return 'text-orange-600';
             default:
-                return "text-gray-600";
+                return 'text-gray-600';
         }
     };
 
     const formatDate = (dateString: string) => {
-        return new Date(dateString).toLocaleDateString("en-GB");
+        return new Date(dateString).toLocaleDateString('en-GB');
     };
 
     return (
