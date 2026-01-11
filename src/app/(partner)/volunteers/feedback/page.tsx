@@ -20,7 +20,7 @@ export default function FeedbackPage() {
     improvement: '',
     comments: '',
   });
-  
+
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async () => {
