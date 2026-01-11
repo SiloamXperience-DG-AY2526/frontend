@@ -3,6 +3,8 @@ import { getUserProfile } from './user';
 
 // DO NOT CALL THESE FUNCTIONS
 // functions reserved for auth context 
+
+// use route handlers for server-side calls
 export async function login( loginData: LoginInputData ): Promise<AuthUser> {
   
   const res = await fetch('/api/auth/login', { // auth token set here
@@ -20,9 +22,8 @@ export async function login( loginData: LoginInputData ): Promise<AuthUser> {
   return authUser;
 }
 
-// TODO: logout endpoint
 export async function logout() {
-  await fetch('/api/auth/logout', { method: 'POST' });
+  await fetch('/api/auth/logout'); // cookie reset
 }
 
 // retrieves data from jwt token
@@ -30,11 +31,12 @@ export async function getUserCredentials(): Promise<UserCredentials> {
 
   const res = await fetch('/api/auth/user');
 
-  if (!res.ok) throw Error('Failed to fetch user credentials.');
+  if (!res.ok) {
+    const body = await res.json();
+    throw Error(body.errMsg);
+  }
   
   const { userId, role } = await res.json();
-
-  console.log('Returned userId:', userId);
 
   return { userId: userId, role: role };
 }
