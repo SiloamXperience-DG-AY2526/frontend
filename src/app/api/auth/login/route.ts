@@ -14,15 +14,11 @@ export async function POST(req: Request) {
 
   const data = await res.json();
 
-  console.log(data);
+  if (!res.ok) return NextResponse.json({ status: 401 });
 
-  if (!res.ok) return NextResponse.json(data, { status: res.status });
+  const response = NextResponse.json({ status: 200 });
 
-  console.log('Login successful, setting token cookie...');
-
-  const response = NextResponse.json({ ok: true }, { status: 200 });
-
-  // set auth token
+  // set auth token cookie
   response.cookies.set('access_token', data.token, {
     httpOnly: true,
     sameSite: 'lax',

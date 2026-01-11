@@ -1,6 +1,15 @@
+'use client';
+
+import { useAuth } from '@/contexts/AuthContext';
+import { ROLE_HOME } from '@/lib/homeRoutes';
 import Link from 'next/link';
 
 export default function LandingPage() {
+
+  const { user } = useAuth();
+  
+  const homeRoute = user ? (ROLE_HOME[user.role] ?? '/') : '/login';
+      
   return (
     // original color to be added after discussion
     <div className="relative min-h-screen bg-white overflow-hidden">
@@ -56,7 +65,7 @@ export default function LandingPage() {
           </h1>
 
           <div className="mt-8 flex gap-5">
-            <Link href="/login">
+            <Link href={homeRoute}>
               <button className="px-12 py-2.5 bg-[#D9D9D9] cursor-pointer text-black rounded-md text-lg font-bold">
                 Log In
               </button>

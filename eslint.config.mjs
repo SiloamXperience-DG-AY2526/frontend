@@ -5,13 +5,10 @@ import tseslint from "typescript-eslint";
 import nextVitals from "eslint-config-next/core-web-vitals";
 
 export default defineConfig([
-  // Next.js rules (core web vitals)
   ...nextVitals,
 
-  // JS recommended
   js.configs.recommended,
 
-  // TS recommended (brings parser + plugin configs)
   ...tseslint.configs.recommended,
 
   // Custom rules
@@ -36,6 +33,7 @@ export default defineConfig([
     files: ["**/*.{ts,tsx}"],
     rules: {
       "no-unused-vars": "off",
+      indent: "off",
     },
   },
 

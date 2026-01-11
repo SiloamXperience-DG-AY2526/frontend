@@ -22,7 +22,7 @@ export type AuthPayload = {
 
 export type JwtPayload = {
   userId: string;
-  role: string;
+  role: 'superAdmin' | 'generalManager' | 'financeManager' | 'partner';
   exp?: number;
 };
 
