@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Sidebar from '@/components/Sidebar';
+import PageHeader from '@/components/ui/PageHeader';
 import StarRating from '@/components/ui/StarRating';
 import Textarea from '@/components/ui/Textarea';
 import Button from '@/components/ui/Button';
@@ -86,19 +87,11 @@ export default function FeedbackPage() {
       <Sidebar />
 
       <main className="flex-1 px-10 py-8">
-        {/* Header with green bar */}
-        <div className="mb-8 flex items-start gap-3">
-          <div className="w-[5px] h-[39px] bg-[#56E0C2] mt-1" />
-          <div>
-            <h1 className="text-2xl font-bold">
-              Volunteer <span className="bg-yellow-300 px-1">Feedback</span>{' '}
-              Form
-            </h1>
-            <p className="text-sm text-gray-500">
-              Track your volunteer activities, donations, and applications
-            </p>
-          </div>
-        </div>
+        <PageHeader
+          title="Volunteer Feedback Form"
+          subtitle="Track your volunteer activities, donations, and applications"
+          highlightTitle={false}
+        />
 
         {/* Rate your experience */}
         <div className="rounded-lg border bg-white p-6 mb-6">
