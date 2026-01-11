@@ -3,12 +3,24 @@ import TableHeaderCell from './TableHeaderCell';
 
 interface TableHeaderProps<T> {
   columns: Column<T>[];
+  headerBgColor?: string;
+  headerTextColor?: string;
+  hideColumnHeaders?: boolean;
 }
 
-export default function TableHeader<T>({ columns }: TableHeaderProps<T>) {
+export default function TableHeader<T>({
+  columns,
+  headerBgColor = '#195D4B',
+  headerTextColor = 'white',
+  hideColumnHeaders = false,
+}: TableHeaderProps<T>) {
+  if (hideColumnHeaders) {
+    return null;
+  }
+
   return (
     <thead>
-      <tr className="bg-[#195D4B] text-white">
+      <tr style={{ backgroundColor: headerBgColor, color: headerTextColor }}>
         {columns.map((column, index) => (
           <TableHeaderCell key={index} column={column} />
         ))}

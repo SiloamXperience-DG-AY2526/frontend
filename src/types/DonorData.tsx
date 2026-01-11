@@ -9,3 +9,27 @@ export type Donor = {
 };
 
 export type DonorTableData = Donor[];
+
+export type Donation = {
+  id: string;
+  project: string;
+  amount: number;
+  receipt: 'Pending' | 'Issued';
+  date: string;
+};
+
+export type DonorDetail = {
+  donorId: string;
+  fullName: string;
+  prefixTitle: string;
+  birthday: string;
+  gender: 'Male' | 'Female' | 'Other';
+  occupation: string;
+  nationality: string;
+  phoneNumber: string;
+  preferredCommunicationMethod: string;
+  donations: Donation[];
+  cumulativeAmount: number;
+  projects: string[];
+  status: 'Active' | 'Inactive';
+};

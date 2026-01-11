@@ -2,6 +2,7 @@ import { Donor } from '@/types/DonorData';
 import DataTable, { Column } from '@/components/table/DataTable';
 import StatusBadge from '@/components/table/StatusBadge';
 import EditButton from '../../../../../components/ui/EditButton';
+import Link from 'next/link';
 
 interface DonorsDataTableProps {
   donors: Donor[];
@@ -18,7 +19,13 @@ export default function DonorsDataTable({
     {
       header: 'Partner Name',
       accessor: (donor) => (
-        <span className="text-blue-600">{donor.partnerName}</span>
+        <Link
+          href={`/finance-manager/donors/${donor.donorId}`}
+          className="hover:underline"
+          style={{ color: '#2C89A5' }}
+        >
+          {donor.partnerName}
+        </Link>
       ),
     },
     {

@@ -6,7 +6,7 @@ interface TableContainerProps {
 
 export default function TableContainer({ children }: TableContainerProps) {
   return (
-    <div className="rounded-lg border bg-white overflow-hidden">
+    <div className="rounded-lg border border-gray-300 bg-white overflow-hidden">
       <div className="overflow-x-auto">{children}</div>
     </div>
   );

@@ -30,5 +30,5 @@ export default function TableRow<T>({
 function getDefaultRowClassName(index: number): string {
   const isEvenRow = index % 2 === 0;
   const bgColor = isEvenRow ? 'bg-white' : 'bg-gray-50';
-  return `border-t ${bgColor} hover:bg-gray-100 transition`;
+  return `${bgColor} hover:bg-gray-100 transition`;
 }

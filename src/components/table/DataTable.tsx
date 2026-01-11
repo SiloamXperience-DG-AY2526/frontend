@@ -35,6 +35,16 @@ interface DataTableProps<T> {
   getRowKey: (item: T) => string;
   /** Optional function that returns CSS class name(s) for a row based on the item and index */
   getRowClassName?: (item: T, index: number) => string;
+  /** Optional table title to display above the table */
+  tableTitle?: string;
+  /** Optional background color for the table title row */
+  tableTitleBgColor?: string;
+  /** Optional background color for the column header row */
+  headerBgColor?: string;
+  /** Optional text color for the column header row */
+  headerTextColor?: string;
+  /** Whether to hide the column header row */
+  hideColumnHeaders?: boolean;
 }
 
 /**
@@ -79,6 +89,11 @@ export default function DataTable<T>({
   emptyMessage = 'No data found',
   getRowKey,
   getRowClassName,
+  tableTitle,
+  tableTitleBgColor = '#4A8B9B',
+  headerBgColor,
+  headerTextColor,
+  hideColumnHeaders = false,
 }: DataTableProps<T>) {
   if (loading) {
     return <LoadingState />;
@@ -87,7 +102,25 @@ export default function DataTable<T>({
   return (
     <TableContainer>
       <Table>
-        <TableHeader columns={columns} />
+        {tableTitle && (
+          <thead>
+            <tr>
+              <th
+                colSpan={columns.length}
+                className="text-white px-6 py-3 text-left"
+                style={{ backgroundColor: tableTitleBgColor }}
+              >
+                <h2 className="text-2xl font-bold">{tableTitle}</h2>
+              </th>
+            </tr>
+          </thead>
+        )}
+        <TableHeader
+          columns={columns}
+          headerBgColor={headerBgColor}
+          headerTextColor={headerTextColor}
+          hideColumnHeaders={hideColumnHeaders}
+        />
         <TableBody
           columns={columns}
           data={data}
