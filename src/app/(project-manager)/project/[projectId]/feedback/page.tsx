@@ -1,5 +1,6 @@
 "use client";
 
+import { useAuth } from "@/contexts/AuthContext";
 import { submitPeerFeedback } from "@/lib/api/general/projects";
 import { useParams } from "next/navigation";
 import { useState } from "react";
@@ -7,9 +8,8 @@ import { useState } from "react";
 type FeedbackType = "supervisor" | "peer" | "self";
 
 export default function FeedbackPage() {
-
-    const { projectId } = useParams(); 
-
+    const { user } = useAuth();
+    const { projectId } = useParams();
     const [loading, setLoading] = useState(false);
     const [feedbackType, setFeedbackType] = useState<FeedbackType | null>(null);
     const [formData, setFormData] = useState({
@@ -19,6 +19,8 @@ export default function FeedbackPage() {
         strengths: "",
         improvements: "",
     });
+
+    if (!user) return null;
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -43,7 +45,7 @@ export default function FeedbackPage() {
             strengths: formData.strengths.trim(),
             improvements: formData.improvements.trim(),
             submittedAt: new Date().toISOString(),
-            projectId : String(projectId),
+            projectId: String(projectId),
         };
 
         try {
