@@ -90,7 +90,6 @@ export default function FeedbackPage() {
         <PageHeader
           title="Volunteer Feedback Form"
           subtitle="Track your volunteer activities, donations, and applications"
-          highlightTitle={false}
         />
 
         {/* Rate your experience */}
