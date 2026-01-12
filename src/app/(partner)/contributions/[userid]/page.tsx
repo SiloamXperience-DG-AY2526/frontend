@@ -1,15 +1,16 @@
 'use client';
-
 import React, { useMemo, useState } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
 import Sidebar from '@/components/sidebar';
 import VolunteeringTab from '@/components/contribution/VolunteeringTab';
 import ApplicationTab from '@/components/contribution/ApplicationTab';
-
-const USER_ID_TEMP = 'ccecd54a-b014-4a4c-a56c-588a0d197fec';
-
+import { useRouter } from 'next/navigation';
 type TabKey = 'volunteering' | 'donations' | 'applications';
 
 export default function MyContributions() {
+  const router = useRouter();
+  const { user } = useAuth();
+
   const [activeTab, setActiveTab] = useState<TabKey>('volunteering');
 
   const tabs = useMemo(
@@ -20,6 +21,21 @@ export default function MyContributions() {
     ],
     []
   );
+  if (!user) {
+    return (
+      <div className="flex min-h-screen w-full items-center justify-center bg-white text-sm text-gray-600">
+        Kindly&nbsp;
+        <button
+          onClick={() => router.push('/login')}
+          className="font-semibold text-teal-600 hover:underline cursor-pointer"
+        >
+          login
+        </button>
+        &nbsp;to volunteer
+      </div>
+    );
+  }
+  const { userId } = user;
 
   return (
     <div className="flex min-h-screen bg-gray-50">
@@ -62,13 +78,9 @@ export default function MyContributions() {
         </div>
 
         {/* Content */}
-        {activeTab === 'volunteering' && (
-          <VolunteeringTab userId={USER_ID_TEMP} />
-        )}
+        {activeTab === 'volunteering' && <VolunteeringTab userId={userId} />}
 
-        {activeTab === 'applications' && (
-          <ApplicationTab userId={USER_ID_TEMP} />
-        )}
+        {activeTab === 'applications' && <ApplicationTab userId={userId} />}
 
         {activeTab === 'donations' && (
           <div className="text-sm text-gray-500 mt-6">

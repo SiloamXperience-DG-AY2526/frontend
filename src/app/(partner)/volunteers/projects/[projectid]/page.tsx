@@ -2,7 +2,7 @@
 
 import React, { use, useEffect, useMemo, useState } from 'react';
 import Sidebar from '@/components/sidebar';
-import { getVolunteerProjectDetail } from '@/lib/api/volunteer';
+import { getVolunteerProjectDetails } from '@/lib/api/volunteer';
 import { formatShortDate, formatTimeRange } from '@/lib/utils/date';
 import {
   CalendarIcon,
@@ -10,67 +10,14 @@ import {
   MapPinIcon,
 } from '@heroicons/react/24/outline';
 import type { VolunteerProjectDetail } from '@/types/Volunteer';
-import TargetIcon from '@/components/icons/TargetIcon';
+import Image from 'next/image';
+
 import Link from 'next/link';
-function capitalizeFirst(s?: string | null) {
-  if (!s) return '';
-  return s.charAt(0).toUpperCase() + s.slice(1);
-}
+import capitalizeFirst from '@/lib/utils/capitalizeFirst';
+import Section from '@/components/volunteer/project/Section';
+import ObjectiveList from '@/components/volunteer/project/ObjectiveList';
+import InfoRow from '@/components/volunteer/project/InfoRow';
 
-function InfoRow({
-  icon: Icon,
-  text,
-}: {
-  icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
-  text: string;
-}) {
-  return (
-    <div className="flex items-center gap-3 text-sm text-gray-700">
-      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#195D4B]">
-        <Icon className="h-4 w-4 text-white" />
-      </div>
-      <span>{text}</span>
-    </div>
-  );
-}
-
-function Section({
-  title,
-  children,
-}: {
-  title: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <section className="mt-8">
-      <h2 className="text-xl md:text-2xl font-bold text-teal-700 tracking-tight">
-        {title}
-      </h2>
-      <div className="mt-2 text-sm md:text-[15px] text-gray-700 leading-6">
-        {children}
-      </div>
-    </section>
-  );
-}
-function ObjectiveList({ text }: { text: string }) {
-  const items = text
-    .split('\n')
-    .map((i) => i.replace(/^•\s*/, '').trim())
-    .filter(Boolean);
-
-  return (
-    <ul className="mt-4 space-y-4">
-      {items.map((item, idx) => (
-        <li key={idx} className="flex items-start gap-3">
-          <TargetIcon className="mt-0.5 shrink-0" />
-          <span className="text-sm md:text-[15px] text-gray-800 leading-6">
-            {item}
-          </span>
-        </li>
-      ))}
-    </ul>
-  );
-}
 export default function VolunteerProjectDetailPage({
   params,
 }: {
@@ -87,7 +34,7 @@ export default function VolunteerProjectDetailPage({
     async function load() {
       try {
         setLoading(true);
-        const res = await getVolunteerProjectDetail(projectid);
+        const res = await getVolunteerProjectDetails(projectid);
         if (mounted) setData(res.data as VolunteerProjectDetail);
       } catch (e: unknown) {
         console.error(e);
@@ -156,7 +103,6 @@ export default function VolunteerProjectDetailPage({
 
       <main className="w-full px-6 py-6 md:px-10">
         <div className="flex flex-col gap-6 lg:flex-row">
-          {/* LEFT */}
           <div className="flex-1">
             <div className="mb-8 flex items-start mt-1 gap-3">
               <div className="w-[5px] h-[39px] bg-[#56E0C2]" />
@@ -167,11 +113,12 @@ export default function VolunteerProjectDetailPage({
             <div className="mt-5 overflow-hidden rounded-2xl border bg-white shadow-sm">
               <div className="relative h-[280px] w-full bg-gray-100">
                 {data.image ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
+                  <Image
                     src={data.image}
                     alt={data.title}
-                    className="h-full w-full object-cover"
+                    fill
+                    className="object-cover"
+                    sizes="100vw"
                   />
                 ) : (
                   <div className="flex h-full items-center justify-center text-sm text-gray-500">
@@ -195,7 +142,6 @@ export default function VolunteerProjectDetailPage({
             {/* Volunteer positions */}
           </div>
 
-          {/* RIGHT card */}
           <aside className="w-full lg:w-[340px]">
             <div className="mt-20">
               <div className="h-[280px] rounded-2xl border bg-white p-6 shadow-sm flex flex-col justify-center">
@@ -206,7 +152,6 @@ export default function VolunteerProjectDetailPage({
                   <InfoRow icon={MapPinIcon} text={data.location ?? '—'} />
                 </div>
 
-                {/* Button */}
                 <button
                   onClick={scrollToPositions}
                   className="

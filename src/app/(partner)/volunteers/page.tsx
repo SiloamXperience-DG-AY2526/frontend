@@ -3,7 +3,6 @@
 import Sidebar from '@/components/sidebar';
 import React, { useEffect, useState } from 'react';
 
-// import { UserIcon, ClockIcon, HeartIcon } from "@heroicons/react/24/solid";
 import VolunteerSearch from '@/components/volunteer/Search';
 import VolunteerProjectGrid from '@/components/volunteer/VolunteerProjectGrid';
 import VolunteerPagination from '@/components/volunteer/VolunteerPagination';
@@ -15,6 +14,7 @@ import HumanStatIcon from '@/components/icons/HumanIcon';
 import ClockIcon from '@/components/icons/ClockIcon';
 import HeartIcon from '@/components/icons/HeartIcon';
 import Link from 'next/link';
+import Toast from '@/components/ui/Toast';
 
 function useDebouncedValue<T>(value: T, delayMs = 450) {
   const [debounced, setDebounced] = useState(value);
@@ -53,6 +53,11 @@ export default function VolunteerPage() {
   const [projects, setProjects] = useState<VolunteerProject[]>([]);
   const [totalPages, setTotalPages] = useState(1);
 
+  const [toastOpen, setToastOpen] = useState(false);
+  const [toastType, setToastType] = useState<'success' | 'error'>('success');
+  const [toastTitle, setToastTitle] = useState('');
+  const [toastMsg, setToastMsg] = useState<string | undefined>(undefined);
+
   useEffect(() => setPage(1), [debouncedSearch]);
 
   useEffect(() => {
@@ -61,26 +66,24 @@ export default function VolunteerPage() {
     async function load() {
       setLoading(true);
       try {
-        const json = await getAvailableVolunteerProjects({
+        const { data, pagination } = await getAvailableVolunteerProjects(
           page,
           limit,
-          search: debouncedSearch,
-          signal: controller.signal,
-        });
+          debouncedSearch,
+          controller.signal
+        );
 
-        setProjects(Array.isArray(json.data) ? json.data : []);
-        setTotalPages(json.pagination?.totalPages ?? 1);
+        setProjects(Array.isArray(data) ? data : []);
+        setTotalPages(pagination?.totalPages ?? 1);
       } catch (e: unknown) {
-        if (
-          typeof e === 'object' &&
-          e !== null &&
-          'name' in e &&
-          (e as { name?: unknown }).name !== 'AbortError'
-        ) {
-          console.error(e);
-          setProjects([]);
-          setTotalPages(1);
-        }
+        if (e instanceof DOMException && e.name === 'AbortError') return;
+        setToastType('error');
+        setToastTitle('Unable to load');
+        setToastMsg(`Unable to load projects: ${e}`);
+        setToastOpen(true);
+
+        setProjects([]);
+        setTotalPages(1);
       } finally {
         setLoading(false);
       }
@@ -93,6 +96,14 @@ export default function VolunteerPage() {
   return (
     <div className="flex min-h-screen bg-gray-50">
       <Sidebar />
+      <Toast
+        open={toastOpen}
+        type={toastType}
+        title={toastTitle}
+        message={toastMsg}
+        duration={3500}
+        onClose={() => setToastOpen(false)}
+      />
 
       <main className="w-full px-6 py-6 md:px-10">
         {/* Header */}

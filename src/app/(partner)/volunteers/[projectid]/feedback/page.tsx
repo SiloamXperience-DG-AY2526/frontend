@@ -1,6 +1,8 @@
 'use client';
 
+import { useAuth } from '@/contexts/AuthContext';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Sidebar from '@/components/sidebar';
 import StarRating from '@/components/ui/StarRating';
 import Textarea from '@/components/ui/TextArea';
@@ -9,9 +11,11 @@ import { useParams } from 'next/navigation';
 import { FeedbackPayload } from '@/types/Volunteer';
 import { submitVolunteerFeedback } from '@/lib/api/volunteer';
 import Toast from '@/components/ui/Toast';
-const USER_ID_TEMP = 'ccecd54a-b014-4a4c-a56c-588a0d197fec';
+
 export default function FeedbackPage() {
   const params = useParams<{ projectid: string }>();
+  const { user } = useAuth();
+  const router = useRouter();
 
   const projectId = params.projectid;
   const [toastOpen, setToastOpen] = useState(false);
@@ -32,6 +36,21 @@ export default function FeedbackPage() {
   });
 
   const [loading, setLoading] = useState(false);
+  if (!user) {
+    return (
+      <div className="flex min-h-screen w-full items-center justify-center bg-white text-sm text-gray-600">
+        Kindly&nbsp;
+        <button
+          onClick={() => router.push('/login')}
+          className="font-semibold text-teal-600 hover:underline cursor-pointer"
+        >
+          login
+        </button>
+        &nbsp;to volunteer
+      </div>
+    );
+  }
+  const { userId } = user;
 
   const handleSubmit = async () => {
     if (!projectId) {
@@ -75,7 +94,7 @@ export default function FeedbackPage() {
 
     try {
       const resp = await submitVolunteerFeedback({
-        userId: USER_ID_TEMP,
+        userId: userId,
         projectId,
         payload,
       });
@@ -89,34 +108,14 @@ export default function FeedbackPage() {
       setRatings({ overall: 0, management: 0, planning: 0, facilities: 0 });
       setFeedback({ experience: '', improvement: '', comments: '' });
       setTimeout(() => {
-        window.location.href = '/volunteers';
+        router.replace('/volunteers');
       }, 2000);
 
       console.log('Feedback response:', resp);
     } catch (e: unknown) {
-      console.error(e);
-      const msg = (() => {
-        if (
-          typeof e === 'object' &&
-          e !== null &&
-          'name' in e &&
-          (e as { name?: unknown }).name === 'ApiError' &&
-          'message' in e &&
-          typeof (e as { message?: unknown }).message === 'string'
-        ) {
-          return (e as { message: string }).message;
-        }
-
-        // Normal Error
-        if (e instanceof Error) return e.message;
-
-        // Fallback
-        return 'Failed to submit application';
-      })();
-
       setToastType('error');
       setToastTitle('Submission failed');
-      setToastMsg(msg);
+      setToastMsg(`Failed to submit feedback: ${e}`);
       setToastOpen(true);
     } finally {
       setLoading(false);
@@ -135,7 +134,6 @@ export default function FeedbackPage() {
         onClose={() => setToastOpen(false)}
       />
       <main className="flex-1 px-10 py-8">
-        {/* Header with green bar */}
         <div className="mb-8 flex items-start gap-3">
           <div className="w-[5px] h-[39px] bg-[#56E0C2] mt-1" />
           <div>

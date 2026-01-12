@@ -5,16 +5,14 @@ import Sidebar from '@/components/sidebar';
 import Input from '@/components/ui/Input';
 import Toast from '@/components/ui/Toast';
 import {
-  getVolunteerProjectDetail,
+  getVolunteerProjectDetails,
   submitVolunteerApplication,
 } from '@/lib/api/volunteer';
 import { formatShortDate, formatTimeRange } from '@/lib/utils/date';
 import type { VolunteerProjectDetail } from '@/types/Volunteer';
-
-function capitalizeFirst(s?: string | null) {
-  if (!s) return '';
-  return s.charAt(0).toUpperCase() + s.slice(1);
-}
+import { useAuth } from '@/contexts/AuthContext';
+import { useRouter } from 'next/navigation';
+import capitalizeFirst from '@/lib/utils/capitalizeFirst';
 
 export default function VolunteerApplication({
   params,
@@ -26,7 +24,8 @@ export default function VolunteerApplication({
   const { projectid } = use(params);
   const { positionId } = use(searchParams);
 
-  const USER_ID_TEMP = 'ccecd54a-b014-4a4c-a56c-588a0d197fec'; //temporary (need auth)
+  const { user } = useAuth();
+  const router = useRouter();
 
   const [data, setData] = useState<VolunteerProjectDetail | null>(null);
   const [loading, setLoading] = useState(true);
@@ -35,7 +34,6 @@ export default function VolunteerApplication({
   const [consent, setConsent] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
-  // Toast state
   const [toastOpen, setToastOpen] = useState(false);
   const [toastType, setToastType] = useState<'success' | 'error'>('success');
   const [toastTitle, setToastTitle] = useState('');
@@ -52,7 +50,7 @@ export default function VolunteerApplication({
           throw new Error('Missing positionId in URL');
         }
 
-        const res = await getVolunteerProjectDetail(projectid);
+        const res = await getVolunteerProjectDetails(projectid);
         if (!mounted) return;
 
         setData(res.data);
@@ -61,15 +59,13 @@ export default function VolunteerApplication({
           setSessionId(res.data.sessions[0].id);
         }
       } catch (e: unknown) {
-        console.error(e);
         if (!mounted) return;
 
         setData(null);
         setToastType('error');
         setToastTitle('Failed to load');
 
-        const msg = e instanceof Error ? e.message : 'Unknown error';
-        setToastMsg(msg);
+        setToastMsg(`Failed to retrieve data: ${e}`);
 
         setToastOpen(true);
       } finally {
@@ -94,8 +90,8 @@ export default function VolunteerApplication({
     const date =
       data.startDate && data.endDate
         ? `${formatShortDate(data.startDate)} - ${formatShortDate(
-          data.endDate
-        )}`
+            data.endDate
+          )}`
         : formatShortDate(data.startDate);
 
     const time = formatTimeRange(data.startTime, data.endTime);
@@ -112,12 +108,7 @@ export default function VolunteerApplication({
     try {
       setSubmitting(true);
 
-      await submitVolunteerApplication({
-        userId: USER_ID_TEMP,
-        projectId: data.id,
-        positionId,
-        sessionId: sessionId,
-      });
+      await submitVolunteerApplication(userId, data.id, positionId, sessionId);
 
       setToastType('success');
       setToastTitle('Application submitted');
@@ -129,25 +120,30 @@ export default function VolunteerApplication({
     } catch (e: unknown) {
       console.error(e);
 
-      const msg =
-        typeof e === 'object' &&
-        e !== null &&
-        'name' in e &&
-        (e as { name?: unknown }).name === 'ApiError' &&
-        'message' in e &&
-        typeof (e as { message?: unknown }).message === 'string'
-          ? (e as { message: string }).message
-          : e instanceof Error
-            ? e.message
-            : 'Failed to submit application';
+
 
       setToastType('error');
       setToastTitle('Submission failed');
       setSubmitting(false);
-      setToastMsg(msg);
+      setToastMsg(`Unable to submit ${e}`);
       setToastOpen(true);
     }
   }
+  if (!user) {
+    return (
+      <div className="flex min-h-screen w-full items-center justify-center bg-white text-sm text-gray-600">
+        Kindly&nbsp;
+        <button
+          onClick={() => router.push('/login')}
+          className="font-semibold text-teal-600 hover:underline cursor-pointer"
+        >
+          login
+        </button>
+        &nbsp;to volunteer
+      </div>
+    );
+  }
+  const { userId } = user;
 
   return (
     <div className="flex min-h-screen w-full bg-white">
