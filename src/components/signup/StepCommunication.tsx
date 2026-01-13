@@ -1,9 +1,15 @@
 'use client';
 
-import { LastSignUpFormProps, SignUpData } from '@/types/SignUpData';
+import {  SignUpData } from '@/types/SignUpData';
 import Button from '@/components/ui/Button';
 import Select from '../ui/Select';
 import { useState } from 'react';
+
+type LastSignUpFormProps = {
+  data: SignUpData;
+  setData: (d: SignUpData) => void;
+  back: () => void;
+};
 
 export default function StepCommunication({
   data,

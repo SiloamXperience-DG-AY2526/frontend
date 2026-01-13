@@ -1,4 +1,4 @@
-import { SignUpFormProps } from '@/types/SignUpData';
+import { SignUpData } from '@/types/SignUpData';
 import Button from '@/components/ui/Button';
 import Input from '../ui/Input';
 import MultiSelect from '../ui/MultiSelect';
@@ -17,6 +17,12 @@ const VOLUNTEER_INTERESTS = [
   'Building & facilities work',
   'Other',
 ];
+type SignUpFormProps = {
+  data: SignUpData;
+  setData: (d: SignUpData) => void;
+  back: () => void;
+  next: () => void;
+}
 
 export default function VolunteerInterest({
   data,

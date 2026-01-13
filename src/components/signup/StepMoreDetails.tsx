@@ -1,13 +1,20 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { SignUpFormProps } from '@/types/SignUpData';
+import { SignUpData } from '@/types/SignUpData';
 import Button from '@/components/ui/Button';
 import { fetchNationalities, fetchLanguages } from '@/lib/countries';
 import Textarea from '../ui/TextArea';
 import Select from '../ui/Select';
 import Input from '../ui/Input';
 import MultiSelect from '../ui/MultiSelect';
+
+export type SignUpFormProps = {
+  data: SignUpData;
+  setData: (d: SignUpData) => void;
+  back: () => void;
+  next: () => void;
+}
 
 const genderOptions = [
   { label: 'Male', value: 'male' },
