@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Sidebar from '@/components/sidebar';
 import StarRating from '@/components/ui/StarRating';
-import Textarea from '@/components/ui/TextArea';
+import TextArea from '@/components/ui/TextArea';
 import Button from '@/components/ui/Button';
 import { useParams } from 'next/navigation';
 import { FeedbackPayload } from '@/types/Volunteer';
@@ -201,19 +201,19 @@ export default function FeedbackPage() {
           </p>
 
           <div className="space-y-5">
-            <Textarea
+            <TextArea
               label="What did you enjoy most about this volunteer experience"
               value={feedback.experience}
               onChange={(v) => setFeedback({ ...feedback, experience: v })}
             />
 
-            <Textarea
+            <TextArea
               label="What could have made the activity better for you"
               value={feedback.improvement}
               onChange={(v) => setFeedback({ ...feedback, improvement: v })}
             />
 
-            <Textarea
+            <TextArea
               label="Any other comments you'd like to share"
               value={feedback.comments}
               onChange={(v) => setFeedback({ ...feedback, comments: v })}
