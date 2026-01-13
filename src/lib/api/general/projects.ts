@@ -1,7 +1,6 @@
 import { ProjectApprovalStatus } from '@/types/ProjectData';
 
-
-const BACKEND_URL = process.env.BACKEND_URL!;
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL!;
 
 type FeedbackType = 'supervisor' | 'peer' | 'self';
 
@@ -10,7 +9,7 @@ export const changeProposedProjectStatus = async (
     status: ProjectApprovalStatus
 ) => {
 
-    const response = await fetch(`${BACKEND_URL}/api/projects/${projectId}/ApplyStatus`, {
+    const response = await fetch(`${BACKEND_URL}/volunteer-projects/${projectId}/ApprovalStatus`, {
         method: 'PATCH',
         headers: {
             'Content-Type': 'application/json',
@@ -40,7 +39,7 @@ export const submitPeerFeedback = async (
         projectId: string;
     }
 ) => {
-    const response = await fetch(`${BACKEND_URL}/general/feedback/submit`, {
+    const response = await fetch(`${BACKEND_URL}/general/peer-feedback`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

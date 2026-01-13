@@ -20,8 +20,6 @@ export default function FeedbackPage() {
         improvements: '',
     });
 
-    if (!user) return null;
-
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
