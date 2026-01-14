@@ -1,17 +1,18 @@
+import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 
 const BACKEND_URL = process.env.BACKEND_URL!;
 
-export async function GET(
-  req: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
-  const { id } = await params;
+export async function GET() {
+
+  const cookie = await cookies();
+
+  const token = cookie.get('access_token')?.value;
 
   // actual backend fetch profile endpoint
-  const res = await fetch(`${BACKEND_URL}/profile/${id}`, {
+  const res = await fetch(`${BACKEND_URL}/profile/me`, {
     method: 'GET',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { Authorization: `Bearer ${token}` },
   });
 
   const data = await res.json(); // user profile
