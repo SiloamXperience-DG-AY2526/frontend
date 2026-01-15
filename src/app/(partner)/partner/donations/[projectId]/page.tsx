@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
+import Image from 'next/image';
 import Sidebar from '@/components/sidebar';
 import Button from '@/components/ui/Button';
 import { getDonationProjectById } from '@/lib/api/donation';
@@ -17,23 +18,23 @@ export default function ProjectDetailPage() {
 
   useEffect(() => {
     if (!projectId) return;
+    
+    const loadProject = async () => {
+      setLoading(true);
+      try {
+        const data = await getDonationProjectById(projectId);
+        setProject(data);
+      } catch (error) {
+        console.error('Failed to load project:', error);
+        alert('Failed to load project details.');
+        router.push('/partner/donations');
+      } finally {
+        setLoading(false);
+      }
+    };
+    
     loadProject();
-  }, [projectId]);
-
-  const loadProject = async () => {
-    setLoading(true);
-    try {
-      const data = await getDonationProjectById(projectId);
-      setProject(data);
-    } catch (error) {
-      console.error('Failed to load project:', error);
-      alert('Failed to load project details.');
-      router.push('/partner/donations');
-    } finally {
-      setLoading(false);
-    }
-  };
-
+  }, [projectId, router]);
   const handleDonate = () => {
     router.push(`/partner/donations/${projectId}/donate`);
   };
@@ -108,12 +109,14 @@ export default function ProjectDetailPage() {
           {/* Left Column - Project Image & Details */}
           <div className="lg:col-span-2 space-y-6">
             {/* Project Image */}
-            <div className="bg-gray-300 rounded-lg h-80 flex items-center justify-center">
+            <div className="bg-gray-300 rounded-lg h-80 flex items-center justify-center overflow-hidden relative">
               {project.image ? (
-                <img
+                <Image
                   src={project.image}
                   alt={project.title}
-                  className="w-full h-full object-cover rounded-lg"
+                  fill
+                  className="object-cover rounded-lg"
+                  sizes="(max-width: 768px) 100vw, 50vw"
                 />
               ) : (
                 <p className="text-gray-500">Project Image Placeholder</p>

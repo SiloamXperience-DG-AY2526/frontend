@@ -48,22 +48,23 @@ export default function DonatePage() {
 
   useEffect(() => {
     if (!projectId) return;
+    
+    const loadProjectDetails = async () => {
+      setLoading(true);
+      try {
+        const data = await getDonationProjectById(projectId);
+        setProject(data);
+      } catch (error) {
+        console.error('Failed to load project:', error);
+        alert('Failed to load project details.');
+        router.push('/partner/donations');
+      } finally {
+        setLoading(false);
+      }
+    };
+    
     loadProjectDetails();
-  }, [projectId]);
-
-  const loadProjectDetails = async () => {
-    setLoading(true);
-    try {
-      const projectData = await getDonationProjectById(projectId);
-      setProject(projectData);
-    } catch (error) {
-      console.error('Failed to load project:', error);
-      alert('Failed to load project details. Please try again.');
-      router.push('/partner/donations');
-    } finally {
-      setLoading(false);
-    }
-  };
+  }, [projectId, router]);
 
   const getDonationAmount = () => {
     if (selectedAmount) return selectedAmount;
@@ -194,7 +195,7 @@ export default function DonatePage() {
         <div className="mb-8 text-center">
           <h1 className="text-3xl font-bold mb-2">Complete Your Donation</h1>
           <p className="text-gray-600">
-            You're one step away from creating meaningful change.
+            You&apos;re one step away from creating meaningful change.
           </p>
         </div>
 

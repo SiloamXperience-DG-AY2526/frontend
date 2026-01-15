@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import Sidebar from '@/components/sidebar';
 import Button from '@/components/ui/Button';
 import { getDonationHomepage, getDonationProjects } from '@/lib/api/donation';
@@ -150,12 +151,14 @@ export default function DonationsPage() {
                 className="bg-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition cursor-pointer"
               >
                 {/* Project Image */}
-                <div className="h-48 bg-white flex items-center justify-center">
+                <div className="h-48 bg-white flex items-center justify-center relative overflow-hidden">
                   {project.image ? (
-                    <img
+                    <Image
                       src={project.image}
                       alt={project.title}
-                      className="w-full h-full object-cover"
+                      fill
+                      className="object-cover"
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                     />
                   ) : (
                     <p className="text-gray-400">Project Image</p>
