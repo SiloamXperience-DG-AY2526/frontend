@@ -474,11 +474,11 @@ export default function VolunteerProjectProposalPage() {
                                   prev.map((x, i) =>
                                     i === pIdx
                                       ? {
-                                        ...x,
-                                        skills: x.skills.map((sv, si) =>
-                                          si === sIdx ? v : sv
-                                        ),
-                                      }
+                                          ...x,
+                                          skills: x.skills.map((sv, si) =>
+                                            si === sIdx ? v : sv
+                                          ),
+                                        }
                                       : x
                                   )
                                 )

@@ -10,7 +10,6 @@ import {
 } from '@/lib/api/volunteer';
 import { formatShortDate, formatTimeRange } from '@/lib/utils/date';
 import type { VolunteerProjectDetail } from '@/types/Volunteer';
-import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import capitalizeFirst from '@/lib/utils/capitalizeFirst';
 
@@ -24,15 +23,15 @@ export default function VolunteerApplication({
   const { projectid } = use(params);
   const { positionId } = use(searchParams);
 
-  const { user } = useAuth();
   const router = useRouter();
 
   const [data, setData] = useState<VolunteerProjectDetail | null>(null);
   const [loading, setLoading] = useState(true);
-
-  const [sessionId, setSessionId] = useState<string | ''>('');
+  const [error, setError] = useState<string | undefined>(undefined);
+  // const [sessionId, setSessionId] = useState<string | ''>('');
   const [consent, setConsent] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [availability, setAvailability] = useState('');
 
   const [toastOpen, setToastOpen] = useState(false);
   const [toastType, setToastType] = useState<'success' | 'error'>('success');
@@ -55,9 +54,9 @@ export default function VolunteerApplication({
 
         setData(res.data);
 
-        if (res.data.sessions?.length) {
-          setSessionId(res.data.sessions[0].id);
-        }
+        // if (res.data.sessions?.length) {
+        //   setSessionId(res.data.sessions[0].id);
+        // }
       } catch (e: unknown) {
         if (!mounted) return;
 
@@ -102,48 +101,41 @@ export default function VolunteerApplication({
 
   async function onSubmit() {
     if (!data || !positionId) return;
-
     if (!consent) return;
-
+    if (!availability.trim()) {
+      setError('Availability is required');
+      return;
+    }
     try {
       setSubmitting(true);
 
-      await submitVolunteerApplication(userId, data.id, positionId, sessionId);
+      await submitVolunteerApplication(
+        data.id,
+        positionId,
+        consent,
+        availability?.trim(),
+        [] //empty for now session id
+      );
 
       setToastType('success');
       setToastTitle('Application submitted');
       setToastMsg('We’ll contact you soon with the next steps.');
       setToastOpen(true);
+
       setTimeout(() => {
-        window.location.href = `/volunteers/projects/${data.id}`;
+        router.push(`/volunteers/projects/${data.id}`);
       }, 2000);
     } catch (e: unknown) {
       console.error(e);
-
-
-
       setToastType('error');
       setToastTitle('Submission failed');
-      setSubmitting(false);
-      setToastMsg(`Unable to submit ${e}`);
+      setToastMsg(e instanceof Error ? e.message : String(e));
       setToastOpen(true);
+    } finally {
+      setSubmitting(false);
     }
   }
-  if (!user) {
-    return (
-      <div className="flex min-h-screen w-full items-center justify-center bg-white text-sm text-gray-600">
-        Kindly&nbsp;
-        <button
-          onClick={() => router.push('/login')}
-          className="font-semibold text-teal-600 hover:underline cursor-pointer"
-        >
-          login
-        </button>
-        &nbsp;to volunteer
-      </div>
-    );
-  }
-  const { userId } = user;
+
 
   return (
     <div className="flex min-h-screen w-full bg-white">
@@ -217,8 +209,17 @@ export default function VolunteerApplication({
                   {dateTimeText}
                 </div>
               </div>
+              <Input
+                label="Availability (optional)"
+                value={availability}
+                onChange={(value) => setAvailability(value)}
+                placeholder="e.g. Weekends 9am–1pm"
+                required
+                error={error}
+              />
 
-              {data.sessions?.length ? (
+{/* later use */}
+              {/* {data.sessions?.length ? (
                 <div>
                   <label className="block text-black text-md mb-2 font-semibold">
                     Session
@@ -240,7 +241,7 @@ export default function VolunteerApplication({
                     ))}
                   </select>
                 </div>
-              ) : null}
+              ) : null} */}
 
               <label className="flex items-start gap-3 text-sm text-gray-700">
                 <input
@@ -260,7 +261,7 @@ export default function VolunteerApplication({
                 <div className="flex justify-end pt-4">
                   <button
                     onClick={onSubmit}
-                    disabled={submitting}
+                    disabled={submitting || !consent || !availability.trim()}
                     className="
                       rounded-md bg-[#195D4B] px-10 py-3
                       text-sm font-semibold text-white

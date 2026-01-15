@@ -2,75 +2,75 @@ import {
   FeedbackPayload,
   FeedbackSubmitResponse,
   ProposeVolunteerProjectPayload,
-  SubmitVolunteerApplicationResult,
   VolunteerApplicationDTO,
   VolunteerProjectDetailResponse,
-  VolunteerProjectsResponse,
-} from '../../types/Volunteer';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL;
+} from '@/types/Volunteer';
+
+const API_BASE = process.env.BACKEND_URL;
 
 export async function getAvailableVolunteerProjects(
   page: number,
   limit: number,
   search?: string,
   signal?: AbortSignal
-): Promise<VolunteerProjectsResponse> {
+) {
   const qs = new URLSearchParams();
   qs.set('page', String(page));
   qs.set('limit', String(limit));
   if (search?.trim()) qs.set('search', search.trim());
 
-  const res = await fetch(
-    `${API_BASE}/volunteer/projects/available?${qs.toString()}`,
-    { signal }
-  );
+  const res = await fetch(`/api/volunteer/available?${qs.toString()}`, {
+    signal,
+     credentials: 'include'
+  });
 
-  if (!res.ok)
-    throw new Error(
-      `Unable to retrieve available volunteer projects ${res.status}`
-    );
-  return (await res.json()) as VolunteerProjectsResponse;
+  const json = await res.json().catch(() => null);
+  if (!res.ok) throw new Error(json?.message ?? `Request failed ${res.status}`);
+  return json;
 }
-
-export async function getVolunteerProjectDetails(projectId: string) {
-  const res = await fetch(
-    `${API_BASE}/volunteer/projects/${projectId}/details`,
-    {
-      cache: 'no-store',
-    }
-  );
-
-  return (await res.json()) as VolunteerProjectDetailResponse;
-}
-
 export async function submitVolunteerApplication(
-  userId: string,
   projectId: string,
   positionId: string,
-  sessionId?: string
-): Promise<SubmitVolunteerApplicationResult> {
-  const res = await fetch(
-    `${API_BASE}/volunteer/projects/${projectId}/application`,
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        userId,
-        positionId,
-        sessionId,
-      }),
-    }
-  );
+  hasConsented: boolean,
+  availability: string,
+  sessionIds: string[] = []
+) {
+  const res = await fetch('/api/volunteer/me/submitApplication', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      projectId,
+      positionId,
+      hasConsented,
+      availability,
+      sessionIds,
+    }),
+  });
 
-  const bodyText = await res.text();
+  const json = await res.json().catch(() => null);
+  if (!res.ok) throw new Error(json?.message ?? `Request failed ${res.status}`);
+  return json;
+}
+
+
+
+export async function getVolunteerProjectDetails(
+  projectId: string
+): Promise<VolunteerProjectDetailResponse> {
+  const res = await fetch(`/api/volunteer/project/${projectId}`, {
+    method: 'GET',
+    cache: 'no-store',
+    credentials: 'include',
+  });
+
+  const json = await res.json().catch(() => null);
+
   if (!res.ok) {
-    throw new Error(
-      `Unable to submit volunteer interest ${res.status} - ${bodyText}`
-    );
+    throw new Error(json?.message ?? `Failed to fetch project details (${res.status})`);
   }
 
-  return JSON.parse(bodyText) as SubmitVolunteerApplicationResult;
+  return json as VolunteerProjectDetailResponse;
 }
 
 export async function submitVolunteerFeedback(args: {
