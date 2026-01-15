@@ -1,17 +1,3 @@
-// props
-export type SignUpFormProps = {
-  data: SignUpData;
-  setData: (d: SignUpData) => void;
-  back: () => void;
-  next: () => void;
-}
-
-export type LastSignUpFormProps = {
-  data: SignUpData;
-  setData: (d: SignUpData) => void;
-  back: () => void;
-}
-
 // data
 export type SignUpData = {
   //page 1 - Personal Details
@@ -44,6 +30,7 @@ export type SignUpData = {
 
   //page 5 - Emergency
   emergencyContactName?: string;
+  emergencyCountryCode?: string;
   emergencyContactNumber?: string;
   skills?: string;
   volunteeredBefore?: 'Yes' | 'No';
@@ -54,4 +41,4 @@ export type SignUpData = {
   preferredContactMethod?: string;
   agreeUpdates?: boolean;
   joinMailingList?: boolean;
-}
+};
