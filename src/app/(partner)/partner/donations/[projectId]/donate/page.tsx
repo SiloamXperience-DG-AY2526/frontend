@@ -3,29 +3,13 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
-import Sidebar from '@/components/Sidebar';
-import Input from '@/components/ui/Input';
-import Select from '@/components/ui/Select';
+import Sidebar from '@/components/sidebar';
 import Button from '@/components/ui/Button';
 import { getDonationProjectById, submitDonation } from '@/lib/api/donation';
 import { DonationProject } from '@/types/DonationProject';
 import { DonationType } from '@/types/DonationData';
-import { fetchNationalities } from '@/lib/countries';
 
-const PAYMENT_MODES = [
-  'Credit Card',
-  'Debit Card',
-  'PayNow',
-  'Bank Transfer',
-  'PayPal',
-  'Other',
-];
-
-const DONATION_TYPES: { value: DonationType; label: string }[] = [
-  { value: 'INDIVIDUAL', label: 'Individual' },
-  { value: 'CORPORATE', label: 'Corporate' },
-  { value: 'FUNDRAISING_EVENTS', label: 'Fundraising Events' },
-];
+const PRESET_AMOUNTS = [50, 100, 200, 500, 1000, 2000];
 
 export default function DonatePage() {
   const { user } = useAuth();
@@ -36,21 +20,32 @@ export default function DonatePage() {
   const [project, setProject] = useState<DonationProject | null>(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [step, setStep] = useState(1); // 1: Amount, 2: Payment, 3: Review, 4: Complete
 
   // Form state
-  const [donationType, setDonationType] = useState<DonationType>('INDIVIDUAL');
-  const [paymentMode, setPaymentMode] = useState('');
-  const [amount, setAmount] = useState('');
-  const [brickCount, setBrickCount] = useState('');
-  const [countryOfResidence, setCountryOfResidence] = useState('');
-  const [countries, setCountries] = useState<string[]>([]);
+  const [selectedAmount, setSelectedAmount] = useState<number | null>(null);
+  const [customAmount, setCustomAmount] = useState('');
+  const [paymentMethod, setPaymentMethod] = useState('');
+  const [donationType] = useState<DonationType>('INDIVIDUAL');
+  const [countryOfResidence] = useState('Singapore');
+  
+  // Success/Failure state
+  const [donationResult, setDonationResult] = useState<{
+    success: boolean;
+    receiptId?: string;
+    amount?: number;
+    projectTitle?: string;
+  } | null>(null);
 
-  // Load countries
-  useEffect(() => {
-    fetchNationalities().then(setCountries);
-  }, []);
+  // Dummy payment methods (saved cards)
+  const savedCards = [
+    { id: '1', type: 'visa', last4: '1234' },
+    { id: '2', type: 'visa', last4: '5678' },
+    { id: '3', type: 'visa', last4: '9012' },
+    { id: '4', type: 'visa', last4: '3456' },
+    { id: '5', type: 'visa', last4: '7890' },
+  ];
 
-  // Load project details
   useEffect(() => {
     if (!projectId) return;
     loadProjectDetails();
@@ -70,54 +65,40 @@ export default function DonatePage() {
     }
   };
 
-  const calculateBrickAmount = () => {
-    if (!project?.brickSize || !brickCount) return 0;
-    const count = parseInt(brickCount);
-    if (isNaN(count)) return 0;
-    return project.brickSize * count;
+  const getDonationAmount = () => {
+    if (selectedAmount) return selectedAmount;
+    if (customAmount) return parseFloat(customAmount);
+    return 0;
   };
 
-  const handleBrickCountChange = (value: string) => {
-    setBrickCount(value);
-    if (project?.brickSize) {
-      const count = parseInt(value);
-      if (!isNaN(count)) {
-        setAmount((project.brickSize * count).toString());
-      } else {
-        setAmount('');
-      }
-    }
+  const handleAmountSelect = (amount: number) => {
+    setSelectedAmount(amount);
+    setCustomAmount('');
   };
 
-  const handleAmountChange = (value: string) => {
-    setAmount(value);
-    // Clear brick count if amount is manually changed
-    if (project?.brickSize) {
-      const amt = parseFloat(value);
-      if (!isNaN(amt) && amt > 0) {
-        const calculatedBricks = Math.floor(amt / project.brickSize);
-        setBrickCount(calculatedBricks.toString());
-      }
-    }
+  const handleCustomAmountChange = (value: string) => {
+    setCustomAmount(value);
+    setSelectedAmount(null);
   };
 
-  const handleSubmit = async () => {
-    // Validation
-    if (!paymentMode) {
-      alert('Please select a payment mode');
+  const handleContinueFromAmount = () => {
+    const amount = getDonationAmount();
+    if (!amount || amount <= 0) {
+      alert('Please select or enter a donation amount');
       return;
     }
+    setStep(2);
+  };
 
-    if (!amount || parseFloat(amount) <= 0) {
-      alert('Please enter a valid donation amount');
+  const handleContinueFromPayment = () => {
+    if (!paymentMethod) {
+      alert('Please select a payment method');
       return;
     }
+    setStep(3);
+  };
 
-    if (!countryOfResidence) {
-      alert('Please select your country of residence');
-      return;
-    }
-
+  const handleConfirmDonation = async () => {
     if (!user) {
       alert('You must be logged in to make a donation');
       router.push('/login');
@@ -131,18 +112,30 @@ export default function DonatePage() {
         projectId: projectId,
         type: donationType,
         countryOfResidence: countryOfResidence,
-        paymentMode: paymentMode,
-        amount: parseFloat(amount),
-        ...(brickCount && { brickCount: parseInt(brickCount) }),
+        paymentMode: paymentMethod,
+        amount: getDonationAmount(),
       };
 
       await submitDonation(donationData);
 
-      alert('Donation application submitted successfully! You will receive payment instructions shortly.');
-      router.push('/partner/donations');
+      // Simulate success/failure (80% success rate for demo)
+      const isSuccess = Math.random() > 0.2;
+      
+      setDonationResult({
+        success: isSuccess,
+        receiptId: isSuccess ? `DN${Math.floor(Math.random() * 1000000)}` : undefined,
+        amount: getDonationAmount(),
+        projectTitle: project?.title,
+      });
+      setStep(4);
     } catch (error: unknown) {
       console.error('Failed to submit donation:', error);
-      alert(`Failed to submit donation. Please try again.\n${error}`);
+      setDonationResult({
+        success: false,
+        amount: getDonationAmount(),
+        projectTitle: project?.title,
+      });
+      setStep(4);
     } finally {
       setSubmitting(false);
     }
@@ -153,11 +146,6 @@ export default function DonatePage() {
       style: 'currency',
       currency: 'SGD',
     }).format(amount);
-  };
-
-  const calculateProgress = (current: number, target: number | null) => {
-    if (!target || target === 0) return 0;
-    return Math.min((current / target) * 100, 100);
   };
 
   if (loading) {
@@ -191,212 +179,255 @@ export default function DonatePage() {
       <Sidebar />
 
       <main className="flex-1 px-10 py-8">
+        {/* Back Button */}
+        {step < 4 && (
+          <button
+            onClick={() => step === 1 ? router.back() : setStep(step - 1)}
+            className="mb-6 text-gray-600 hover:text-gray-900 flex items-center gap-2 cursor-pointer"
+          >
+            <span className="text-2xl">←</span>
+            <span>Back</span>
+          </button>
+        )}
+
         {/* Header */}
-        <div className="mb-8 flex items-start gap-3">
-          <div className="w-[5px] h-[39px] bg-[#56E0C2] mt-1" />
-          <div>
-            <h1 className="text-2xl font-bold">
-              Make a <span className="bg-yellow-300 px-1">Donation</span>
-            </h1>
-            <p className="text-sm text-gray-500">
-              Support this project with your generous contribution
-            </p>
-          </div>
+        <div className="mb-8 text-center">
+          <h1 className="text-3xl font-bold mb-2">Complete Your Donation</h1>
+          <p className="text-gray-600">
+            You're one step away from creating meaningful change.
+          </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Left Column - Project Details */}
-          <div className="lg:col-span-1">
-            <div className="bg-white rounded-lg border p-6 sticky top-8">
-              <h2 className="text-xl font-bold mb-4">Project Details</h2>
-
-              {/* Project Image */}
-              {project.image ? (
-                <img
-                  src={project.image}
-                  alt={project.title}
-                  className="w-full h-48 object-cover rounded-md mb-4"
-                />
-              ) : (
-                <div className="w-full h-48 bg-gray-200 rounded-md mb-4 flex items-center justify-center">
-                  <p className="text-gray-400">No Image</p>
-                </div>
-              )}
-
-              {/* Project Title */}
-              <h3 className="font-bold text-lg mb-2">{project.title}</h3>
-
-              {/* Location */}
-              <p className="text-sm text-gray-600 mb-3">
-                📍 {project.location}
-              </p>
-
-              {/* Type Badge */}
-              <div className="mb-4">
-                <span
-                  className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${
-                    project.type === 'ONGOING'
-                      ? 'bg-green-100 text-green-800'
-                      : 'bg-blue-100 text-blue-800'
-                  }`}
-                >
-                  {project.type === 'ONGOING' ? 'Ongoing' : 'Specific Project'}
-                </span>
-              </div>
-
-              {/* Progress (if target exists) */}
-              {project.targetFund && (
-                <div className="mb-4">
-                  <div className="flex justify-between text-sm mb-2">
-                    <span className="font-semibold">
-                      {formatCurrency(project.currentFund)}
-                    </span>
-                    <span className="text-gray-500">
-                      of {formatCurrency(project.targetFund)}
-                    </span>
-                  </div>
-                  <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-[#56E0C2] transition-all"
-                      style={{
-                        width: `${calculateProgress(
-                          project.currentFund,
-                          project.targetFund
-                        )}%`,
-                      }}
-                    />
-                  </div>
-                </div>
-              )}
-
-              {/* About */}
-              <div className="text-sm text-gray-700">
-                <p className="font-semibold mb-1">About:</p>
-                <p>{project.about}</p>
-              </div>
-
-              {/* Brick Size Info (if applicable) */}
-              {project.brickSize && (
-                <div className="mt-4 p-3 bg-blue-50 rounded-md">
-                  <p className="text-sm font-semibold text-blue-900">
-                    Brick-by-Brick Donation
-                  </p>
-                  <p className="text-xs text-blue-700 mt-1">
-                    Each brick: {formatCurrency(project.brickSize)}
-                  </p>
-                </div>
-              )}
+        <div className="max-w-4xl mx-auto">
+          {/* Project Title Box (Top Right) */}
+          <div className="flex justify-end mb-6">
+            <div className="bg-gray-300 rounded-lg px-8 py-4">
+              <h2 className="font-bold">{project.title}</h2>
             </div>
           </div>
 
-          {/* Right Column - Donation Form */}
-          <div className="lg:col-span-2">
-            <div className="bg-white rounded-lg border p-8">
-              <h2 className="text-xl font-bold mb-6">Donation Information</h2>
-
-              <div className="space-y-6">
-                {/* Pre-filled User Information (Read-only) */}
-                <div className="bg-gray-50 p-4 rounded-md">
-                  <p className="text-sm font-semibold text-gray-700 mb-3">
-                    Your Information (from account):
+          {/* Step Indicator */}
+          <div className="flex items-center justify-center mb-8">
+            {[1, 2, 3, 4].map((s) => (
+              <div key={s} className="flex items-center">
+                <div className="flex flex-col items-center">
+                  <div
+                    className={`w-12 h-12 rounded-full flex items-center justify-center font-bold border-2 ${
+                      step === s
+                        ? 'bg-black text-white border-black'
+                        : step > s
+                        ? 'bg-gray-400 text-gray-700 border-gray-400'
+                        : 'bg-white text-gray-400 border-gray-400'
+                    }`}
+                  >
+                    {s}
+                  </div>
+                  <p
+                    className={`mt-2 text-sm font-semibold ${
+                      step === s ? 'text-black' : 'text-gray-400'
+                    }`}
+                  >
+                    {s === 1 && 'Amount'}
+                    {s === 2 && 'Payment'}
+                    {s === 3 && 'Review'}
+                    {s === 4 && 'Complete'}
                   </p>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
-                    <div>
-                      <span className="text-gray-600">Name:</span>{' '}
-                      <span className="font-semibold">
-                        {user?.firstName} {user?.lastName}
-                      </span>
-                    </div>
-                    <div>
-                      <span className="text-gray-600">Email:</span>{' '}
-                      <span className="font-semibold">{user?.email}</span>
-                    </div>
-                  </div>
                 </div>
-
-                {/* Donation Type */}
-                <Select
-                  label="Donation Type"
-                  value={donationType}
-                  options={DONATION_TYPES.map((t) => t.label)}
-                  onChange={(value) => {
-                    const selected = DONATION_TYPES.find((t) => t.label === value);
-                    if (selected) setDonationType(selected.value);
-                  }}
-                />
-
-                {/* Country of Residence */}
-                <Select
-                  label="Country of Residence"
-                  value={countryOfResidence}
-                  options={countries}
-                  onChange={setCountryOfResidence}
-                />
-
-                {/* Payment Mode */}
-                <Select
-                  label="Preferred Payment Mode"
-                  value={paymentMode}
-                  options={PAYMENT_MODES}
-                  onChange={setPaymentMode}
-                />
-
-                {/* Brick Count (if brick-by-brick donation available) */}
-                {project.brickSize && (
-                  <div>
-                    <Input
-                      label={`Number of Bricks (${formatCurrency(project.brickSize)} each)`}
-                      value={brickCount}
-                      onChange={handleBrickCountChange}
-                      type="number"
-                    />
-                    {brickCount && parseInt(brickCount) > 0 && (
-                      <p className="text-sm text-gray-600 mt-1">
-                        Total: {formatCurrency(calculateBrickAmount())}
-                      </p>
-                    )}
-                  </div>
+                {s < 4 && (
+                  <div
+                    className={`w-20 h-1 mx-2 ${
+                      step > s ? 'bg-black' : 'bg-gray-300'
+                    }`}
+                  />
                 )}
+              </div>
+            ))}
+          </div>
 
-                {/* Amount */}
-                <div>
-                  <Input
-                    label="Donation Amount (SGD)"
-                    value={amount}
-                    onChange={handleAmountChange}
-                    type="number"
-                  />
-                  {project.brickSize && (
-                    <p className="text-xs text-gray-500 mt-1">
-                      You can also specify the number of bricks above
-                    </p>
-                  )}
+          {/* Step Content */}
+          <div className="bg-white rounded-lg border-2 border-black p-12">
+            {/* STEP 1: Amount */}
+            {step === 1 && (
+              <div>
+                <h2 className="text-2xl font-bold mb-6">
+                  Choose your donation amount
+                </h2>
+
+                {/* Preset Amount Buttons */}
+                <div className="grid grid-cols-3 gap-4 mb-6">
+                  {PRESET_AMOUNTS.map((amount) => (
+                    <button
+                      key={amount}
+                      onClick={() => handleAmountSelect(amount)}
+                      className={`py-6 rounded-lg border-2 font-bold text-xl transition cursor-pointer ${
+                        selectedAmount === amount
+                          ? 'border-black bg-gray-100'
+                          : 'border-gray-300 hover:border-gray-400'
+                      }`}
+                    >
+                      ${amount}
+                    </button>
+                  ))}
                 </div>
 
-                {/* Info Box */}
-                <div className="bg-yellow-50 border border-yellow-200 rounded-md p-4">
-                  <p className="text-sm text-yellow-800">
-                    <strong>Note:</strong> After submitting this application, you
-                    will receive payment instructions via email. Your donation
-                    will be marked as &quot;in-progress&quot; until payment is
-                    confirmed.
-                  </p>
+                {/* Custom Amount */}
+                <div className="mb-8">
+                  <label className="block font-semibold mb-3">Or enter a custom amount</label>
+                  <div className="relative">
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-xl font-bold text-gray-600">
+                      $
+                    </span>
+                    <input
+                      type="number"
+                      value={customAmount}
+                      onChange={(e) => handleCustomAmountChange(e.target.value)}
+                      placeholder="xx"
+                      className="w-full py-4 pl-10 pr-4 text-xl font-bold border-2 border-gray-300 rounded-lg focus:border-[#195D4B] outline-none transition"
+                    />
+                  </div>
                 </div>
 
-                {/* Buttons */}
-                <div className="flex gap-4 pt-4">
+                {/* Continue Button */}
+                <div className="flex justify-end">
                   <Button
-                    label="Cancel"
-                    onClick={() => router.push('/partner/donations')}
-                  />
-                  <Button
-                    label={submitting ? 'Submitting...' : 'Submit Donation'}
-                    onClick={handleSubmit}
-                    disabled={submitting}
+                    label="Continue"
+                    onClick={handleContinueFromAmount}
+                    variant="primary"
                   />
                 </div>
               </div>
-            </div>
+            )}
+
+            {/* STEP 2: Payment */}
+            {step === 2 && (
+              <div>
+                <h2 className="text-2xl font-bold mb-6">Select payment method</h2>
+
+                {/* Payment Method List */}
+                <div className="space-y-4 mb-8">
+                  {savedCards.map((card) => (
+                    <button
+                      key={card.id}
+                      onClick={() => setPaymentMethod(`${card.type} ****${card.last4}`)}
+                      className={`w-full p-4 border-b-2 text-left flex items-center gap-3 hover:bg-gray-50 transition ${
+                        paymentMethod === `${card.type} ****${card.last4}`
+                          ? 'border-black bg-gray-50'
+                          : 'border-gray-300'
+                      }`}
+                    >
+                      <span className="text-2xl">💳</span>
+                      <span className="font-semibold">
+                        [icon] {card.type} {card.last4}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+
+                {/* Continue Button */}
+                <div className="flex justify-end">
+                  <Button
+                    label="Continue"
+                    onClick={handleContinueFromPayment}
+                    variant="primary"
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* STEP 3: Review */}
+            {step === 3 && (
+              <div>
+                <h2 className="text-2xl font-bold mb-6">Review your donation</h2>
+
+                <div className="space-y-4 mb-8">
+                  <div className="flex justify-between py-3 border-b">
+                    <span className="font-semibold">Project</span>
+                    <span className="font-bold">{project.title}</span>
+                  </div>
+                  <div className="flex justify-between py-3 border-b">
+                    <span className="font-semibold">Donation Amount</span>
+                    <span className="font-bold">{formatCurrency(getDonationAmount())}</span>
+                  </div>
+                  <div className="flex justify-between py-3 border-b">
+                    <span className="font-semibold">Total</span>
+                    <span className="font-bold">{formatCurrency(getDonationAmount())}</span>
+                  </div>
+                  <div className="py-3">
+                    <p className="font-semibold mb-2">Payment method</p>
+                    <p className="text-gray-700 flex items-center gap-2">
+                      <span>💳</span>
+                      <span>[icon] credit card ******** {paymentMethod.slice(-4)}</span>
+                    </p>
+                  </div>
+                </div>
+
+                {/* Confirm Button */}
+                <Button
+                  label={submitting ? 'Processing...' : 'Confirm donation'}
+                  onClick={handleConfirmDonation}
+                  disabled={submitting}
+                  variant="primary"
+                />
+              </div>
+            )}
+
+            {/* STEP 4: Complete (Success/Failure) */}
+            {step === 4 && donationResult && (
+              <div className="text-center">
+                {donationResult.success ? (
+                  <>
+                    {/* Success */}
+                    <div className="text-6xl mb-6">✓</div>
+                    <h2 className="text-3xl font-bold mb-4">
+                      Donation Successful !
+                    </h2>
+                    <p className="text-gray-600 mb-2">
+                      Thank you for your generous donation of{' '}
+                      {formatCurrency(donationResult.amount || 0)} to{' '}
+                      {donationResult.projectTitle}
+                    </p>
+                    <p className="text-gray-700 font-semibold mb-6">
+                      Receipt ID: #{donationResult.receiptId}
+                    </p>
+
+                    {/* Subscribe Checkbox */}
+                    <div className="mb-8">
+                      <label className="flex items-center justify-center gap-2">
+                        <input type="checkbox" className="w-4 h-4" />
+                        <span className="text-sm text-gray-600">
+                          Subscribe for email reminder emails for recurring donations?
+                        </span>
+                      </label>
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="flex gap-4 justify-center">
+                      <Button
+                        label="Request Receipt"
+                        onClick={() => router.push('/partner/donations')}
+                        variant="secondary"
+                      />
+                      <Button
+                        label="Home"
+                        onClick={() => router.push('/partner/donations')}
+                        variant="primary"
+                      />
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    {/* Failure */}
+                    <div className="text-6xl mb-6">✗</div>
+                    <h2 className="text-3xl font-bold mb-4">
+                      Your donation was unsuccessful!
+                    </h2>
+                    <p className="text-gray-600 mb-6">
+                      Please try again. The merchant will redirect in 5 seconds...
+                    </p>
+                  </>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </main>

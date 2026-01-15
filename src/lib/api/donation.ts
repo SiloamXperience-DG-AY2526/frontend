@@ -12,6 +12,18 @@ import {
   DonationDetail 
 } from '@/types/DonationData';
 
+// Get donation homepage data (statistics and featured projects)
+export async function getDonationHomepage(): Promise<any> {
+  const res = await fetch('/api/v1/donations/home');
+
+  if (!res.ok) {
+    throw new Error('Failed to fetch donation homepage data.');
+  }
+
+  const data = await res.json();
+  return data;
+}
+
 // Get all donation projects with optional filters
 export async function getDonationProjects(
   type?: 'ongoing' | 'specific' | 'all',
