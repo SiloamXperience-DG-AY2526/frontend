@@ -48,7 +48,12 @@ export type DonationHistoryResponse = {
 };
 
 export type DonationHomepage = {
-  featuredProjects: any[];
+  featuredProjects: Array<{
+    id: string;
+    title: string;
+    currentFund: number;
+    targetFund: number | null;
+  }>;
   statistics: {
     totalDonations: number;
     totalProjects: number;

@@ -40,7 +40,7 @@ export async function GET(request: Request) {
       type: 'SPECIFIC',
       submissionStatus: 'PUBLISHED',
       approvalStatus: 'APPROVED',
-      initiatorName: "Children's Society",
+      initiatorName: 'Children\'s Society',
       organisingTeam: 'Education Support Division',
       donorCount: 234,
       createdAt: '2026-01-05T00:00:00Z',

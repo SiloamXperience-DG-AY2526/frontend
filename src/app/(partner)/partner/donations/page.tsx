@@ -10,7 +10,6 @@ import { DonationProject } from '@/types/DonationProject';
 export default function DonationsPage() {
   const [projects, setProjects] = useState<DonationProject[]>([]);
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState<'all' | 'ongoing' | 'specific'>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [statistics, setStatistics] = useState({
     totalDonations: 0,
@@ -21,7 +20,7 @@ export default function DonationsPage() {
 
   useEffect(() => {
     loadData();
-  }, [filter]);
+  }, []);
 
   const loadData = async () => {
     setLoading(true);
@@ -33,7 +32,7 @@ export default function DonationsPage() {
       }
 
       // Load projects
-      const response = await getDonationProjects(filter);
+      const response = await getDonationProjects('all');
       setProjects(response.projects);
     } catch (error) {
       console.error('Failed to load donation data:', error);
@@ -223,8 +222,8 @@ export default function DonationsPage() {
             <p className="text-gray-500 mb-2">No donation projects found</p>
             <p className="text-sm text-gray-400">
               {searchQuery
-                ? `Try a different search term`
-                : `Check back later for new projects`}
+                ? 'Try a different search term'
+                : 'Check back later for new projects'}
             </p>
           </div>
         )}

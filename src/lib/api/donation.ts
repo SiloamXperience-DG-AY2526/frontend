@@ -9,11 +9,12 @@ import {
   SubmitDonationApplication, 
   DonationApplication,
   DonationHistoryResponse,
-  DonationDetail 
+  DonationDetail,
+  DonationHomepage 
 } from '@/types/DonationData';
 
 // Get donation homepage data (statistics and featured projects)
-export async function getDonationHomepage(): Promise<any> {
+export async function getDonationHomepage(): Promise<DonationHomepage> {
   const res = await fetch('/api/v1/donations/home');
 
   if (!res.ok) {
