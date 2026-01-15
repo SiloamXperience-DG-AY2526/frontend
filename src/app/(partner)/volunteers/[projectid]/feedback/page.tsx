@@ -1,14 +1,28 @@
 'use client';
 
+import { useAuth } from '@/contexts/AuthContext';
 import { useState } from 'react';
-import Sidebar from '@/components/Sidebar';
+import { useRouter } from 'next/navigation';
+import Sidebar from '@/components/sidebar';
 import PageHeader from '@/components/ui/PageHeader';
 import StarRating from '@/components/ui/StarRating';
-import Textarea from '@/components/ui/Textarea';
+import Textarea from '@/components/ui/TextArea';
 import Button from '@/components/ui/Button';
-import { FeedbackPayload } from '@/types/VolunteerFeedback';
+import { useParams } from 'next/navigation';
+import { FeedbackPayload } from '@/types/Volunteer';
+import { submitVolunteerFeedback } from '@/lib/api/volunteer';
+import Toast from '@/components/ui/Toast';
 
 export default function FeedbackPage() {
+  const params = useParams<{ projectid: string }>();
+  const { user } = useAuth();
+  const router = useRouter();
+
+  const projectId = params.projectid;
+  const [toastOpen, setToastOpen] = useState(false);
+  const [toastType, setToastType] = useState<'success' | 'error'>('success');
+  const [toastTitle, setToastTitle] = useState('');
+  const [toastMsg, setToastMsg] = useState<string | undefined>(undefined);
   const [ratings, setRatings] = useState({
     overall: 0,
     management: 0,
@@ -23,8 +37,28 @@ export default function FeedbackPage() {
   });
 
   const [loading, setLoading] = useState(false);
+  if (!user) {
+    return (
+      <div className="flex min-h-screen w-full items-center justify-center bg-white text-sm text-gray-600">
+        Kindly&nbsp;
+        <button
+          onClick={() => router.push('/login')}
+          className="font-semibold text-teal-600 hover:underline cursor-pointer"
+        >
+          login
+        </button>
+        &nbsp;to volunteer
+      </div>
+    );
+  }
+  const { userId } = user;
 
   const handleSubmit = async () => {
+    if (!projectId) {
+      alert('Missing projectId in URL.');
+      return;
+    }
+
     // basic frontend validation
     if (
       !ratings.overall ||
@@ -33,6 +67,12 @@ export default function FeedbackPage() {
       !ratings.facilities
     ) {
       alert('Please rate all categories before submitting.');
+      return;
+    }
+
+    //  validation for text fields
+    if (!feedback.experience.trim() || !feedback.improvement.trim()) {
+      alert('Please fill in the experience and improvement fields.');
       return;
     }
 
@@ -48,35 +88,36 @@ export default function FeedbackPage() {
       feedback: {
         experience: feedback.experience.trim(),
         improvement: feedback.improvement.trim(),
-        comments: feedback.comments.trim(),
+        comments: feedback.comments.trim() || undefined,
       },
       submittedAt: new Date().toISOString(),
     };
 
     try {
-      // test call
-      console.log('Submitting feedback payload:', payload);
+      const resp = await submitVolunteerFeedback({
+        userId: userId,
+        projectId,
+        payload,
+      });
 
-      await new Promise((resolve) => setTimeout(resolve, 1200));
-
-      alert('Feedback submitted successfully!');
+      setToastType('success');
+      setToastTitle('Application submitted');
+      setToastMsg('We’ll contact you soon with the next steps.');
+      setToastOpen(true);
 
       // reset form
-      setRatings({
-        overall: 0,
-        management: 0,
-        planning: 0,
-        facilities: 0,
-      });
+      setRatings({ overall: 0, management: 0, planning: 0, facilities: 0 });
+      setFeedback({ experience: '', improvement: '', comments: '' });
+      setTimeout(() => {
+        router.replace('/volunteers');
+      }, 2000);
 
-      setFeedback({
-        experience: '',
-        improvement: '',
-        comments: '',
-      });
-    } catch (error) {
-      console.error(error);
-      alert('Something went wrong. Please try again.');
+      console.log('Feedback response:', resp);
+    } catch (e: unknown) {
+      setToastType('error');
+      setToastTitle('Submission failed');
+      setToastMsg(`Failed to submit feedback: ${e}`);
+      setToastOpen(true);
     } finally {
       setLoading(false);
     }
@@ -85,7 +126,14 @@ export default function FeedbackPage() {
   return (
     <div className="flex min-h-screen bg-gray-50">
       <Sidebar />
-
+      <Toast
+        open={toastOpen}
+        type={toastType}
+        title={toastTitle}
+        message={toastMsg}
+        duration={3500}
+        onClose={() => setToastOpen(false)}
+      />
       <main className="flex-1 px-10 py-8">
         <PageHeader
           title="Volunteer Feedback Form"
@@ -143,9 +191,7 @@ export default function FeedbackPage() {
 
         {/* Your Feedback */}
         <div className="rounded-lg border bg-white p-6">
-          <h2 className="text-xl font-bold mb-1">
-            Your <span className="bg-yellow-300 px-1">Feedback</span>
-          </h2>
+          <h2 className="text-xl font-bold mb-1">Your Feedback</h2>
           <p className="text-sm text-gray-500 mb-6">
             Help us understand your experience better
           </p>
