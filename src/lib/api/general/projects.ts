@@ -2,7 +2,7 @@ import { ProjectApprovalStatus } from '@/types/ProjectData';
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL!;
 
-type FeedbackType = 'supervisor' | 'peer' | 'self';
+export type FeedbackType = 'supervisor' | 'peer' | 'self';
 
 
 // changes the approval status of a proposed volunteer project
