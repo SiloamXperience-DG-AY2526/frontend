@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 export default function Select({
   label,
@@ -30,8 +30,8 @@ export default function Select({
           w-full rounded-md border px-3 py-3 bg-white outline-none transition
           ${
             error
-              ? "border-red-600 focus:border-red-600 focus:ring-red-600"
-              : "border-green-700 focus:border-green-800 focus:ring-green-800"
+              ? 'border-red-600 focus:border-red-600 focus:ring-red-600'
+              : 'border-green-700 focus:border-green-800 focus:ring-green-800'
           }
           focus:ring-1
         `}

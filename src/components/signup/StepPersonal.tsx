@@ -1,13 +1,13 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import Link from "next/link";
-import { SignUpData } from "@/types/SignUpData";
-import Button from "@/components/ui/Button";
-import Input from "../ui/Input";
-import Select from "../ui/Select";
-import Toast from "@/components/ui/Toast";
-import { fetchCountryCodes } from "@/lib/countries";
+import { useEffect, useState } from 'react';
+import Link from 'next/link';
+import { SignUpData } from '@/types/SignUpData';
+import Button from '@/components/ui/Button';
+import Input from '../ui/Input';
+import Select from '../ui/Select';
+import Toast from '@/components/ui/Toast';
+import { fetchCountryCodes } from '@/lib/countries';
 
 interface Props {
   data: SignUpData;
@@ -16,13 +16,13 @@ interface Props {
 }
 
 const salutations = [
-  "Mr.",
-  "Ms.",
-  "Mrs.",
-  "Mx.",
-  "Dr.",
-  "Rev.",
-  "Prefer not to say",
+  'Mr.',
+  'Ms.',
+  'Mrs.',
+  'Mx.',
+  'Dr.',
+  'Rev.',
+  'Prefer not to say',
 ];
 
 export default function PersonalDetails({ data, setData, next }: Props) {
@@ -30,10 +30,10 @@ export default function PersonalDetails({ data, setData, next }: Props) {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [toast, setToast] = useState<{
     open: boolean;
-    type: "success" | "error";
+    type: 'success' | 'error';
     title: string;
     message?: string;
-  }>({ open: false, type: "error", title: "" });
+  }>({ open: false, type: 'error', title: '' });
 
   useEffect(() => {
     fetchCountryCodes().then(setCountryCodes);
@@ -45,32 +45,32 @@ export default function PersonalDetails({ data, setData, next }: Props) {
   const validate = () => {
     const e: Record<string, string> = {};
 
-    if (!data.salutation) e.salutation = "Required";
-    if (!data.firstName?.trim()) e.firstName = "Required";
-    if (!data.lastName?.trim()) e.lastName = "Required";
+    if (!data.salutation) e.salutation = 'Required';
+    if (!data.firstName?.trim()) e.firstName = 'Required';
+    if (!data.lastName?.trim()) e.lastName = 'Required';
 
     if (!data.email?.trim()) {
-      e.email = "Required";
+      e.email = 'Required';
     } else if (!isValidEmail(data.email)) {
-      e.email = "Invalid email format";
+      e.email = 'Invalid email format';
     }
 
-    if (!data.countryCode) e.countryCode = "Required";
+    if (!data.countryCode) e.countryCode = 'Required';
     if (!data.contact?.trim()) {
-      e.contact = "Required";
+      e.contact = 'Required';
     } else if (!/^\d+$/.test(data.contact)) {
-      e.contact = "Contact number must contain only numbers";
+      e.contact = 'Contact number must contain only numbers';
     }
 
-    if (!data.password) e.password = "Required";
-    if (!data.confirmPassword) e.confirmPassword = "Required";
+    if (!data.password) e.password = 'Required';
+    if (!data.confirmPassword) e.confirmPassword = 'Required';
 
     if (
       data.password &&
       data.confirmPassword &&
       data.password !== data.confirmPassword
     ) {
-      e.confirmPassword = "Passwords do not match";
+      e.confirmPassword = 'Passwords do not match';
     }
 
     setErrors(e);
@@ -81,28 +81,28 @@ export default function PersonalDetails({ data, setData, next }: Props) {
     const validationErrors = validate();
 
     if (Object.keys(validationErrors).length > 0) {
-      let title = "Missing information";
-      let message = "Please fill in all required fields.";
+      let title = 'Missing information';
+      let message = 'Please fill in all required fields.';
 
-      if (validationErrors.email === "Invalid email format") {
-        title = "Invalid email";
-        message = "Please enter a valid email address (e.g. name@example.com).";
+      if (validationErrors.email === 'Invalid email format') {
+        title = 'Invalid email';
+        message = 'Please enter a valid email address (e.g. name@example.com).';
       } else if (
-        validationErrors.confirmPassword === "Passwords do not match"
+        validationErrors.confirmPassword === 'Passwords do not match'
       ) {
-        title = "Password mismatch";
-        message = "Password and Confirm Password must be the same.";
+        title = 'Password mismatch';
+        message = 'Password and Confirm Password must be the same.';
       } else if (
         validationErrors.contact &&
-        validationErrors.contact !== "Required"
+        validationErrors.contact !== 'Required'
       ) {
-        title = "Invalid contact number";
-        message = "Contact number must contain only numbers.";
+        title = 'Invalid contact number';
+        message = 'Contact number must contain only numbers.';
       }
 
       setToast({
         open: true,
-        type: "error",
+        type: 'error',
         title,
         message,
       });
@@ -125,7 +125,7 @@ export default function PersonalDetails({ data, setData, next }: Props) {
       <div className="text-start mb-5 mt-3">
         <h1 className="text-3xl font-bold text-black">Create an Account</h1>
         <p className="text-sm text-gray-500 mt-1">
-          Already have an account?{" "}
+          Already have an account?{' '}
           <Link
             href="/login"
             className="text-blue-500 font-bold hover:underline"
@@ -145,7 +145,7 @@ export default function PersonalDetails({ data, setData, next }: Props) {
             onChange={(v) => {
               setData({ ...data, salutation: v });
               if (errors.salutation)
-                setErrors((p) => ({ ...p, salutation: "" }));
+                setErrors((p) => ({ ...p, salutation: '' }));
             }}
             required
             error={errors.salutation}
@@ -156,7 +156,7 @@ export default function PersonalDetails({ data, setData, next }: Props) {
             value={data.firstName}
             onChange={(v) => {
               setData({ ...data, firstName: v });
-              if (errors.firstName) setErrors((p) => ({ ...p, firstName: "" }));
+              if (errors.firstName) setErrors((p) => ({ ...p, firstName: '' }));
             }}
             required
             error={errors.firstName}
@@ -168,7 +168,7 @@ export default function PersonalDetails({ data, setData, next }: Props) {
               value={data.lastName}
               onChange={(v) => {
                 setData({ ...data, lastName: v });
-                if (errors.lastName) setErrors((p) => ({ ...p, lastName: "" }));
+                if (errors.lastName) setErrors((p) => ({ ...p, lastName: '' }));
               }}
               required
               error={errors.lastName}
@@ -182,7 +182,7 @@ export default function PersonalDetails({ data, setData, next }: Props) {
           value={data.email}
           onChange={(v) => {
             setData({ ...data, email: v });
-            if (errors.email) setErrors((p) => ({ ...p, email: "" }));
+            if (errors.email) setErrors((p) => ({ ...p, email: '' }));
           }}
           required
           error={errors.email}
@@ -197,7 +197,7 @@ export default function PersonalDetails({ data, setData, next }: Props) {
               onChange={(v) => {
                 setData({ ...data, countryCode: v });
                 if (errors.countryCode)
-                  setErrors((p) => ({ ...p, countryCode: "" }));
+                  setErrors((p) => ({ ...p, countryCode: '' }));
               }}
               required
               error={errors.countryCode}
@@ -211,7 +211,7 @@ export default function PersonalDetails({ data, setData, next }: Props) {
               value={data.contact}
               onChange={(v) => {
                 setData({ ...data, contact: v });
-                if (errors.contact) setErrors((p) => ({ ...p, contact: "" }));
+                if (errors.contact) setErrors((p) => ({ ...p, contact: '' }));
               }}
               required
               error={errors.contact}
@@ -225,7 +225,7 @@ export default function PersonalDetails({ data, setData, next }: Props) {
           value={data.password}
           onChange={(v) => {
             setData({ ...data, password: v });
-            if (errors.password) setErrors((p) => ({ ...p, password: "" }));
+            if (errors.password) setErrors((p) => ({ ...p, password: '' }));
           }}
           required
           error={errors.password}
@@ -238,7 +238,7 @@ export default function PersonalDetails({ data, setData, next }: Props) {
           onChange={(v) => {
             setData({ ...data, confirmPassword: v });
             if (errors.confirmPassword)
-              setErrors((p) => ({ ...p, confirmPassword: "" }));
+              setErrors((p) => ({ ...p, confirmPassword: '' }));
           }}
           required
           error={errors.confirmPassword}

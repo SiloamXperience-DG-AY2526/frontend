@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
 export default function Input({
   label,
   value,
   onChange,
-  type = "text",
+  type = 'text',
   placeholder,
   readOnly = false,
   disabled = false,
@@ -42,8 +42,8 @@ export default function Input({
           w-full rounded-md border px-3 py-3 outline-none transition text-sm
           ${
             error
-              ? "border-red-600 focus:border-red-600 focus:ring-red-600"
-              : "border-green-700 focus:border-green-800 focus:ring-green-800"
+              ? 'border-red-600 focus:border-red-600 focus:ring-red-600'
+              : 'border-green-700 focus:border-green-800 focus:ring-green-800'
           }
           focus:ring-1
           placeholder:text-gray-400

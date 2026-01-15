@@ -13,7 +13,7 @@ export type SignUpData = {
   //page 3 - more about user
   nationality: string;
   identificationNumber: string;
-  gender: "male" | "female";
+  gender: 'male' | 'female';
   dob: string;
   occupation: string;
   languages: string[];
@@ -33,7 +33,7 @@ export type SignUpData = {
   emergencyCountryCode?: string;
   emergencyContactNumber?: string;
   skills?: string;
-  volunteeredBefore?: "Yes" | "No";
+  volunteeredBefore?: 'Yes' | 'No';
   availability?: string;
 
   // page 6 - Communication Preferences

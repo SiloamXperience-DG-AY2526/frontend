@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from 'react';
 
 interface Props {
   label: string;
@@ -17,11 +17,11 @@ export default function MultiSelect({
   options,
   value,
   onChange,
-  placeholder = "Select All Applicable",
+  placeholder = 'Select All Applicable',
   required = false,
   error,
 }: Props) {
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState('');
   const [open, setOpen] = useState(false);
   const wrapRef = useRef<HTMLDivElement | null>(null);
 
@@ -30,8 +30,8 @@ export default function MultiSelect({
       if (!wrapRef.current) return;
       if (!wrapRef.current.contains(e.target as Node)) setOpen(false);
     };
-    document.addEventListener("mousedown", onDoc);
-    return () => document.removeEventListener("mousedown", onDoc);
+    document.addEventListener('mousedown', onDoc);
+    return () => document.removeEventListener('mousedown', onDoc);
   }, []);
 
   const filtered = options.filter(
@@ -41,7 +41,7 @@ export default function MultiSelect({
 
   const add = (opt: string) => {
     onChange([...value, opt]);
-    setQuery("");
+    setQuery('');
     setOpen(false);
   };
 
@@ -89,8 +89,8 @@ export default function MultiSelect({
           w-full rounded-md border px-3 py-2 outline-none transition
           ${
             error
-              ? "border-red-600 focus:border-red-600 focus:ring-red-600"
-              : "border-green-700 focus:border-green-800 focus:ring-green-800"
+              ? 'border-red-600 focus:border-red-600 focus:ring-red-600'
+              : 'border-green-700 focus:border-green-800 focus:ring-green-800'
           }
           focus:ring-1
         `}

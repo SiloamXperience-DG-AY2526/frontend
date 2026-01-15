@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 export default function TextArea({
   label,
@@ -22,7 +22,7 @@ export default function TextArea({
       {label && (
         <label className="block text-black font-semibold text-md mb-2">
           {label}
-          {required && <span className="text-red-600"> *</span>}
+          {required && <span className="text-red-600">*</span>}
         </label>
       )}
 
@@ -37,8 +37,8 @@ export default function TextArea({
           placeholder:text-gray-400
           ${
             error
-              ? "border-red-600 focus:border-red-600 focus:ring-red-600"
-              : "border-green-700 focus:border-green-800 focus:ring-green-800"
+              ? 'border-red-600 focus:border-red-600 focus:ring-red-600'
+              : 'border-green-700 focus:border-green-800 focus:ring-green-800'
           }
           focus:ring-1
         `}

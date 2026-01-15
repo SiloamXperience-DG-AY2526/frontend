@@ -1,24 +1,24 @@
-import { SignUpData } from "@/types/SignUpData";
-import Button from "@/components/ui/Button";
-import Input from "../ui/Input";
-import MultiSelect from "../ui/MultiSelect";
-import Textarea from "../ui/TextArea";
-import { useState } from "react";
-import Toast from "../ui/Toast";
-import RadioGroup from "../ui/RadioGroup";
+import { SignUpData } from '@/types/SignUpData';
+import Button from '@/components/ui/Button';
+import Input from '../ui/Input';
+import MultiSelect from '../ui/MultiSelect';
+import Textarea from '../ui/TextArea';
+import { useState } from 'react';
+import Toast from '../ui/Toast';
+import RadioGroup from '../ui/RadioGroup';
 
 const VOLUNTEER_INTERESTS = [
-  "Organizing fundraising events",
-  "Planning trips for your organization/group",
-  "Short-term mission trips (up to 14 days)",
-  "Long-term commitments (6 months or more)",
-  "Behind-the-scenes administration",
-  "Marketing & social media magic",
-  "Teaching & mentoring",
-  "Training & program development",
-  "Agriculture projects",
-  "Building & facilities work",
-  "Other",
+  'Organizing fundraising events',
+  'Planning trips for your organization/group',
+  'Short-term mission trips (up to 14 days)',
+  'Long-term commitments (6 months or more)',
+  'Behind-the-scenes administration',
+  'Marketing & social media magic',
+  'Teaching & mentoring',
+  'Training & program development',
+  'Agriculture projects',
+  'Building & facilities work',
+  'Other',
 ];
 type SignUpFormProps = {
   data: SignUpData;
@@ -26,7 +26,7 @@ type SignUpFormProps = {
   back: () => void;
   next: () => void;
 };
-type YesNo = "Yes" | "No";
+type YesNo = 'Yes' | 'No';
 
 export default function VolunteerInterest({
   data,
@@ -34,33 +34,33 @@ export default function VolunteerInterest({
   next,
   back,
 }: SignUpFormProps) {
-  const showOther = data.interest.includes("Other");
+  const showOther = data.interest.includes('Other');
   //  ui check if no passport details when user comes back, state would be no
   const hasPassport =
     !!data.passportName?.trim() ||
     !!data.passportNumber?.trim() ||
     !!data.passportExpiry?.trim();
 
-  const [trips, setTrips] = useState<YesNo>(hasPassport ? "Yes" : "No");
+  const [trips, setTrips] = useState<YesNo>(hasPassport ? 'Yes' : 'No');
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [toast, setToast] = useState<{
     open: boolean;
-    type: "success" | "error";
+    type: 'success' | 'error';
     title: string;
     message?: string;
-  }>({ open: false, type: "error", title: "" });
+  }>({ open: false, type: 'error', title: '' });
   const validate = () => {
     const e: Record<string, string> = {};
 
-    if (!data.interest || data.interest.length === 0) e.interest = "Required";
-    if (showOther && !(data.otherInterest || "").trim())
-      e.otherInterest = "Required";
+    if (!data.interest || data.interest.length === 0) e.interest = 'Required';
+    if (showOther && !(data.otherInterest || '').trim())
+      e.otherInterest = 'Required';
 
-    if (trips === "Yes") {
-      if (!(data.passportName || "").trim()) e.passportName = "Required";
-      if (!(data.passportNumber || "").trim()) e.passportNumber = "Required";
-      if (!(data.passportExpiry || "").trim()) e.passportExpiry = "Required";
+    if (trips === 'Yes') {
+      if (!(data.passportName || '').trim()) e.passportName = 'Required';
+      if (!(data.passportNumber || '').trim()) e.passportNumber = 'Required';
+      if (!(data.passportExpiry || '').trim()) e.passportExpiry = 'Required';
     }
 
     setErrors(e);
@@ -71,46 +71,46 @@ export default function VolunteerInterest({
     const e = validate();
 
     if (Object.keys(e).length > 0) {
-      const hasRequired = Object.values(e).includes("Required");
+      const hasRequired = Object.values(e).includes('Required');
 
-      let title = "Missing information";
-      let message = "Please fill in all required fields before continuing.";
+      let title = 'Missing information';
+      let message = 'Please fill in all required fields before continuing.';
 
       if (
         !hasRequired &&
         (e.passportName || e.passportNumber || e.passportExpiry)
       ) {
-        title = "Trip details required";
-        message = "Please complete your passport details to proceed.";
+        title = 'Trip details required';
+        message = 'Please complete your passport details to proceed.';
       }
 
-      setToast({ open: true, type: "error", title, message });
+      setToast({ open: true, type: 'error', title, message });
       return;
     }
 
     next();
   };
   const onTripsChange = (v: string) => {
-    const yn: YesNo = v === "Yes" ? "Yes" : "No";
+    const yn: YesNo = v === 'Yes' ? 'Yes' : 'No';
     setTrips(yn);
 
-    if (yn === "No") {
+    if (yn === 'No') {
       setData({
         ...data,
-        passportName: "",
-        passportNumber: "",
-        passportExpiry: "",
+        passportName: '',
+        passportNumber: '',
+        passportExpiry: '',
       });
       setErrors((p) => ({
         ...p,
-        passportName: "",
-        passportNumber: "",
-        passportExpiry: "",
+        passportName: '',
+        passportNumber: '',
+        passportExpiry: '',
       }));
     }
   };
 
-  const passportDisabled = trips === "No";
+  const passportDisabled = trips === 'No';
 
   return (
     <div>
@@ -134,7 +134,7 @@ export default function VolunteerInterest({
           value={data.interest}
           onChange={(v) => {
             setData({ ...data, interest: v });
-            if (errors.interest) setErrors((p) => ({ ...p, interest: "" }));
+            if (errors.interest) setErrors((p) => ({ ...p, interest: '' }));
           }}
           required
           error={errors.interest}
@@ -143,11 +143,11 @@ export default function VolunteerInterest({
         {showOther && (
           <Input
             label="Other (please specify)"
-            value={data.otherInterest || ""}
+            value={data.otherInterest || ''}
             onChange={(v) => {
               setData({ ...data, otherInterest: v });
               if (errors.otherInterest)
-                setErrors((p) => ({ ...p, otherInterest: "" }));
+                setErrors((p) => ({ ...p, otherInterest: '' }));
             }}
             required
             error={errors.otherInterest}
@@ -155,7 +155,7 @@ export default function VolunteerInterest({
         )}
         <Textarea
           label="Do you have any health conditions we should know about?"
-          value={data.healthNotes || ""}
+          value={data.healthNotes || ''}
           onChange={(v) => setData({ ...data, healthNotes: v })}
           placeholder=""
         />
@@ -163,8 +163,8 @@ export default function VolunteerInterest({
           label="Interested in trips?"
           value={trips}
           options={[
-            { label: "Yes", value: "Yes" },
-            { label: "No", value: "No" },
+            { label: 'Yes', value: 'Yes' },
+            { label: 'No', value: 'No' },
           ]}
           onChange={onTripsChange}
           required
@@ -173,18 +173,18 @@ export default function VolunteerInterest({
         {/* Trip details */}
         <div className="space-y-3">
           <p className="text-md font-semibold text-green-900">
-            Trip details {trips === "Yes" ? "(required)" : ""}
+            Trip details {trips === 'Yes' ? '(required)' : ''}
           </p>
 
           <Input
             label="Full Name (as per passport)"
-            value={data.passportName || ""}
+            value={data.passportName || ''}
             onChange={(v) => {
               setData({ ...data, passportName: v });
               if (errors.passportName)
-                setErrors((p) => ({ ...p, passportName: "" }));
+                setErrors((p) => ({ ...p, passportName: '' }));
             }}
-            required={trips === "Yes"}
+            required={trips === 'Yes'}
             disabled={passportDisabled}
             error={errors.passportName}
           />
@@ -193,13 +193,13 @@ export default function VolunteerInterest({
             <div className="md:col-span-7">
               <Input
                 label="Passport Number"
-                value={data.passportNumber || ""}
+                value={data.passportNumber || ''}
                 onChange={(v) => {
                   setData({ ...data, passportNumber: v });
                   if (errors.passportNumber)
-                    setErrors((p) => ({ ...p, passportNumber: "" }));
+                    setErrors((p) => ({ ...p, passportNumber: '' }));
                 }}
-                required={trips === "Yes"}
+                required={trips === 'Yes'}
                 disabled={passportDisabled}
                 error={errors.passportNumber}
               />
@@ -209,13 +209,13 @@ export default function VolunteerInterest({
               <Input
                 label="Passport Expiry Date"
                 type="date"
-                value={data.passportExpiry || ""}
+                value={data.passportExpiry || ''}
                 onChange={(v) => {
                   setData({ ...data, passportExpiry: v });
                   if (errors.passportExpiry)
-                    setErrors((p) => ({ ...p, passportExpiry: "" }));
+                    setErrors((p) => ({ ...p, passportExpiry: '' }));
                 }}
-                required={trips === "Yes"}
+                required={trips === 'Yes'}
                 disabled={passportDisabled}
                 error={errors.passportExpiry}
               />

@@ -1,14 +1,14 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import { SignUpData } from "@/types/SignUpData";
-import Button from "@/components/ui/Button";
-import { fetchNationalities, fetchLanguages } from "@/lib/countries";
-import Textarea from "../ui/TextArea";
-import Select from "../ui/Select";
-import Input from "../ui/Input";
-import MultiSelect from "../ui/MultiSelect";
-import Toast from "../ui/Toast";
+import { useEffect, useState } from 'react';
+import { SignUpData } from '@/types/SignUpData';
+import Button from '@/components/ui/Button';
+import { fetchNationalities, fetchLanguages } from '@/lib/countries';
+import Textarea from '../ui/TextArea';
+import Select from '../ui/Select';
+import Input from '../ui/Input';
+import MultiSelect from '../ui/MultiSelect';
+import Toast from '../ui/Toast';
 
 export type SignUpFormProps = {
   data: SignUpData;
@@ -18,16 +18,16 @@ export type SignUpFormProps = {
 };
 
 const genderOptions = [
-  { label: "Male", value: "male" },
-  { label: "Female", value: "female" },
+  { label: 'Male', value: 'male' },
+  { label: 'Female', value: 'female' },
 ] as const;
 
 //cache to avoid reloading and flickering
 
-const CACHE_KEY = "more_details_meta_v1";
+const CACHE_KEY = 'more_details_meta_v1';
 
 function getCachedMeta(): { countries: string[]; languages: string[] } | null {
-  if (typeof window === "undefined") return null;
+  if (typeof window === 'undefined') return null;
   try {
     const cached = sessionStorage.getItem(CACHE_KEY);
     return cached ? JSON.parse(cached) : null;
@@ -54,10 +54,10 @@ export default function MoreAboutYou({
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [toast, setToast] = useState<{
     open: boolean;
-    type: "success" | "error";
+    type: 'success' | 'error';
     title: string;
     message?: string;
-  }>({ open: false, type: "error", title: "" });
+  }>({ open: false, type: 'error', title: '' });
   useEffect(() => {
     if (cachedMeta) return;
 
@@ -86,14 +86,14 @@ export default function MoreAboutYou({
   const validate = () => {
     const e: Record<string, string> = {};
 
-    if (!data.nationality) e.nationality = "Required";
-    if (!data.gender) e.gender = "Required";
-    if (!data.dob) e.dob = "Required";
-    if (!data.occupation?.trim()) e.occupation = "Required";
+    if (!data.nationality) e.nationality = 'Required';
+    if (!data.gender) e.gender = 'Required';
+    if (!data.dob) e.dob = 'Required';
+    if (!data.occupation?.trim()) e.occupation = 'Required';
     if (!data.languages || data.languages.length === 0)
-      e.languages = "Select at least 1";
-    if (!data.qualification) e.qualification = "Required";
-    if (!data.address?.trim()) e.address = "Required";
+      e.languages = 'Select at least 1';
+    if (!data.qualification) e.qualification = 'Required';
+    if (!data.address?.trim()) e.address = 'Required';
 
     setErrors(e);
     return e;
@@ -103,20 +103,20 @@ export default function MoreAboutYou({
     const e = validate();
 
     if (Object.keys(e).length > 0) {
-      let title = "Missing information";
-      let message = "Please fill in all required fields.";
-      const hasRequiredError = Object.values(e).includes("Required");
+      let title = 'Missing information';
+      let message = 'Please fill in all required fields.';
+      const hasRequiredError = Object.values(e).includes('Required');
 
       if (hasRequiredError) {
-        title = "Missing information";
-        message = "Please fill in all required fields before continuing.";
+        title = 'Missing information';
+        message = 'Please fill in all required fields before continuing.';
       }
       if (e.languages) {
-        title = "Languages required";
-        message = "Please select at least one language.";
+        title = 'Languages required';
+        message = 'Please select at least one language.';
       }
 
-      setToast({ open: true, type: "error", title, message });
+      setToast({ open: true, type: 'error', title, message });
       return;
     }
 
@@ -166,7 +166,7 @@ export default function MoreAboutYou({
             onChange={(v) => {
               setData({ ...data, nationality: v });
               if (errors.nationality)
-                setErrors((p) => ({ ...p, nationality: "" }));
+                setErrors((p) => ({ ...p, nationality: '' }));
             }}
             required
             error={errors.nationality}
@@ -186,7 +186,7 @@ export default function MoreAboutYou({
                     onChange={() => {
                       setData({ ...data, gender: value });
                       if (errors.gender)
-                        setErrors((p) => ({ ...p, gender: "" }));
+                        setErrors((p) => ({ ...p, gender: '' }));
                     }}
                   />
                   {label}
@@ -207,7 +207,7 @@ export default function MoreAboutYou({
             value={data.dob}
             onChange={(v) => {
               setData({ ...data, dob: v });
-              if (errors.dob) setErrors((p) => ({ ...p, dob: "" }));
+              if (errors.dob) setErrors((p) => ({ ...p, dob: '' }));
             }}
             required
             error={errors.dob}
@@ -219,7 +219,7 @@ export default function MoreAboutYou({
             onChange={(v) => {
               setData({ ...data, occupation: v });
               if (errors.occupation)
-                setErrors((p) => ({ ...p, occupation: "" }));
+                setErrors((p) => ({ ...p, occupation: '' }));
             }}
             required
             error={errors.occupation}
@@ -233,7 +233,7 @@ export default function MoreAboutYou({
             value={data.languages}
             onChange={(v) => {
               setData({ ...data, languages: v });
-              if (errors.languages) setErrors((p) => ({ ...p, languages: "" }));
+              if (errors.languages) setErrors((p) => ({ ...p, languages: '' }));
             }}
             required
             error={errors.languages}
@@ -243,17 +243,17 @@ export default function MoreAboutYou({
             label="Highest Qualification"
             value={data.qualification}
             options={[
-              "Secondary School",
-              "Diploma",
-              "Bachelor's Degree",
-              "Master's Degree",
-              "Doctorate",
-              "Others",
+              'Secondary School',
+              'Diploma',
+              'Bachelor\'s Degree',
+              'Master\'s Degree',
+              'Doctorate',
+              'Others',
             ]}
             onChange={(v) => {
               setData({ ...data, qualification: v });
               if (errors.qualification)
-                setErrors((p) => ({ ...p, qualification: "" }));
+                setErrors((p) => ({ ...p, qualification: '' }));
             }}
             required
             error={errors.qualification}
@@ -266,7 +266,7 @@ export default function MoreAboutYou({
           value={data.address}
           onChange={(v) => {
             setData({ ...data, address: v });
-            if (errors.address) setErrors((p) => ({ ...p, address: "" }));
+            if (errors.address) setErrors((p) => ({ ...p, address: '' }));
           }}
           required
           error={errors.address}

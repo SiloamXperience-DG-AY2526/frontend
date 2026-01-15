@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { SignUpData } from "@/types/SignUpData";
-import Button from "@/components/ui/Button";
-import Select from "../ui/Select";
-import Toast from "../ui/Toast";
+import { useState } from 'react';
+import { SignUpData } from '@/types/SignUpData';
+import Button from '@/components/ui/Button';
+import Select from '../ui/Select';
+import Toast from '../ui/Toast';
 
 type LastSignUpFormProps = {
   data: SignUpData;
@@ -17,17 +17,17 @@ export default function StepCommunication({ data, setData, back }: LastSignUpFor
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [toast, setToast] = useState<{
     open: boolean;
-    type: "success" | "error";
+    type: 'success' | 'error';
     title: string;
     message?: string;
-  }>({ open: false, type: "error", title: "" });
+  }>({ open: false, type: 'error', title: '' });
 
   const validate = () => {
     const e: Record<string, string> = {};
 
     //  Required fields for submission
-    if (!data.preferredContactMethod) e.preferredContactMethod = "Required";
-    if (data.agreeUpdates !== true) e.agreeUpdates = "Required";
+    if (!data.preferredContactMethod) e.preferredContactMethod = 'Required';
+    if (data.agreeUpdates !== true) e.agreeUpdates = 'Required';
 
     setErrors(e);
     return e;
@@ -38,18 +38,18 @@ export default function StepCommunication({ data, setData, back }: LastSignUpFor
 
     if (Object.keys(e).length > 0) {
       // Required-first toast
-      let title = "Missing information";
-      let message = "Please complete the required fields to submit.";
+      let title = 'Missing information';
+      let message = 'Please complete the required fields to submit.';
 
-      if (e.preferredContactMethod === "Required") {
-        title = "Preferred contact required";
-        message = "Please select the best way to stay in touch.";
-      } else if (e.agreeUpdates === "Required") {
-        title = "Consent required";
-        message = "You must agree to receive updates to continue.";
+      if (e.preferredContactMethod === 'Required') {
+        title = 'Preferred contact required';
+        message = 'Please select the best way to stay in touch.';
+      } else if (e.agreeUpdates === 'Required') {
+        title = 'Consent required';
+        message = 'You must agree to receive updates to continue.';
       }
 
-      setToast({ open: true, type: "error", title, message });
+      setToast({ open: true, type: 'error', title, message });
       return;
     }
 
@@ -59,23 +59,23 @@ export default function StepCommunication({ data, setData, back }: LastSignUpFor
       const payload: SignUpData = { ...data };
 
       // frontend test
-      console.log("Signup data:", payload);
+      console.log('Signup data:', payload);
 
       await new Promise((resolve) => setTimeout(resolve, 1500));
 
       setToast({
         open: true,
-        type: "success",
-        title: "Signup complete",
-        message: "Your signup was submitted successfully.",
+        type: 'success',
+        title: 'Signup complete',
+        message: 'Your signup was submitted successfully.',
       });
     } catch (error) {
       console.error(error);
       setToast({
         open: true,
-        type: "error",
-        title: "Submission failed",
-        message: "There was an error submitting the form. Please try again.",
+        type: 'error',
+        title: 'Submission failed',
+        message: 'There was an error submitting the form. Please try again.',
       });
     } finally {
       setLoading(false);
@@ -100,19 +100,19 @@ export default function StepCommunication({ data, setData, back }: LastSignUpFor
       <div className="space-y-6">
         <Select
           label="How did you hear about us?"
-          value={data.foundUsThrough || ""}
-          options={["Friend", "Social Media", "Church", "Website", "Event", "Other"]}
+          value={data.foundUsThrough || ''}
+          options={['Friend', 'Social Media', 'Church', 'Website', 'Event', 'Other']}
           onChange={(v) => setData({ ...data, foundUsThrough: v })}
         />
 
         <Select
           label="What's the best way to stay in touch?"
-          value={data.preferredContactMethod || ""}
-          options={["Email", "WhatsApp", "Telegram", "Messenger", "Phone Call"]}
+          value={data.preferredContactMethod || ''}
+          options={['Email', 'WhatsApp', 'Telegram', 'Messenger', 'Phone Call']}
           onChange={(v) => {
             setData({ ...data, preferredContactMethod: v });
             if (errors.preferredContactMethod)
-              setErrors((p) => ({ ...p, preferredContactMethod: "" }));
+              setErrors((p) => ({ ...p, preferredContactMethod: '' }));
           }}
           required
           error={errors.preferredContactMethod}
@@ -127,11 +127,11 @@ export default function StepCommunication({ data, setData, back }: LastSignUpFor
               checked={data.agreeUpdates === true}
               onChange={(e) => {
                 setData({ ...data, agreeUpdates: e.target.checked });
-                if (errors.agreeUpdates) setErrors((p) => ({ ...p, agreeUpdates: "" }));
+                if (errors.agreeUpdates) setErrors((p) => ({ ...p, agreeUpdates: '' }));
               }}
             />
             <span>
-              I agree to receive updates and communications{" "}
+              I agree to receive updates and communications{' '}
               <span className="text-red-600">(required)</span>
             </span>
           </label>
@@ -148,7 +148,7 @@ export default function StepCommunication({ data, setData, back }: LastSignUpFor
               onChange={(e) => setData({ ...data, joinMailingList: e.target.checked })}
             />
             <span>
-              I&apos;d like to join your mailing list for newsletters and event invitations{" "}
+              I&apos;d like to join your mailing list for newsletters and event invitations{' '}
               <span className="text-gray-500">(optional)</span>
             </span>
           </label>
@@ -158,7 +158,7 @@ export default function StepCommunication({ data, setData, back }: LastSignUpFor
       <div className="mt-8 flex justify-between">
         <Button label="Back" onClick={back} />
         <Button
-          label={loading ? "Submitting..." : "SUBMIT →"}
+          label={loading ? 'Submitting...' : 'SUBMIT →'}
           onClick={handleSubmit}
           disabled={loading}
         />
