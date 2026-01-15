@@ -1,142 +1,64 @@
 import { NextResponse } from 'next/server';
-import { DonorDetail } from '@/types/DonorData';
+import { cookies } from 'next/headers';
+import { z } from 'zod';
+import { DonorDetailSchema } from '@/types/DonorData';
 
-// Mock data for donor details
-const mockDonorDetails: Record<string, DonorDetail> = {
-  '1': {
-    donorId: '1',
-    fullName: 'Alex Tan',
-    prefixTitle: 'Mr',
-    birthday: '13/03/1998',
-    gender: 'Male',
-    occupation: 'Marketing Executive',
-    nationality: 'Singaporean',
-    phoneNumber: '91234567',
-    preferredCommunicationMethod: 'Email',
-    cumulativeAmount: 5650,
-    projects: ['Education Support Fund', 'Food Distribution Drive'],
-    status: 'Active',
-    donations: [
-      {
-        id: '1',
-        project: 'Education Support Fund',
-        amount: 150,
-        receipt: 'Pending',
-        date: '2024-01-15',
-      },
-      {
-        id: '2',
-        project: 'Food Distribution Drive',
-        amount: 100,
-        receipt: 'Issued',
-        date: '2024-02-10',
-      },
-      {
-        id: '3',
-        project: 'Food Distribution Drive',
-        amount: 100,
-        receipt: 'Issued',
-        date: '2024-03-05',
-      },
-      {
-        id: '4',
-        project: 'Food Distribution Drive',
-        amount: 100,
-        receipt: 'Issued',
-        date: '2024-04-20',
-      },
-      {
-        id: '5',
-        project: 'Food Distribution Drive',
-        amount: 100,
-        receipt: 'Issued',
-        date: '2024-05-15',
-      },
-      {
-        id: '6',
-        project: 'Food Distribution Drive',
-        amount: 100,
-        receipt: 'Issued',
-        date: '2024-06-12',
-      },
-    ],
-  },
-  '2': {
-    donorId: '2',
-    fullName: 'Sarah Johnson',
-    prefixTitle: 'Ms',
-    birthday: '22/07/1985',
-    gender: 'Female',
-    occupation: 'Software Engineer',
-    nationality: 'American',
-    phoneNumber: '98765432',
-    preferredCommunicationMethod: 'Phone',
-    cumulativeAmount: 3200,
-    projects: ['Healthcare Initiative', 'Community Center'],
-    status: 'Active',
-    donations: [
-      {
-        id: '7',
-        project: 'Healthcare Initiative',
-        amount: 500,
-        receipt: 'Issued',
-        date: '2024-01-10',
-      },
-      {
-        id: '8',
-        project: 'Community Center',
-        amount: 300,
-        receipt: 'Issued',
-        date: '2024-03-15',
-      },
-    ],
-  },
-  '3': {
-    donorId: '3',
-    fullName: 'Michael Chen',
-    prefixTitle: 'Mr',
-    birthday: '05/11/1992',
-    gender: 'Male',
-    occupation: 'Doctor',
-    nationality: 'Malaysian',
-    phoneNumber: '87654321',
-    preferredCommunicationMethod: 'Email',
-    cumulativeAmount: 8000,
-    projects: ['Healthcare Initiative', 'Education Support Fund'],
-    status: 'Active',
-    donations: [
-      {
-        id: '9',
-        project: 'Healthcare Initiative',
-        amount: 1000,
-        receipt: 'Issued',
-        date: '2024-01-05',
-      },
-      {
-        id: '10',
-        project: 'Education Support Fund',
-        amount: 500,
-        receipt: 'Issued',
-        date: '2024-02-20',
-      },
-    ],
-  },
-};
+const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:3000/api/v1';
 
 export async function GET(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { id } = await params;
+  try {
+    const { id } = await params;
 
-  // Simulate network delay
-  await new Promise((resolve) => setTimeout(resolve, 300));
+    // Get auth token from cookies
+    const cookieStore = await cookies();
+    const token = cookieStore.get('access_token')?.value;
 
-  const donor = mockDonorDetails[id];
+    if (!token) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
 
-  if (!donor) {
-    return NextResponse.json({ error: 'Donor not found' }, { status: 404 });
+    // Call backend API
+    const response = await fetch(`${BACKEND_URL}/donors/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      if (response.status === 404) {
+        return NextResponse.json({ error: 'Donor not found' }, { status: 404 });
+      }
+
+      const errorData = await response.json().catch(() => ({}));
+      return NextResponse.json(
+        { error: errorData.message || 'Failed to fetch donor details' },
+        { status: response.status }
+      );
+    }
+
+    const data = await response.json();
+
+    // Validate response shape with Zod
+    const validatedData = DonorDetailSchema.parse(data);
+
+    return NextResponse.json(validatedData, { status: 200 });
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      console.error('Validation error:', error);
+      return NextResponse.json(
+        { error: 'Invalid response format from backend' },
+        { status: 500 }
+      );
+    }
+
+    console.error('Error fetching donor details:', error);
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
   }
-
-  return NextResponse.json(donor, { status: 200 });
 }

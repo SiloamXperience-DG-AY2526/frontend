@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Donor, DonorDetail } from '@/types/DonorData';
 
 export function useDonors() {
   const [donors, setDonors] = useState<Donor[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [statusCode, setStatusCode] = useState<number | null>(null);
 
   useEffect(() => {
     fetchDonors();
@@ -14,7 +15,15 @@ export function useDonors() {
     try {
       setLoading(true);
       const res = await fetch('/api/donors');
-      if (!res.ok) throw new Error('Failed to fetch donors');
+      setStatusCode(res.status);
+
+      if (!res.ok) {
+        const errorData = await res
+          .json()
+          .catch(() => ({ error: 'Failed to fetch donors' }));
+        throw new Error(errorData.error || 'Failed to fetch donors');
+      }
+
       const data = await res.json();
       setDonors(data);
       setError(null);
@@ -27,23 +36,28 @@ export function useDonors() {
     }
   };
 
-  return { donors, loading, error, refetch: fetchDonors };
+  return { donors, loading, error, statusCode, refetch: fetchDonors };
 }
 
 export function useDonor(id: string) {
   const [donor, setDonor] = useState<DonorDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [statusCode, setStatusCode] = useState<number | null>(null);
 
-  useEffect(() => {
-    fetchDonor();
-  }, [id]);
-
-  const fetchDonor = async () => {
+  const fetchDonor = useCallback(async () => {
     try {
       setLoading(true);
       const res = await fetch(`/api/donors/${id}`);
-      if (!res.ok) throw new Error('Failed to fetch donor');
+      setStatusCode(res.status);
+
+      if (!res.ok) {
+        const errorData = await res
+          .json()
+          .catch(() => ({ error: 'Failed to fetch donor' }));
+        throw new Error(errorData.error || 'Failed to fetch donor');
+      }
+
       const data = await res.json();
       setDonor(data);
       setError(null);
@@ -54,9 +68,13 @@ export function useDonor(id: string) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [id]);
 
-  return { donor, loading, error, refetch: fetchDonor };
+  useEffect(() => {
+    fetchDonor();
+  }, [fetchDonor]);
+
+  return { donor, loading, error, statusCode, refetch: fetchDonor };
 }
 
 export function useSearchFilter(donors: Donor[], searchQuery: string) {

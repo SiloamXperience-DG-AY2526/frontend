@@ -4,6 +4,7 @@ import { use } from 'react';
 import FinanceManagerSidebar from '@/components/FinanceManagerSidebar';
 import PageHeader from '@/components/ui/PageHeader';
 import BackButton from '@/components/ui/BackButton';
+import UnauthorizedAccessCard from '@/components/UnauthorizedAccessCard';
 import { useDonor } from '@/hooks/useDonors';
 import PersonalParticulars from './_components/PersonalParticulars';
 import DonationsTable from './_components/DonationsTable';
@@ -14,7 +15,7 @@ export default function DonorDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = use(params);
-  const { donor, loading, error } = useDonor(id);
+  const { donor, loading, error, statusCode } = useDonor(id);
 
   if (loading) {
     return (
@@ -25,6 +26,10 @@ export default function DonorDetailPage({
         </main>
       </div>
     );
+  }
+
+  if (statusCode === 403) {
+    return <UnauthorizedAccessCard />;
   }
 
   if (error || !donor) {

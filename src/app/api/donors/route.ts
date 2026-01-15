@@ -1,76 +1,58 @@
 import { NextResponse } from 'next/server';
-import { Donor } from '@/types/DonorData';
+import { cookies } from 'next/headers';
+import { z } from 'zod';
+import { DonorSchema } from '@/types/DonorData';
 
-// Mock donor data - replace with actual backend call later
-const mockDonors: Donor[] = [
-  {
-    donorId: '1',
-    partnerName: 'Tan Chen Yi',
-    projects: ['Project Recycle', 'Project Health'],
-    cumulativeAmount: 100,
-    gender: 'Female',
-    contactNumber: '91111111',
-    status: 'Active',
-  },
-  {
-    donorId: '2',
-    partnerName: 'Tan Siew Mei',
-    projects: ['Project Recycle', 'Project Health'],
-    cumulativeAmount: 100,
-    gender: 'Female',
-    contactNumber: '91111111',
-    status: 'Inactive',
-  },
-  {
-    donorId: '3',
-    partnerName: 'Tan Siew Mei',
-    projects: ['Project Recycle'],
-    cumulativeAmount: 100,
-    gender: 'Female',
-    contactNumber: '91111111',
-    status: 'Active',
-  },
-  {
-    donorId: '4',
-    partnerName: 'Tan Siew Mei',
-    projects: ['Project Recycle'],
-    cumulativeAmount: 100,
-    gender: 'Female',
-    contactNumber: '91111111',
-    status: 'Active',
-  },
-  {
-    donorId: '5',
-    partnerName: 'Tan Siew Mei',
-    projects: ['Project Recycle', 'Project Health'],
-    cumulativeAmount: 100,
-    gender: 'Female',
-    contactNumber: '91111111',
-    status: 'Active',
-  },
-  {
-    donorId: '6',
-    partnerName: 'Tan Siew Mei',
-    projects: ['Project Health'],
-    cumulativeAmount: 100,
-    gender: 'Female',
-    contactNumber: '91111111',
-    status: 'Active',
-  },
-  {
-    donorId: '7',
-    partnerName: 'Tan Siew Mei',
-    projects: ['Project Health'],
-    cumulativeAmount: 100,
-    gender: 'Female',
-    contactNumber: '91111111',
-    status: 'Active',
-  },
-];
+const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:3000/api/v1';
+
+// Schema for array of donors
+const DonorsArraySchema = z.array(DonorSchema);
 
 export async function GET() {
-  // Simulate network delay
-  await new Promise((resolve) => setTimeout(resolve, 300));
+  try {
+    // Get auth token from cookies
+    const cookieStore = await cookies();
+    const token = cookieStore.get('access_token')?.value;
 
-  return NextResponse.json(mockDonors, { status: 200 });
+    if (!token) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // Call backend API
+    const response = await fetch(`${BACKEND_URL}/donors`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      return NextResponse.json(
+        { error: errorData.message || 'Failed to fetch donors' },
+        { status: response.status }
+      );
+    }
+
+    const data = await response.json();
+
+    // Validate response shape with Zod
+    const validatedData = DonorsArraySchema.parse(data);
+
+    return NextResponse.json(validatedData, { status: 200 });
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      console.error('Validation error:', error.message);
+      return NextResponse.json(
+        { error: 'Invalid response format from backend' },
+        { status: 500 }
+      );
+    }
+
+    console.error('Error fetching donors:', error);
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
+  }
 }
