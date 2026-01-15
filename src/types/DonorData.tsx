@@ -40,3 +40,87 @@ export type Donor = z.infer<typeof DonorSchema>;
 export type DonorTableData = Donor[];
 export type Donation = z.infer<typeof DonationSchema>;
 export type DonorDetail = z.infer<typeof DonorDetailSchema>;
+
+// Backend response Zod schemas for validation
+const BackendDonorSchema = z.object({
+  user: z.object({
+    id: z.string(),
+    title: z.string().nullable(),
+    firstName: z.string(),
+    lastName: z.string(),
+    email: z.string(),
+    managedDonationProjects: z.array(z.string()),
+  }),
+  gender: z.string(),
+  contactNumber: z.string(),
+  nationality: z.string(),
+  identificationNumber: z.string(),
+  dob: z.string(),
+  occupation: z.string(),
+  otherContactModes: z.string().nullable(),
+  contactModes: z.array(
+    z.object({
+      mode: z.string(),
+    })
+  ),
+  totalDonations: z.number(),
+});
+
+export const BackendDonorsResponseSchema = z.object({
+  donorsWithTotals: z.array(BackendDonorSchema),
+  pagination: z.object({
+    page: z.number(),
+    limit: z.number(),
+    totalCount: z.number(),
+    totalPages: z.number(),
+  }),
+});
+
+const BackendDonationSchema = z.object({
+  id: z.string(),
+  project: z.string(),
+  amount: z.number(),
+  receipt: z.string(),
+  date: z.string(),
+});
+
+export const BackendDonorDetailResponseSchema = z.object({
+  donorDetails: z.object({
+    user: z.object({
+      id: z.string(),
+      title: z.string().nullable(),
+      firstName: z.string(),
+      lastName: z.string(),
+      email: z.string(),
+      managedDonationProjects: z.array(z.string()),
+    }),
+    gender: z.string(),
+    contactNumber: z.string(),
+    nationality: z.string(),
+    identificationNumber: z.string(),
+    dob: z.string(),
+    occupation: z.string(),
+    otherContactModes: z.string().nullable(),
+    contactModes: z.array(
+      z.object({
+        mode: z.string(),
+      })
+    ),
+  }),
+  donationHistory: z.object({
+    donations: z.array(BackendDonationSchema),
+    pagination: z.object({
+      page: z.number(),
+      limit: z.number(),
+      totalCount: z.number(),
+      totalPages: z.number(),
+    }),
+  }),
+});
+
+// TypeScript types for backend responses
+export type BackendDonor = z.infer<typeof BackendDonorSchema>;
+export type BackendDonorsResponse = z.infer<typeof BackendDonorsResponseSchema>;
+export type BackendDonorDetailResponse = z.infer<
+  typeof BackendDonorDetailResponseSchema
+>;

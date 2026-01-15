@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { z } from 'zod';
-import { DonorDetailSchema } from '@/types/DonorData';
+import { BackendDonorDetailResponseSchema } from '@/types/DonorData';
 import { formatDate } from '@/lib/formatDate';
 
 const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:3000/api/v1';
@@ -48,10 +48,13 @@ export async function GET(
       JSON.stringify(data, null, 2)
     );
 
+    // Validate backend response with Zod
+    const validatedBackendData = BackendDonorDetailResponseSchema.parse(data);
+
     // Transform backend response to match frontend schema
-    const donorDetails = data.donorDetails;
+    const donorDetails = validatedBackendData.donorDetails;
     const user = donorDetails.user;
-    const donationHistory = data.donationHistory;
+    const donationHistory = validatedBackendData.donationHistory;
 
     const transformedDonor = {
       donorId: user.id,
@@ -68,7 +71,7 @@ export async function GET(
       ]
         .filter(Boolean)
         .join(', '),
-      donations: donationHistory.donations.map((donation: any) => ({
+      donations: donationHistory.donations.map((donation) => ({
         id: donation.id || '',
         project: donation.project || '',
         amount: donation.amount || 0,
@@ -85,10 +88,7 @@ export async function GET(
       JSON.stringify(transformedDonor, null, 2)
     );
 
-    // Validate response shape with Zod
-    const validatedData = DonorDetailSchema.parse(transformedDonor);
-
-    return NextResponse.json(validatedData, { status: 200 });
+    return NextResponse.json(transformedDonor, { status: 200 });
   } catch (error) {
     if (error instanceof z.ZodError) {
       console.error('Validation error:', error.message);

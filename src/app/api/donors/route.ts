@@ -1,12 +1,9 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { z } from 'zod';
-import { DonorSchema } from '@/types/DonorData';
+import { BackendDonorsResponseSchema } from '@/types/DonorData';
 
 const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:3000/api/v1';
-
-// Schema for array of donors
-const DonorsArraySchema = z.array(DonorSchema);
 
 export async function GET() {
   try {
@@ -38,26 +35,28 @@ export async function GET() {
 
     console.log('Raw donors data from backend:', JSON.stringify(data, null, 2));
 
+    // Validate backend response with Zod
+    const validatedBackendData = BackendDonorsResponseSchema.parse(data);
+
     // Transform backend response to match frontend schema
-    const transformedDonors = data.donorsWithTotals.map((donor: any) => ({
-      donorId: donor.user.id,
-      partnerName: `${donor.user.firstName} ${donor.user.lastName}`,
-      projects: donor.user.managedDonationProjects || [],
-      cumulativeAmount: donor.totalDonations || 0,
-      gender: donor.gender,
-      contactNumber: donor.contactNumber,
-      status: 'Active', // Default status, adjust if backend provides this
-    }));
+    const transformedDonors = validatedBackendData.donorsWithTotals.map(
+      (donor) => ({
+        donorId: donor.user.id,
+        partnerName: `${donor.user.firstName} ${donor.user.lastName}`,
+        projects: donor.user.managedDonationProjects || [],
+        cumulativeAmount: donor.totalDonations || 0,
+        gender: donor.gender,
+        contactNumber: donor.contactNumber,
+        status: 'Active' as const, // Default status, adjust if backend provides this
+      })
+    );
 
     console.log(
       'Transformed donors:',
       JSON.stringify(transformedDonors, null, 2)
     );
 
-    // Validate response shape with Zod
-    const validatedData = DonorsArraySchema.parse(transformedDonors);
-
-    return NextResponse.json(validatedData, { status: 200 });
+    return NextResponse.json(transformedDonors, { status: 200 });
   } catch (error) {
     if (error instanceof z.ZodError) {
       console.error('Validation error:', error.message);
