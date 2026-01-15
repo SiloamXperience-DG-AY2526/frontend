@@ -1,27 +1,19 @@
-"use client";
-
 export default function RadioGroup({
   label,
   value,
   options,
   onChange,
-  required = false,
-  error,
 }: {
   label: string;
   value: string;
   options: { value: string; label: string }[];
   onChange: (v: string) => void;
-  required?: boolean;
-  error?: string;
 }) {
   return (
     <div>
       <label className="block text-black text-md mb-2 font-semibold">
         {label}
-        {required && <span className="text-red-600"> *</span>}
       </label>
-
       <div className="flex items-center gap-10">
         {options.map((opt) => (
           <label
@@ -38,8 +30,6 @@ export default function RadioGroup({
           </label>
         ))}
       </div>
-
-      {error ? <p className="mt-1 text-xs text-red-600">{error}</p> : null}
     </div>
   );
 }
