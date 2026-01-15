@@ -1,14 +1,14 @@
 'use client';
 
-import { useAuth } from '@/contexts/AuthContext';
 import { submitPeerFeedback } from '@/lib/api/general/projects';
 import { useParams } from 'next/navigation';
 import { useState } from 'react';
 
+
 type FeedbackType = 'supervisor' | 'peer' | 'self';
 
+
 export default function FeedbackPage() {
-    const { user } = useAuth();
     const { projectId } = useParams();
     const [loading, setLoading] = useState(false);
     const [feedbackType, setFeedbackType] = useState<FeedbackType | null>(null);
