@@ -1,5 +1,6 @@
 import { DonorDetail } from '@/types/DonorData';
 import DataTable, { Column } from '@/components/table/DataTable';
+import { formatDate } from '@/lib/formatDate';
 
 interface PersonalParticularsProps {
   donor: DonorDetail;
@@ -16,7 +17,7 @@ export default function PersonalParticulars({
   const personalFields: PersonalField[] = [
     { label: 'Full Name', value: donor.fullName },
     { label: 'Prefix Title', value: donor.prefixTitle },
-    { label: 'Birthday', value: donor.birthday },
+    { label: 'Birthday', value: formatDate(donor.birthday) },
     { label: 'Gender', value: donor.gender },
     { label: 'Occupation', value: donor.occupation },
     { label: 'Nationality', value: donor.nationality },

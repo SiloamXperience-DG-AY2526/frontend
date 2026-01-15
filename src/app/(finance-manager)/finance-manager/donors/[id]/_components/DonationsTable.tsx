@@ -1,5 +1,6 @@
 import { Donation } from '@/types/DonorData';
 import DataTable, { Column } from '@/components/table/DataTable';
+import { formatDate } from '@/lib/formatDate';
 
 interface DonationsTableProps {
   donations: Donation[];
@@ -28,6 +29,10 @@ export default function DonationsTable({ donations }: DonationsTableProps) {
           {donation.receipt}
         </span>
       ),
+    },
+    {
+      header: 'Date',
+      accessor: (donation) => formatDate(donation.date),
     },
   ];
 

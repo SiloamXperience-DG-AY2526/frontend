@@ -6,7 +6,7 @@ export const DonorSchema = z.object({
   partnerName: z.string(),
   projects: z.array(z.string()),
   cumulativeAmount: z.number(),
-  gender: z.enum(['Male', 'Female', 'Other']),
+  gender: z.enum(['male', 'female', 'others']),
   contactNumber: z.string(),
   status: z.enum(['Active', 'Inactive']),
 });
@@ -24,7 +24,7 @@ export const DonorDetailSchema = z.object({
   fullName: z.string(),
   prefixTitle: z.string(),
   birthday: z.string(),
-  gender: z.enum(['Male', 'Female', 'Other']),
+  gender: z.enum(['male', 'female', 'others']),
   occupation: z.string(),
   nationality: z.string(),
   phoneNumber: z.string(),

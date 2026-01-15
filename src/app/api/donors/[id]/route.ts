@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { z } from 'zod';
 import { DonorDetailSchema } from '@/types/DonorData';
+import { formatDate } from '@/lib/formatDate';
 
 const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:3000/api/v1';
 
@@ -42,15 +43,64 @@ export async function GET(
 
     const data = await response.json();
 
+    console.log(
+      'Raw donor detail data from backend:',
+      JSON.stringify(data, null, 2)
+    );
+
+    // Transform backend response to match frontend schema
+    const donorDetails = data.donorDetails;
+    const user = donorDetails.user;
+    const donationHistory = data.donationHistory;
+
+    const transformedDonor = {
+      donorId: user.id,
+      fullName: `${user.firstName} ${user.lastName}`,
+      prefixTitle: user.title || '',
+      birthday: formatDate(donorDetails.dob),
+      gender: donorDetails.gender,
+      occupation: donorDetails.occupation,
+      nationality: donorDetails.nationality,
+      phoneNumber: donorDetails.contactNumber,
+      preferredCommunicationMethod: [
+        ...donorDetails.contactModes.map((c) => c.mode),
+        donorDetails.otherContactModes,
+      ]
+        .filter(Boolean)
+        .join(', '),
+      donations: donationHistory.donations.map((donation: any) => ({
+        id: donation.id || '',
+        project: donation.project || '',
+        amount: donation.amount || 0,
+        receipt: donation.receipt || 'Pending',
+        date: donation.date || '',
+      })),
+      cumulativeAmount: 0, // Calculate from donations or get from backend if available
+      projects: user.managedDonationProjects || [],
+      status: 'Active', // Default status, adjust if backend provides this
+    };
+
+    console.log(
+      'Transformed donor:',
+      JSON.stringify(transformedDonor, null, 2)
+    );
+
     // Validate response shape with Zod
-    const validatedData = DonorDetailSchema.parse(data);
+    const validatedData = DonorDetailSchema.parse(transformedDonor);
 
     return NextResponse.json(validatedData, { status: 200 });
   } catch (error) {
     if (error instanceof z.ZodError) {
-      console.error('Validation error:', error);
+      console.error('Validation error:', error.message);
+      console.error(
+        'Validation issues:',
+        JSON.stringify(error.issues, null, 2)
+      );
       return NextResponse.json(
-        { error: 'Invalid response format from backend' },
+        {
+          error: 'Invalid response format from backend',
+          details: error.issues,
+        },
         { status: 500 }
       );
     }

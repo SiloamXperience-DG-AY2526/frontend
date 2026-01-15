@@ -14,7 +14,7 @@ export function useDonors() {
   const fetchDonors = async () => {
     try {
       setLoading(true);
-      const res = await fetch('/api/donors');
+      const res = await fetch('/api/donors/');
       setStatusCode(res.status);
 
       if (!res.ok) {

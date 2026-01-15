@@ -36,15 +36,40 @@ export async function GET() {
 
     const data = await response.json();
 
+    console.log('Raw donors data from backend:', JSON.stringify(data, null, 2));
+
+    // Transform backend response to match frontend schema
+    const transformedDonors = data.donorsWithTotals.map((donor: any) => ({
+      donorId: donor.user.id,
+      partnerName: `${donor.user.firstName} ${donor.user.lastName}`,
+      projects: donor.user.managedDonationProjects || [],
+      cumulativeAmount: donor.totalDonations || 0,
+      gender: donor.gender,
+      contactNumber: donor.contactNumber,
+      status: 'Active', // Default status, adjust if backend provides this
+    }));
+
+    console.log(
+      'Transformed donors:',
+      JSON.stringify(transformedDonors, null, 2)
+    );
+
     // Validate response shape with Zod
-    const validatedData = DonorsArraySchema.parse(data);
+    const validatedData = DonorsArraySchema.parse(transformedDonors);
 
     return NextResponse.json(validatedData, { status: 200 });
   } catch (error) {
     if (error instanceof z.ZodError) {
       console.error('Validation error:', error.message);
+      console.error(
+        'Validation issues:',
+        JSON.stringify(error.issues, null, 2)
+      );
       return NextResponse.json(
-        { error: 'Invalid response format from backend' },
+        {
+          error: 'Invalid response format from backend',
+          details: error.issues,
+        },
         { status: 500 }
       );
     }

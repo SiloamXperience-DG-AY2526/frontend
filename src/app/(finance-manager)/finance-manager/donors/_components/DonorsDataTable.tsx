@@ -38,7 +38,7 @@ export default function DonorsDataTable({
     },
     {
       header: 'Gender',
-      accessor: (donor) => donor.gender.charAt(0).toLowerCase(),
+      accessor: (donor) => donor.gender,
     },
     {
       header: 'Contact Number',
