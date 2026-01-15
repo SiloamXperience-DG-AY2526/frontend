@@ -25,7 +25,7 @@ export default function LandingPage() {
         "
       />
 
-      {/* Left abstract (keep, but behind everything) */}
+      {/* Left abstract  */}
       <div
         className="
           pointer-events-none
@@ -40,13 +40,13 @@ export default function LandingPage() {
         "
       />
 
-      {/* Navbar */}
+
       <Navbar />
 
       {/* Main */}
       <main className="relative z-10 mx-auto max-w-6xl px-4 pt-10 pb-16 sm:px-6 md:px-12 md:pt-16">
         <div className="grid items-center gap-10 lg:grid-cols-2">
-          {/* Text */}
+        
           <div className="max-w-md">
             <h1 className="text-4xl font-bold leading-tight text-gray-900 sm:text-5xl">
               Welcome to <br />
@@ -84,7 +84,7 @@ export default function LandingPage() {
             </div>
           </div>
 
-          {/* Desktop image INSIDE right side (only lg+) */}
+          {/* Desktop image inside right abstract  hidden in mobile view*/}
           <div className=" hidden lg:block absolute bottom-10 right-1 z-20">
             <Image
               src="/assets/logo.png"
