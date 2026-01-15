@@ -2,6 +2,7 @@
 
 import { useAuth } from '@/contexts/AuthContext';
 import { ROLE_HOME } from '@/lib/homeRoutes';
+import Image from 'next/image';
 import Link from 'next/link';
 
 export default function LandingPage() {
@@ -14,19 +15,6 @@ export default function LandingPage() {
     // original color to be added after discussion
     <div className="relative min-h-screen bg-white overflow-hidden">
       {/* right abstract */}
-      <div
-        className="
-          absolute
-          -top-24
-          right-0
-          w-[680px]
-          h-[744.92px]
-          bg-[#D9D9D9]
-          rounded-bl-[480px]
-          rounded-br-[390px]
-          z-20
-        "
-      />
 
       {/* left abstract*/}
       <div
@@ -34,7 +22,7 @@ export default function LandingPage() {
           absolute
           w-[320px]
           h-[320px]
-          bg-[#D9D9D9]
+          bg-[#195D4B]
           rounded-full
           left-[-140px]
           bottom-[-120px]
@@ -43,55 +31,57 @@ export default function LandingPage() {
       />
 
       {/* Navbar */}
-      <nav className="relative z-10 bg-[#F0F0F2]">
-        <div className="flex items-center gap-40 px-16 py-6">
-          <div className="font-bold text-black">Logo</div>
+      <nav className="z-10 border border-gray-200">
+        <div className="flex justify-between align-center px-16 py-6">
+          <div className="font-bold text-2xl text-[#195D4B]">SVLTI</div>
 
-          <ul className="flex gap-40 text-md font-bold text-black">
+          <ul className="flex gap-40 text-md font-bold text-[#195D4B]">
             <li>Home</li>
-            <li>About</li>
-            <li>Contact Us</li>
+            <li>People</li>
+            <li>Courses</li>
+            <li>Happenings</li>
+            <li>Contact</li>
           </ul>
         </div>
       </nav>
 
-      {/* Main*/}
-      <main className="relative z-20 px-42 pt-32">
-        {/* Login/Sign Up*/}
-        <div className="max-w-md">
-          <h1 className="text-5xl font-bold leading-tight text-black">
-            Welcome to <br />
-            <span className="underline">SiloamXperience!</span>
-          </h1>
+      {/* Main */}
+      <main className="relative z-20 min-h-[calc(100vh-96px)] flex items-center justify-center px-6 pb-10">
+        <div className="w-full max-w-6xl flex items-center justify-between gap-16">
+          {/* LEFT: text */}
+          <div className="max-w-md">
+            <h1 className="text-5xl font-bold leading-tight text-black">
+              Welcome to <br />
+              <span className="text-[#195D4B]">SiloamXperience!</span>
+            </h1>
 
-          <div className="mt-8 flex gap-5">
-            <Link href={homeRoute}>
-              <button className="px-12 py-2.5 bg-[#D9D9D9] cursor-pointer text-black rounded-md text-lg font-bold">
-                Log In
-              </button>
-            </Link>
-            <Link href="/signup">
-              <button className="px-12 py-2.5 bg-[#D9D9D9] cursor-pointer text-black rounded-md text-lg font-bold">
-                Sign Up
-              </button>
-            </Link>
+            <div className="mt-8 flex gap-5">
+              <Link href={homeRoute}>
+                <button className="px-12 py-2.5 bg-[#7EDDC399]/50 cursor-pointer text-black rounded-md text-lg font-bold">
+                  Log In
+                </button>
+              </Link>
+              <Link href="/signup">
+                <button className="px-12 py-2.5 bg-[#7EDDC399]/50 cursor-pointer text-black rounded-md text-lg font-bold">
+                  Sign Up
+                </button>
+              </Link>
+            </div>
+          </div>
+
+          {/* RIGHT: image */}
+          <div className="relative w-[800px] h-[360px] shrink-0">
+            <Image
+              src="/assets/landing-page.png"
+              alt="Landing Page"
+              fill
+              className="object-contain"
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              priority
+            />
           </div>
         </div>
       </main>
-
-      {/* IMAGE PLACEHOLDER*/}
-      <div
-        className="
-          absolute
-          top-20
-          right-[160px]
-          z-30
-        "
-      >
-        <div className="bg-white px-10 py-8 rounded-lg shadow-sm text-sm text-gray-600">
-          Include SiloamXperience picture here
-        </div>
-      </div>
     </div>
   );
 }

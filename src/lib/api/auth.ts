@@ -48,7 +48,7 @@ export async function getAuthUser(): Promise<AuthUser> {
 
   console.log('userInfo:', userInfo);
 
-  const { firstName, lastName, email } = await getUserProfile(userInfo.userId);
+  const { firstName, lastName, email } = await getUserProfile();
 
   return {
     userId: userInfo.userId,
