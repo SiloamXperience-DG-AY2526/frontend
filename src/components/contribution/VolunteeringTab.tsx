@@ -2,13 +2,13 @@
 
 import React, { useEffect, useMemo, useState } from 'react';
 import ContributionCard from '../contribution/ContributionCard';
-import { fetchVolunteerApplications } from '@/lib/api/volunteer';
+import { fetchMyVolunteerApplications } from '@/lib/api/volunteer';
 import { VolunteerApplicationDTO } from '@/types/Volunteer';
 import { Pill } from './ui';
 
 type FilterKey = 'all' | 'upcoming' | 'active' | 'completed' | 'pending';
 
-export default function VolunteeringTab({ userId }: { userId: string }) {
+export default function VolunteeringTab() {
   const [filter, setFilter] = useState<FilterKey>('all');
   const [loading, setLoading] = useState(true);
   const [items, setItems] = useState<VolunteerApplicationDTO[]>([]);
@@ -24,8 +24,7 @@ export default function VolunteeringTab({ userId }: { userId: string }) {
         setError(null);
 
         // fetch only approved from backend
-        const data = await fetchVolunteerApplications({
-          userId,
+        const data = await fetchMyVolunteerApplications({
           status: 'approved',
         });
 
@@ -44,10 +43,10 @@ export default function VolunteeringTab({ userId }: { userId: string }) {
     return () => {
       mounted = false;
     };
-  }, [userId]);
+  }, []);
 
   const computed = useMemo(() => {
-    const now = new Date(); 
+    const now = new Date();
 
     const getBucket = (a: VolunteerApplicationDTO) => {
       const start = new Date(a.project.startDate);
@@ -71,16 +70,16 @@ export default function VolunteeringTab({ userId }: { userId: string }) {
       filter === 'all'
         ? decorated
         : filter === 'pending'
-          ? []
-          : decorated.filter((x) => x.bucket.key === filter);
+        ? []
+        : decorated.filter((x) => x.bucket.key === filter);
 
     return filtered.map(({ a, bucket }) => {
       const badge =
         bucket.key === 'upcoming'
           ? { label: 'Upcoming', tone: 'upcoming' as const }
           : bucket.key === 'active'
-            ? { label: 'Active', tone: 'active' as const }
-            : { label: 'Completed', tone: 'completed' as const };
+          ? { label: 'Active', tone: 'active' as const }
+          : { label: 'Completed', tone: 'completed' as const };
 
       // feedback
       const showGiveFeedback =
@@ -88,7 +87,7 @@ export default function VolunteeringTab({ userId }: { userId: string }) {
 
       return { item: a, badge, showGiveFeedback };
     });
-  }, [items, filter]); 
+  }, [items, filter]);
 
   return (
     <div>

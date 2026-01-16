@@ -1,7 +1,6 @@
 'use client';
 
 import React, { use, useEffect, useMemo, useState } from 'react';
-import Sidebar from '@/components/sidebar';
 import { getVolunteerProjectDetails } from '@/lib/api/volunteer';
 import { formatShortDate, formatTimeRange } from '@/lib/utils/date';
 import {
@@ -74,7 +73,7 @@ export default function VolunteerProjectDetailPage({
   if (loading) {
     return (
       <div className="flex min-h-screen bg-gray-50">
-        <Sidebar />
+    
         <main className="w-full px-6 py-6 md:px-10">
           <div className="rounded-2xl border bg-white p-8 text-sm text-gray-600 shadow-sm">
             Loading project details...
@@ -87,7 +86,7 @@ export default function VolunteerProjectDetailPage({
   if (!data) {
     return (
       <div className="flex min-h-screen bg-gray-50">
-        <Sidebar />
+      
         <main className="w-full px-6 py-6 md:px-10">
           <div className="rounded-2xl border bg-white p-8 text-sm text-gray-600 shadow-sm">
             Project not found / failed to load.
@@ -99,7 +98,7 @@ export default function VolunteerProjectDetailPage({
 
   return (
     <div className="flex min-h-screen bg-gray-50">
-      <Sidebar />
+
 
       <main className="w-full px-6 py-6 md:px-10">
         <div className="flex flex-col gap-6 lg:flex-row">
@@ -179,7 +178,7 @@ export default function VolunteerProjectDetailPage({
             {data.positions?.map((pos) => (
               <Link
                 key={pos.id}
-                href={`/volunteers/projects/${data.id}/apply?positionId=${pos.id}`}
+                href={`/partner/volunteers/projects/${data.id}/apply?positionId=${pos.id}`}
                 className="
           relative block min-h-[340px]
           rounded-2xl bg-white border border-gray-200

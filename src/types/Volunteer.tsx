@@ -10,7 +10,6 @@ export type FeedbackPayload = {
     improvement: string;
     comments?: string;
   };
-  submittedAt?: string;
 };
 
 export type FeedbackSubmitResponse = {
@@ -40,7 +39,7 @@ export type SubmitVolunteerApplicationResult = {
     positionId: string;
     status: string;
     hasConsented: boolean;
-    createdAt: string; 
+    createdAt: string;
   };
   volunteer: {
     userId: string;
@@ -194,7 +193,7 @@ export type ProjectFrequency =
   | 'yearly';
 
 export type ProposeVolunteerProjectPayload = {
-  userId: string;
+ 
 
   title: string;
   initiatorName?: string;

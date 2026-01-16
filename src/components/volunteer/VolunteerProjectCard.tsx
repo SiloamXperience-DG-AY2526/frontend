@@ -68,7 +68,7 @@ export default function VolunteerProjectCard({ p }: { p: VolunteerProject }) {
         {/* Button aligned bottom-right */}
         <div className="mt-5 flex justify-end">
           <Link
-            href={`/volunteers/projects/${p.id}`}
+            href={`/partner/volunteers/projects/${p.id}`}
             className="
               inline-flex items-center justify-center
               rounded-xl px-6 py-2.5 text-sm font-bold text-white

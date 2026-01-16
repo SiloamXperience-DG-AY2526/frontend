@@ -1,17 +1,10 @@
 'use client';
 
-import { useAuth } from '@/contexts/AuthContext';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Sidebar from '@/components/sidebar';
-<<<<<<< HEAD
-import StarRating from '@/components/ui/StarRating';
 import TextArea from '@/components/ui/TextArea';
-=======
 import PageHeader from '@/components/ui/PageHeader';
 import StarRating from '@/components/ui/StarRating';
-import Textarea from '@/components/ui/TextArea';
->>>>>>> main
 import Button from '@/components/ui/Button';
 import { useParams } from 'next/navigation';
 import { FeedbackPayload } from '@/types/Volunteer';
@@ -20,7 +13,7 @@ import Toast from '@/components/ui/Toast';
 
 export default function FeedbackPage() {
   const params = useParams<{ projectid: string }>();
-  const { user } = useAuth();
+
   const router = useRouter();
 
   const projectId = params.projectid;
@@ -42,21 +35,6 @@ export default function FeedbackPage() {
   });
 
   const [loading, setLoading] = useState(false);
-  if (!user) {
-    return (
-      <div className="flex min-h-screen w-full items-center justify-center bg-white text-sm text-gray-600">
-        Kindly&nbsp;
-        <button
-          onClick={() => router.push('/login')}
-          className="font-semibold text-teal-600 hover:underline cursor-pointer"
-        >
-          login
-        </button>
-        &nbsp;to volunteer
-      </div>
-    );
-  }
-  const { userId } = user;
 
   const handleSubmit = async () => {
     if (!projectId) {
@@ -95,12 +73,11 @@ export default function FeedbackPage() {
         improvement: feedback.improvement.trim(),
         comments: feedback.comments.trim() || undefined,
       },
-      submittedAt: new Date().toISOString(),
+   
     };
 
     try {
       const resp = await submitVolunteerFeedback({
-        userId: userId,
         projectId,
         payload,
       });
@@ -114,7 +91,7 @@ export default function FeedbackPage() {
       setRatings({ overall: 0, management: 0, planning: 0, facilities: 0 });
       setFeedback({ experience: '', improvement: '', comments: '' });
       setTimeout(() => {
-        router.replace('/volunteers');
+        router.replace('/partner/volunteers');
       }, 2000);
 
       console.log('Feedback response:', resp);
@@ -130,7 +107,7 @@ export default function FeedbackPage() {
 
   return (
     <div className="flex min-h-screen bg-gray-50">
-      <Sidebar />
+
       <Toast
         open={toastOpen}
         type={toastType}
@@ -140,22 +117,10 @@ export default function FeedbackPage() {
         onClose={() => setToastOpen(false)}
       />
       <main className="flex-1 px-10 py-8">
-<<<<<<< HEAD
-        <div className="mb-8 flex items-start gap-3">
-          <div className="w-[5px] h-[39px] bg-[#56E0C2] mt-1" />
-          <div>
-            <h1 className="text-3xl font-bold">Volunteer Feedback Form</h1>
-            <p className="text-sm text-gray-500">
-              Track your volunteer activities, donations, and applications
-            </p>
-          </div>
-        </div>
-=======
         <PageHeader
           title="Volunteer Feedback Form"
           subtitle="Track your volunteer activities, donations, and applications"
         />
->>>>>>> main
 
         {/* Rate your experience */}
         <div className="rounded-lg border bg-white p-6 mb-6">

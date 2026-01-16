@@ -68,7 +68,7 @@ export default function ContributionCard({
 
           {showGiveFeedback && (
             <Link
-              href={`/volunteer/${item.project.id}/feedback`}
+              href={`/partner/volunteers/${item.project.id}/feedback`}
               className="rounded-full bg-[#0E5A4A] px-4 py-1.5 text-xs font-semibold text-white hover:opacity-90"
             >
               Give feedback
