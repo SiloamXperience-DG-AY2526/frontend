@@ -1,6 +1,5 @@
 'use client';
 
-import Sidebar from '@/components/sidebar';
 import React, { useEffect, useState } from 'react';
 
 import VolunteerSearch from '@/components/volunteer/Search';
@@ -95,7 +94,6 @@ export default function VolunteerPage() {
 
   return (
     <div className="flex min-h-screen bg-gray-50">
-      <Sidebar />
       <Toast
         open={toastOpen}
         type={toastType}
