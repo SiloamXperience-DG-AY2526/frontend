@@ -1,14 +1,14 @@
-import { cookies } from "next/headers";
-import { NextResponse } from "next/server";
+import { cookies } from 'next/headers';
+import { NextResponse } from 'next/server';
 
 const BACKEND_URL = process.env.BACKEND_URL!;
 
 export async function GET(req: Request) {
-  const token = (await cookies()).get("access_token")?.value;
+  const token = (await cookies()).get('access_token')?.value;
 
   if (!token) {
     return NextResponse.json(
-      { status: "error", message: "NO_ACCESS_TOKEN_COOKIE" },
+      { status: 'error', message: 'NO_ACCESS_TOKEN_COOKIE' },
       { status: 401 }
     );
   }
@@ -16,12 +16,12 @@ export async function GET(req: Request) {
   const url = new URL(req.url);
   const qs = url.searchParams.toString();
 
-  const backendUrl = `${BACKEND_URL}/volunteer-applications/me${qs ? `?${qs}` : ""}`;
+  const backendUrl = `${BACKEND_URL}/volunteer-applications/me${qs ? `?${qs}` : ''}`;
 
   const res = await fetch(backendUrl, {
-    method: "GET",
+    method: 'GET',
     headers: { Authorization: `Bearer ${token}` },
-    cache: "no-store",
+    cache: 'no-store',
   });
 
   const data = await res.json().catch(() => null);

@@ -13,7 +13,7 @@ export type FeedbackPayload = {
 };
 
 export type FeedbackSubmitResponse = {
-  status: "success";
+  status: 'success';
   message: string;
   data: {
     feedback: {
@@ -89,7 +89,7 @@ export type VolunteerProject = {
   sessions?: VolunteerProjectListSession[];
 };
 export type VolunteerProjectsResponse = {
-  status: "success" | "error";
+  status: 'success' | 'error';
   data: VolunteerProject[];
   pagination?: {
     page: number;
@@ -151,17 +151,17 @@ export type VolunteerProjectDetail = {
 };
 
 export type VolunteerProjectDetailResponse = {
-  status: "success";
+  status: 'success';
   data: VolunteerProjectDetail;
 };
 export type VolunteerProjectPositionStatus =
-  | "reviewing"
-  | "approved"
-  | "rejected"
-  | "active"
-  | "inactive";
+  | 'reviewing'
+  | 'approved'
+  | 'rejected'
+  | 'active'
+  | 'inactive';
 
-export type OperationStatus = "ongoing" | "paused" | "cancelled" | "completed";
+export type OperationStatus = 'ongoing' | 'paused' | 'cancelled' | 'completed';
 
 export type VolunteerApplicationDTO = {
   applicationId: string;
@@ -186,11 +186,11 @@ export type VolunteerApplicationDTO = {
 };
 
 export type ProjectFrequency =
-  | "once"
-  | "daily"
-  | "weekly"
-  | "monthly"
-  | "yearly";
+  | 'once'
+  | 'daily'
+  | 'weekly'
+  | 'monthly'
+  | 'yearly';
 
 export type ProposeVolunteerProjectPayload = {
   userId: string;

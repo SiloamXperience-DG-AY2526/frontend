@@ -75,12 +75,12 @@ export async function fetchMyVolunteerApplications(args?: {
   status?: string;
 }): Promise<VolunteerApplicationDTO[]> {
   const qs = new URLSearchParams();
-  if (args?.status) qs.set("status", args.status);
+  if (args?.status) qs.set('status', args.status);
 
-  const res = await fetch(`/api/contribution/volunteerApplication${qs.toString() ? `?${qs}` : ""}`, {
-    method: "GET",
-    credentials: "include",
-    cache: "no-store",
+  const res = await fetch(`/api/contribution/volunteerApplication${qs.toString() ? `?${qs}` : ''}`, {
+    method: 'GET',
+    credentials: 'include',
+    cache: 'no-store',
   });
 
   const json = await res.json().catch(() => null);
@@ -100,10 +100,10 @@ export async function submitVolunteerFeedback(args: {
   const res = await fetch(
     `/api/volunteer/feedback/${args.projectId}`,
     {
-      method: "POST",
-      credentials: "include",
-      cache: "no-store",
-      headers: { "Content-Type": "application/json" },
+      method: 'POST',
+      credentials: 'include',
+      cache: 'no-store',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(args.payload), 
     }
   );

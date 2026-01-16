@@ -1,16 +1,15 @@
-"use client";
+'use client';
 
-import { useAuth } from "@/contexts/AuthContext";
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import Sidebar from "@/components/sidebar";
-import StarRating from "@/components/ui/StarRating";
-import Textarea from "@/components/ui/TextArea";
-import Button from "@/components/ui/Button";
-import { useParams } from "next/navigation";
-import { FeedbackPayload } from "@/types/Volunteer";
-import { submitVolunteerFeedback } from "@/lib/api/volunteer";
-import Toast from "@/components/ui/Toast";
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import Sidebar from '@/components/sidebar';
+import StarRating from '@/components/ui/StarRating';
+import Textarea from '@/components/ui/TextArea';
+import Button from '@/components/ui/Button';
+import { useParams } from 'next/navigation';
+import { FeedbackPayload } from '@/types/Volunteer';
+import { submitVolunteerFeedback } from '@/lib/api/volunteer';
+import Toast from '@/components/ui/Toast';
 
 export default function FeedbackPage() {
   const params = useParams<{ projectid: string }>();
@@ -19,8 +18,8 @@ export default function FeedbackPage() {
 
   const projectId = params.projectid;
   const [toastOpen, setToastOpen] = useState(false);
-  const [toastType, setToastType] = useState<"success" | "error">("success");
-  const [toastTitle, setToastTitle] = useState("");
+  const [toastType, setToastType] = useState<'success' | 'error'>('success');
+  const [toastTitle, setToastTitle] = useState('');
   const [toastMsg, setToastMsg] = useState<string | undefined>(undefined);
   const [ratings, setRatings] = useState({
     overall: 0,
@@ -30,16 +29,16 @@ export default function FeedbackPage() {
   });
 
   const [feedback, setFeedback] = useState({
-    experience: "",
-    improvement: "",
-    comments: "",
+    experience: '',
+    improvement: '',
+    comments: '',
   });
 
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async () => {
     if (!projectId) {
-      alert("Missing projectId in URL.");
+      alert('Missing projectId in URL.');
       return;
     }
 
@@ -50,13 +49,13 @@ export default function FeedbackPage() {
       !ratings.planning ||
       !ratings.facilities
     ) {
-      alert("Please rate all categories before submitting.");
+      alert('Please rate all categories before submitting.');
       return;
     }
 
     //  validation for text fields
     if (!feedback.experience.trim() || !feedback.improvement.trim()) {
-      alert("Please fill in the experience and improvement fields.");
+      alert('Please fill in the experience and improvement fields.');
       return;
     }
 
@@ -83,22 +82,22 @@ export default function FeedbackPage() {
         payload,
       });
 
-      setToastType("success");
-      setToastTitle("Application submitted");
-      setToastMsg("We’ll contact you soon with the next steps.");
+      setToastType('success');
+      setToastTitle('Application submitted');
+      setToastMsg('We’ll contact you soon with the next steps.');
       setToastOpen(true);
 
       // reset form
       setRatings({ overall: 0, management: 0, planning: 0, facilities: 0 });
-      setFeedback({ experience: "", improvement: "", comments: "" });
+      setFeedback({ experience: '', improvement: '', comments: '' });
       setTimeout(() => {
-        router.replace("/volunteers");
+        router.replace('/volunteers');
       }, 2000);
 
-      console.log("Feedback response:", resp);
+      console.log('Feedback response:', resp);
     } catch (e: unknown) {
-      setToastType("error");
-      setToastTitle("Submission failed");
+      setToastType('error');
+      setToastTitle('Submission failed');
       setToastMsg(`Failed to submit feedback: ${e}`);
       setToastOpen(true);
     } finally {
@@ -208,7 +207,7 @@ export default function FeedbackPage() {
         {/* Submit */}
         <div className="mt-6 flex justify-end">
           <Button
-            label={loading ? "Submitting..." : "SUBMIT"}
+            label={loading ? 'Submitting...' : 'SUBMIT'}
             onClick={handleSubmit}
             disabled={loading}
           />
