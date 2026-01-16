@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import FinanceManagerSidebar from '@/components/FinanceManagerSidebar';
+import FinanceManagerSidebar from '@/components/finance-manager/FinanceManagerSidebar';
 import PageHeader from '@/components/ui/PageHeader';
 import SearchAndFilterBar from '@/components/ui/SearchAndFilterBar';
 import DonorsDataTable from './_components/DonorsDataTable';
@@ -27,17 +27,14 @@ export default function DonorsPage() {
 
   if (error && statusCode !== 403) {
     return (
-      <div className="flex min-h-screen bg-gray-50">
-        <FinanceManagerSidebar />
-        <main className="flex-1 px-10 py-8">
-          <PageHeader title="Donors" />
-          <div className="mt-8 rounded-lg border border-red-200 bg-red-50 p-4">
-            <p className="text-red-800">
-              Failed to load donors. Please try again.
-            </p>
-          </div>
-        </main>
-      </div>
+      <>
+        <PageHeader title="Donors" />
+        <div className="mt-8 rounded-lg border border-red-200 bg-red-50 p-4">
+          <p className="text-red-800">
+            Failed to load donors. Please try again.
+          </p>
+        </div>
+      </>
     );
   }
 

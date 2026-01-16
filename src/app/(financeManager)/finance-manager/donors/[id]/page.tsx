@@ -1,7 +1,7 @@
 'use client';
 
 import { use } from 'react';
-import FinanceManagerSidebar from '@/components/FinanceManagerSidebar';
+import FinanceManagerSidebar from '@/components/finance-manager/FinanceManagerSidebar';
 import PageHeader from '@/components/ui/PageHeader';
 import BackButton from '@/components/ui/BackButton';
 import UnauthorizedAccessCard from '@/components/UnauthorizedAccessCard';
@@ -46,9 +46,7 @@ export default function DonorDetailPage({
   }
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
-      <FinanceManagerSidebar />
-
+    <>
       <main className="flex-1 px-10 py-8">
         <BackButton label="Back to Donors" href="/finance-manager/donors" />
 
@@ -57,6 +55,6 @@ export default function DonorDetailPage({
         <PersonalParticulars donor={donor} />
         <DonationsTable donations={donor.donations} />
       </main>
-    </div>
+    </>
   );
 }
