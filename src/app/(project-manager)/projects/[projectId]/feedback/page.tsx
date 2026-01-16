@@ -7,37 +7,7 @@ import StatsCards from '@/components/project-manager/feedback/StatsCards';
 import ScoreGauge from '@/components/project-manager/feedback/ScoreGauge';
 import FamousTags from '@/components/project-manager/feedback/FamousTags';
 import FeedbackTable from '@/components/project-manager/feedback/FeedbackTable';
-
-interface FeedbackTag {
-    id: string;
-    name: string;
-    feedbackId: string;
-    createdAt: string;
-}
-
-interface User {
-    id: string;
-    email: string;
-    firstName: string;
-    lastName: string;
-    title: string;
-}
-
-interface FeedbackData {
-    id: string;
-    reviewerId: string;
-    revieweeId: string;
-    projectId: string;
-    reviewer: User;
-    reviewee: User;
-    score: number;
-    type: string;
-    strengths: string;
-    improvements: string;
-    tags: FeedbackTag[];
-    createdAt: string;
-    updatedAt: string;
-}
+import { FeedbackData } from '@/types/FeedbackData';
 
 export default function FeedbackAnalyticsPage() {
     const params = useParams();
