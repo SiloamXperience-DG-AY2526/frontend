@@ -6,26 +6,24 @@ import Image from 'next/image';
 import Link from 'next/link';
 
 export default function LandingPage() {
-
   const { user } = useAuth();
-  
-  const homeRoute = user ? (ROLE_HOME[user.role] ?? '/') : '/login';
-      
+  const homeRoute = user ? ROLE_HOME[user.role] ?? '/' : '/login';
+
   return (
     // original color to be added after discussion
     <div className="relative min-h-screen bg-white overflow-hidden">
       {/* right abstract */}
 
-      {/* left abstract*/}
+      {/* Left abstract  */}
       <div
         className="
+          pointer-events-none
           absolute
           w-[320px]
           h-[320px]
           bg-[#195D4B]
           rounded-full
-          left-[-140px]
-          bottom-[-120px]
+          left-[-120px] bottom-[-120px]
           z-0
         "
       />

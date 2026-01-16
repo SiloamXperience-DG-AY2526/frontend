@@ -5,6 +5,7 @@ import { getUserProfile, updateUserProfile } from '@/lib/api/user';
 import { PartnerProfile } from '@/types/UserData';
 import { useEffect, useState } from 'react';
 import FieldBox from '@/components/partner/FieldBox';
+import DropdownFieldBox from '@/components/partner/DropdownFieldBox';
 
 export default function ProfilePage() {
   const [partnerProfile, setPartnerProfile] = useState<PartnerProfile | null>(null);
@@ -22,7 +23,7 @@ export default function ProfilePage() {
     nationality: '',
     address: '',
     availability: '',
-    expertise: '',
+    skills: '',
     experience: '',
   });
 
@@ -42,7 +43,7 @@ export default function ProfilePage() {
         nationality: p?.nationality ?? '',
         address: p?.residentialAddress ?? '',
         availability: p?.volunteerAvailability ?? '',
-        expertise: (p?.skills ?? []).join(', '),
+        skills: (p?.skills ?? []).join(', '),
         experience: p?.hasVolunteerExperience ? 'Yes' : 'No',
       });
     };
@@ -64,7 +65,7 @@ export default function ProfilePage() {
       nationality: partnerProfile.nationality ?? '',
       address: partnerProfile.residentialAddress ?? '',
       availability: partnerProfile.volunteerAvailability ?? '',
-      expertise: (partnerProfile.skills ?? []).join(', '),
+      skills: (partnerProfile.skills ?? []).join(', '),
       experience: partnerProfile.hasVolunteerExperience ? 'Yes' : 'No',
     });
     setIsEditing(false);
@@ -86,11 +87,11 @@ export default function ProfilePage() {
       nationality: form.nationality.trim(),
       residentialAddress: form.address.trim(),
       volunteerAvailability: form.availability.trim(),
-      skills: form.expertise
+      skills: form.skills
         .split(',')
         .map((s) => s.trim())
         .filter(Boolean),
-      hasVolunteerExperience: form.experience == 'Yes' ? true : false,
+      hasVolunteerExperience: form.experience.toLocaleLowerCase() == 'yes' ? true : false,
     };
 
     const updated = await updateUserProfile(payload);
@@ -98,6 +99,11 @@ export default function ProfilePage() {
     setIsEditing(false);
     alert('Profile updated successfully!');
   };
+
+  const volunteerExperienceOptions = [
+    { label: 'Yes', value: 'Yes' },
+    { label: 'No', value: 'No' },
+  ];
 
   return (
     <div className="h-full overflow-y-auto bg-white">
@@ -185,17 +191,18 @@ export default function ProfilePage() {
                 editable={isEditing}
                 onChange={(v) => setForm((p) => ({ ...p, availability: v }))}
               />
-              <FieldBox
+              <DropdownFieldBox
                 label="Volunteer Experience"
                 value={form.experience}
                 editable={isEditing}
+                options={volunteerExperienceOptions}
                 onChange={(v) => setForm((p) => ({ ...p, experience: v }))}
               />
               <FieldBox
-                label="Expertise"
-                value={form.expertise}
+                label="Volunteer Skills"
+                value={form.skills}
                 editable={isEditing}
-                onChange={(v) => setForm((p) => ({ ...p, expertise: v }))}
+                onChange={(v) => setForm((p) => ({ ...p, skills: v }))}
               />
             </div>
           </div>
