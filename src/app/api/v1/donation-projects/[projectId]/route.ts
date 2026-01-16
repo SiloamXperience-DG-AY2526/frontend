@@ -1,0 +1,143 @@
+import { NextResponse } from 'next/server';
+
+export async function GET(
+  request: Request,
+  { params }: { params: Promise<{ projectId: string }> }
+) {
+  const { projectId } = await params;
+
+  // Mock donation projects (same as listing)
+  const mockProjects = [
+    {
+      id: '550e8400-e29b-41d4-a716-446655440001',
+      title: 'Emergency Relief Fund',
+      location: 'Singapore',
+      about: 'Help families affected by recent floods. Your donation will provide immediate relief including food, water, and temporary shelter to displaced families.',
+      objectives: 'Provide emergency shelter\nSupply food and water\nOffer medical assistance\nSupport long-term rehabilitation',
+      targetFund: 50000,
+      currentFund: 25000,
+      deadline: '2026-06-30',
+      beneficiaries: 'Over 200 families affected by floods in the eastern region of Singapore.',
+      image: null,
+      type: 'SPECIFIC',
+      submissionStatus: 'PUBLISHED',
+      approvalStatus: 'APPROVED',
+      initiatorName: 'Red Cross Singapore',
+      organisingTeam: 'Emergency Response Team',
+      donorCount: 150,
+      createdAt: '2026-01-01T00:00:00Z',
+      updatedAt: '2026-01-15T00:00:00Z',
+    },
+    {
+      id: '550e8400-e29b-41d4-a716-446655440002',
+      title: 'Children Education Fund',
+      location: 'Singapore',
+      about: 'Support underprivileged children with school supplies, uniforms, and learning materials. Every child deserves access to quality education.',
+      objectives: 'Provide school supplies\nFund educational programs\nSupport after-school tutoring\nOffer scholarship opportunities',
+      targetFund: 100000,
+      currentFund: 45000,
+      deadline: '2026-12-31',
+      beneficiaries: 'Over 500 children from low-income families across Singapore.',
+      image: null,
+      type: 'SPECIFIC',
+      submissionStatus: 'PUBLISHED',
+      approvalStatus: 'APPROVED',
+      initiatorName: 'Children\'s Society',
+      organisingTeam: 'Education Support Division',
+      donorCount: 234,
+      createdAt: '2026-01-05T00:00:00Z',
+      updatedAt: '2026-01-15T00:00:00Z',
+    },
+    {
+      id: '550e8400-e29b-41d4-a716-446655440003',
+      title: 'Senior Care Program',
+      location: 'Singapore',
+      about: 'Provide ongoing support for elderly citizens who live alone. This includes meal deliveries, medical checkups, and social companionship programs.',
+      objectives: 'Daily meal delivery service\nRegular health screenings\nSocial activities and companionship\nHome maintenance support',
+      targetFund: null,
+      currentFund: 130000,
+      deadline: null,
+      beneficiaries: 'Elderly residents living alone, primarily in HDB estates. Currently supporting 300+ seniors.',
+      image: null,
+      type: 'ONGOING',
+      submissionStatus: 'PUBLISHED',
+      approvalStatus: 'APPROVED',
+      initiatorName: 'SilverCare Foundation',
+      organisingTeam: 'Community Outreach Team',
+      donorCount: 450,
+      createdAt: '2025-06-01T00:00:00Z',
+      updatedAt: '2026-01-15T00:00:00Z',
+    },
+    {
+      id: '550e8400-e29b-41d4-a716-446655440004',
+      title: 'Medical Equipment Drive',
+      location: 'Singapore',
+      about: 'Help us purchase essential medical equipment for community health centers. Your donation will ensure quality healthcare access for all.',
+      objectives: 'Purchase diagnostic equipment\nUpgrade treatment facilities\nTrain healthcare workers\nImprove patient care standards',
+      targetFund: 200000,
+      currentFund: 87500,
+      deadline: '2026-08-15',
+      beneficiaries: 'Patients at 5 community health centers serving over 10,000 residents monthly.',
+      image: null,
+      type: 'SPECIFIC',
+      submissionStatus: 'PUBLISHED',
+      approvalStatus: 'APPROVED',
+      initiatorName: 'HealthCare Alliance',
+      organisingTeam: 'Medical Services Department',
+      donorCount: 320,
+      createdAt: '2026-01-10T00:00:00Z',
+      updatedAt: '2026-01-15T00:00:00Z',
+    },
+    {
+      id: '550e8400-e29b-41d4-a716-446655440005',
+      title: 'Environmental Conservation',
+      location: 'Singapore',
+      about: 'Ongoing efforts to protect and restore natural habitats in Singapore. Join us in preserving our green spaces for future generations.',
+      objectives: 'Plant native trees and vegetation\nClean up coastal areas\nEducate the community\nMonitor wildlife populations',
+      targetFund: null,
+      currentFund: 65000,
+      deadline: null,
+      beneficiaries: 'The environment and all residents of Singapore who benefit from cleaner air, water, and green spaces.',
+      image: null,
+      type: 'ONGOING',
+      submissionStatus: 'PUBLISHED',
+      approvalStatus: 'APPROVED',
+      initiatorName: 'Green Earth Foundation',
+      organisingTeam: 'Conservation Team',
+      donorCount: 280,
+      createdAt: '2025-03-15T00:00:00Z',
+      updatedAt: '2026-01-15T00:00:00Z',
+    },
+    {
+      id: '550e8400-e29b-41d4-a716-446655440006',
+      title: 'Youth Sports Development',
+      location: 'Singapore',
+      about: 'Empower young athletes from underprivileged backgrounds with training, equipment, and competition opportunities.',
+      objectives: 'Provide sports equipment\nFund training programs\nSponsors competition fees\nOffer mentorship from professional athletes',
+      targetFund: 75000,
+      currentFund: 42000,
+      deadline: '2026-09-30',
+      beneficiaries: 'Over 150 young athletes aged 10-18 from low-income families.',
+      image: null,
+      type: 'SPECIFIC',
+      submissionStatus: 'PUBLISHED',
+      approvalStatus: 'APPROVED',
+      initiatorName: 'Sports For All Foundation',
+      organisingTeam: 'Youth Development Team',
+      donorCount: 189,
+      createdAt: '2026-01-08T00:00:00Z',
+      updatedAt: '2026-01-15T00:00:00Z',
+    },
+  ];
+
+  const project = mockProjects.find(p => p.id === projectId);
+
+  if (!project) {
+    return NextResponse.json(
+      { error: 'Project not found' },
+      { status: 404 }
+    );
+  }
+
+  return NextResponse.json(project);
+}

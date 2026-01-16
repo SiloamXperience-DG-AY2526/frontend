@@ -1,23 +1,28 @@
 import SignupForm from '@/components/signup/SignupForm';
+import Image from 'next/image';
 
 export default function SignUpPage() {
   return (
-    <div className="h-dvh overflow-hidden flex flex-col md:flex-row">
-      {/* left */}
-      <div className="md:w-1/2 bg-gray-200 flex flex-col justify-center items-center px-10 py-16">
-        <div className="bg-white px-12 py-12 rounded-md w-fit mb-14 mx-auto">
-          Include SiloamXperience pic as background
+    <div className="min-h-dvh w-full bg-white">
+      <div className="flex min-h-dvh w-full flex-col md:flex-row">
+        <div className="w-full md:w-2/5 px-6 md:px-10 py-6">
+          <div className="hidden md:block">
+            <div className="relative w-full h-[calc(100dvh-48px)] rounded-2xl overflow-hidden">
+              <Image
+                src="/assets/signup.png"
+                alt="SiloamXperience signup"
+                fill
+                priority
+                className="object-cover"
+                sizes="40vw"
+              />
+            </div>
+          </div>
         </div>
 
-        <h1 className="text-5xl text-center mt-3 font-bold text-black leading-snug">
-          Sign Up as a <br />
-          <span className="underline">Partner</span> here!
-        </h1>
-      </div>
-
-      {/* right */}
-      <div className="md:w-1/2 bg-white overflow-y-auto px-6 md:px-24 py-10">
-        <SignupForm />
+        <div className="w-full md:w-3/5 bg-white md:h-dvh overflow-y-auto px-6 md:px-14 py-10">
+          <SignupForm />
+        </div>
       </div>
     </div>
   );
