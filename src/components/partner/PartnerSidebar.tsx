@@ -14,7 +14,7 @@ import { useAuth } from '@/contexts/AuthContext';
 
 const menu = [
   { name: 'Home', icon: HomeIcon, href: '/' },
-  { name: 'Volunteer', icon: HandRaisedIcon, href: '/volunteer' },
+  { name: 'Volunteer', icon: HandRaisedIcon, href: '/volunteers' },
   { name: 'Donate', icon: HeartIcon, href: '/donate' },
   { name: 'My Contributions', icon: ClipboardDocumentListIcon, href: '/contributions' },
   { name: 'My Profile', icon: UserIcon, href: '/partner/profile' },
