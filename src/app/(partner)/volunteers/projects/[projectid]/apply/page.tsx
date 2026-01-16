@@ -1,17 +1,17 @@
-'use client';
+"use client";
 
-import React, { use, useEffect, useMemo, useState } from 'react';
-import Sidebar from '@/components/sidebar';
-import Input from '@/components/ui/Input';
-import Toast from '@/components/ui/Toast';
+import React, { use, useEffect, useMemo, useState } from "react";
+import Sidebar from "@/components/sidebar";
+import Input from "@/components/ui/Input";
+import Toast from "@/components/ui/Toast";
 import {
   getVolunteerProjectDetails,
   submitVolunteerApplication,
-} from '@/lib/api/volunteer';
-import { formatShortDate, formatTimeRange } from '@/lib/utils/date';
-import type { VolunteerProjectDetail } from '@/types/Volunteer';
-import { useRouter } from 'next/navigation';
-import capitalizeFirst from '@/lib/utils/capitalizeFirst';
+} from "@/lib/api/volunteer";
+import { formatShortDate, formatTimeRange } from "@/lib/utils/date";
+import type { VolunteerProjectDetail } from "@/types/Volunteer";
+import { useRouter } from "next/navigation";
+import capitalizeFirst from "@/lib/utils/capitalizeFirst";
 
 export default function VolunteerApplication({
   params,
@@ -31,11 +31,11 @@ export default function VolunteerApplication({
   // const [sessionId, setSessionId] = useState<string | ''>('');
   const [consent, setConsent] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [availability, setAvailability] = useState('');
+  const [availability, setAvailability] = useState("");
 
   const [toastOpen, setToastOpen] = useState(false);
-  const [toastType, setToastType] = useState<'success' | 'error'>('success');
-  const [toastTitle, setToastTitle] = useState('');
+  const [toastType, setToastType] = useState<"success" | "error">("success");
+  const [toastTitle, setToastTitle] = useState("");
   const [toastMsg, setToastMsg] = useState<string | undefined>(undefined);
 
   useEffect(() => {
@@ -46,7 +46,7 @@ export default function VolunteerApplication({
         setLoading(true);
 
         if (!positionId) {
-          throw new Error('Missing positionId in URL');
+          throw new Error("Missing positionId in URL");
         }
 
         const res = await getVolunteerProjectDetails(projectid);
@@ -61,8 +61,8 @@ export default function VolunteerApplication({
         if (!mounted) return;
 
         setData(null);
-        setToastType('error');
-        setToastTitle('Failed to load');
+        setToastType("error");
+        setToastTitle("Failed to load");
 
         setToastMsg(`Failed to retrieve data: ${e}`);
 
@@ -84,7 +84,7 @@ export default function VolunteerApplication({
   }, [data, positionId]);
 
   const dateTimeText = useMemo(() => {
-    if (!data) return '—';
+    if (!data) return "—";
 
     const date =
       data.startDate && data.endDate
@@ -103,7 +103,7 @@ export default function VolunteerApplication({
     if (!data || !positionId) return;
     if (!consent) return;
     if (!availability.trim()) {
-      setError('Availability is required');
+      setError("Availability is required");
       return;
     }
     try {
@@ -117,9 +117,9 @@ export default function VolunteerApplication({
         [] //empty for now session id
       );
 
-      setToastType('success');
-      setToastTitle('Application submitted');
-      setToastMsg('We’ll contact you soon with the next steps.');
+      setToastType("success");
+      setToastTitle("Application submitted");
+      setToastMsg("We’ll contact you soon with the next steps.");
       setToastOpen(true);
 
       setTimeout(() => {
@@ -127,15 +127,14 @@ export default function VolunteerApplication({
       }, 2000);
     } catch (e: unknown) {
       console.error(e);
-      setToastType('error');
-      setToastTitle('Submission failed');
+      setToastType("error");
+      setToastTitle("Submission failed");
       setToastMsg(e instanceof Error ? e.message : String(e));
       setToastOpen(true);
     } finally {
       setSubmitting(false);
     }
   }
-
 
   return (
     <div className="flex min-h-screen w-full bg-white">
@@ -190,13 +189,13 @@ export default function VolunteerApplication({
             <div className="mt-6 space-y-6">
               <Input
                 label="Project"
-                value={data.title ?? '—'}
+                value={data.title ?? "—"}
                 readOnly
                 disabled
               />
               <Input
                 label="Volunteer Position"
-                value={selectedPosition.role ?? '—'}
+                value={selectedPosition.role ?? "—"}
                 readOnly
                 disabled
               />
@@ -210,7 +209,7 @@ export default function VolunteerApplication({
                 </div>
               </div>
               <Input
-                label="Availability (optional)"
+                label="Availability"
                 value={availability}
                 onChange={(value) => setAvailability(value)}
                 placeholder="e.g. Weekends 9am–1pm"
@@ -218,7 +217,7 @@ export default function VolunteerApplication({
                 error={error}
               />
 
-{/* later use */}
+              {/* later use */}
               {/* {data.sessions?.length ? (
                 <div>
                   <label className="block text-black text-md mb-2 font-semibold">
@@ -269,7 +268,7 @@ export default function VolunteerApplication({
                       disabled:opacity-60 disabled:cursor-not-allowed
                     "
                   >
-                    {submitting ? 'Registering...' : 'Register'}
+                    {submitting ? "Registering..." : "Register"}
                   </button>
                 </div>
               ) : null}
