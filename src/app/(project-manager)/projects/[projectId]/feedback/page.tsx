@@ -43,9 +43,6 @@ export default function FeedbackAnalyticsPage() {
     const params = useParams();
     const projectId = params?.projectId as string;
 
-    console.log('Params:', params);
-    console.log('Project ID:', projectId);
-
     const [feedbackData, setFeedbackData] = useState<FeedbackData[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -70,7 +67,7 @@ export default function FeedbackAnalyticsPage() {
     }, [projectId]);
 
     const totalShown = feedbackData.length;
-    const totalResponse = feedbackData.filter(f => f.score > 0).length;
+    const totalResponse = feedbackData.filter(f => f.score !== null && f.score !== undefined).length;
     const responseRate = totalShown > 0 ? Math.round((totalResponse / totalShown) * 100) : 0;
 
     const averageScore = feedbackData.length > 0

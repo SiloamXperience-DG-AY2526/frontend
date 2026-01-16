@@ -74,13 +74,13 @@ export default function Projects() {
     };
 
     const handleEdit = () => {
-        alert('Edit clicked');
-        // Add edit logic
+        console.warn('Edit action is not yet implemented.');
+        setError('Editing projects is not available in this version.');
     };
 
     const handleDelete = () => {
-        alert('Delete clicked');
-        // Add deletion logic 
+        console.warn('Delete action is not yet implemented.');
+        setError('Deleting projects is not available in this version.');
     };
 
     const getStatusColor = (status: ProjectApprovalStatus) => {
