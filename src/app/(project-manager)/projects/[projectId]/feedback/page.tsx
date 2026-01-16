@@ -3,10 +3,10 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { getProjectPeerFeedback } from '@/lib/api/general/projects';
-import StatsCards from "@/components/project-manager/feedback/StatsCards";
-import ScoreGauge from "@/components/project-manager/feedback/ScoreGauge";
-import FamousTags from "@/components/project-manager/feedback/FamousTags";
-import FeedbackTable from "@/components/project-manager/feedback/FeedbackTable";
+import StatsCards from '@/components/project-manager/feedback/StatsCards';
+import ScoreGauge from '@/components/project-manager/feedback/ScoreGauge';
+import FamousTags from '@/components/project-manager/feedback/FamousTags';
+import FeedbackTable from '@/components/project-manager/feedback/FeedbackTable';
 
 interface FeedbackTag {
     id: string;
@@ -91,9 +91,6 @@ export default function FeedbackAnalyticsPage() {
         .slice(0, 9)
         .map(([name]) => name);
 
-    const lastUpdated = feedbackData.length > 0
-        ? new Date(Math.max(...feedbackData.map(f => new Date(f.updatedAt).getTime())))
-        : new Date();
 
     if (isLoading) {
         return (

@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { ProjectApprovalStatus } from '@/types/ProjectData';
 import { changeProposedProjectStatus, getVolunteerProjects } from '@/lib/api/general/projects';
-import Link from "next/link";
+import Link from 'next/link';
 
 interface Project {
     id: string;
@@ -74,12 +74,12 @@ export default function Projects() {
     };
 
     const handleEdit = () => {
-        alert("Edit clicked");
+        alert('Edit clicked');
         // Add edit logic
     };
 
     const handleDelete = () => {
-        alert("Delete clicked");
+        alert('Delete clicked');
         // Add deletion logic 
     };
 
