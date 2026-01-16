@@ -1,8 +1,15 @@
-export type UserProfile = {
+export type StaffProfile = {
   firstName: string;
   lastName: string;
   email: string;
-  dob: string;
+  title: string;
+}
+
+export type PartnerProfile = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  title: string;
   countryCode: string;
   contactNumber: string;
   emergencyCountryCode: string;
@@ -15,7 +22,7 @@ export type UserProfile = {
   otherInterests: string;
   otherReferrers: string;
   otherContactModes: string;
-  hasVolunteerExperience: string;
+  hasVolunteerExperience: boolean;
   volunteerAvailability: string;
   isActive: string;
   consentUpdatesCommunications: string;

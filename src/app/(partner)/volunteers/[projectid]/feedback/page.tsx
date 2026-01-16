@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Sidebar from '@/components/sidebar';
+import PageHeader from '@/components/ui/PageHeader';
 import StarRating from '@/components/ui/StarRating';
 import Textarea from '@/components/ui/TextArea';
 import Button from '@/components/ui/Button';
@@ -117,15 +118,10 @@ export default function FeedbackPage() {
         onClose={() => setToastOpen(false)}
       />
       <main className="flex-1 px-10 py-8">
-        <div className="mb-8 flex items-start gap-3">
-          <div className="w-[5px] h-[39px] bg-[#56E0C2] mt-1" />
-          <div>
-            <h1 className="text-3xl font-bold">Volunteer Feedback Form</h1>
-            <p className="text-sm text-gray-500">
-              Track your volunteer activities, donations, and applications
-            </p>
-          </div>
-        </div>
+        <PageHeader
+          title="Volunteer Feedback Form"
+          subtitle="Track your volunteer activities, donations, and applications"
+        />
 
         {/* Rate your experience */}
         <div className="rounded-lg border bg-white p-6 mb-6">
