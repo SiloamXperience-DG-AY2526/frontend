@@ -1,4 +1,4 @@
-import { User, FeedbackTag, FeedbackData } from '../../../types/FeedbackData';
+import { User, FeedbackTag, FeedbackData } from '@/types/FeedbackData';
 interface FeedbackTableProps {
     feedbackData: FeedbackData[];
 }
