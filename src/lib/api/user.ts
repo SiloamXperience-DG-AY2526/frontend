@@ -11,7 +11,7 @@ export async function getUserProfile(): Promise<StaffProfile | PartnerProfile> {
   return userProfile;
 }
 
-export async function updateUserProfile( profileData: Partial<PartnerProfile> ): Promise<PartnerProfile> {
+export async function updateUserProfile( profileData: Partial<StaffProfile |PartnerProfile> ): Promise<PartnerProfile> {
 
   const res = await fetch('/api/me', {
     method: 'PATCH',
