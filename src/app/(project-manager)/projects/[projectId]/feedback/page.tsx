@@ -72,7 +72,7 @@ export default function FeedbackAnalyticsPage() {
     }, [projectId]);
 
     const totalShown = feedbackData.length;
-    const totalResponse = feedbackData.filter(f => f.score > 0).length;
+    const totalResponse = feedbackData.filter(f => f.score !== null && f.score !== undefined).length;
     const responseRate = totalShown > 0 ? Math.round((totalResponse / totalShown) * 100) : 0;
 
     const averageScore = feedbackData.length > 0
