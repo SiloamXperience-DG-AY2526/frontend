@@ -6,7 +6,7 @@ interface FamousTagsProps {
     return (
       <div className="border border-[#207860] rounded-2xl shadow-[0_4px_4px_0_rgba(0,0,0,0.25)] p-4 overflow-hidden">
         <h2 className="text-[#207860] text-xl font-semibold mb-4">
-          Famous Tag
+          Famous Tags
         </h2>
   
         {tags.length === 0 ? (
