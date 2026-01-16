@@ -13,7 +13,7 @@ export default async function DashboardLayout({
 
     if (!role) redirect('/login');
 
-    if (role !== UserRole.PARTNER) redirect('/unauthorized');
+    if (role !== UserRole.GENERAL_MANAGER) redirect('/unauthorized');
 
 
     return (

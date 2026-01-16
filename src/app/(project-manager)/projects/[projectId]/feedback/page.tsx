@@ -54,9 +54,7 @@ export default function FeedbackAnalyticsPage() {
         const fetchFeedback = async () => {
             try {
                 setIsLoading(true);
-                console.log('Fetching feedback for project:', projectId);
                 const data = await getProjectPeerFeedback(projectId);
-                console.log('Received data:', data);
                 setFeedbackData(data);
             } catch (err) {
                 console.error('Error fetching feedback:', err);
