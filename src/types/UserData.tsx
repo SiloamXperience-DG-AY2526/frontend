@@ -22,7 +22,7 @@ export type PartnerProfile = {
   otherInterests: string;
   otherReferrers: string;
   otherContactModes: string;
-  hasVolunteerExperience: string;
+  hasVolunteerExperience: boolean;
   volunteerAvailability: string;
   isActive: string;
   consentUpdatesCommunications: string;

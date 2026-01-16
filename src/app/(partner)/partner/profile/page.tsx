@@ -1,155 +1,228 @@
 'use client';
 
-import { getUserProfile } from '@/lib/api/user';
+import Button from '@/components/ui/Button';
+import { getUserProfile, updateUserProfile } from '@/lib/api/user';
 import { PartnerProfile } from '@/types/UserData';
 import { useEffect, useState } from 'react';
-
-
-const empty = '— — —';
-
-const Field = ({ label, value }: { label: string; value?: string }) => (
-  <div className="flex items-center justify-between gap-6 py-2">
-    <span className="text-sm font-semibold text-slate-900">{label}</span>
-    <span className="text-sm text-slate-500">
-      {value}
-    </span>
-  </div>
-);
+import FieldBox from '@/components/partner/FieldBox';
 
 export default function ProfilePage() {
+  const [partnerProfile, setPartnerProfile] = useState<PartnerProfile | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
 
-  const [partnerProfile, setPartnerProfile] = useState<PartnerProfile>();
+  // form state
+  const [form, setForm] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    contactNumber: '',
+    occupation: '',
+    education: '',
+    languages: '',
+    nationality: '',
+    address: '',
+    availability: '',
+    expertise: '',
+    experience: '',
+  });
 
   useEffect(() => {
     const fetchProfile = async () => {
-      const partnerProfile = await getUserProfile() as PartnerProfile;
-      setPartnerProfile(partnerProfile);
+      const p = (await getUserProfile()) as PartnerProfile;
+      setPartnerProfile(p);
+
+      setForm({
+        firstName: p?.firstName ?? '',
+        lastName: p?.lastName ?? '',
+        email: p?.email ?? '',
+        contactNumber: p?.contactNumber ?? '',
+        occupation: p?.occupation ?? '',
+        education: p?.otherInterests ?? '',
+        languages: (p?.languages ?? []).join(', '),
+        nationality: p?.nationality ?? '',
+        address: p?.residentialAddress ?? '',
+        availability: p?.volunteerAvailability ?? '',
+        expertise: (p?.skills ?? []).join(', '),
+        experience: p?.hasVolunteerExperience ? 'Yes' : 'No',
+      });
     };
 
     fetchProfile();
-
   }, []);
 
-  const profile = {
-    lastUpdated: '04 Oct 2025',
-    name: `${partnerProfile?.firstName} ${partnerProfile?.lastName}`,
-    email: partnerProfile?.email,
-    title: partnerProfile?.title,
-
-    contactNumber: partnerProfile?.contactNumber,
-
-    occupation: partnerProfile?.occupation,
-    education: partnerProfile?.otherInterests,
-    languages: partnerProfile?.languages?.join(', '),
-    nationality: partnerProfile?.nationality,
-    address: partnerProfile?.residentialAddress,
-
-    availability: partnerProfile?.volunteerAvailability,
-    expertise: partnerProfile?.skills?.join(', '),
-    experience: partnerProfile?.hasVolunteerExperience,
+  const onCancel = () => {
+    // reset to original values
+    if (!partnerProfile) return;
+    setForm({
+      firstName: partnerProfile.firstName ?? '',
+      lastName: partnerProfile.lastName ?? '',
+      email: partnerProfile.email ?? '',
+      contactNumber: partnerProfile.contactNumber ?? '',
+      occupation: partnerProfile.occupation ?? '',
+      education: partnerProfile.otherInterests ?? '',
+      languages: (partnerProfile.languages ?? []).join(', '),
+      nationality: partnerProfile.nationality ?? '',
+      address: partnerProfile.residentialAddress ?? '',
+      availability: partnerProfile.volunteerAvailability ?? '',
+      expertise: (partnerProfile.skills ?? []).join(', '),
+      experience: partnerProfile.hasVolunteerExperience ? 'Yes' : 'No',
+    });
+    setIsEditing(false);
   };
 
-  const onEdit = () => {
-    // Example: route to edit page
-    // router.push("/profile/edit");
-    alert('Edit clicked');
+  const onSave = async () => {
+    const payload = {
+      ...partnerProfile,
+      firstName: form.firstName.trim(),
+      lastName: form.lastName.trim(),
+      email: form.email.trim(),
+      contactNumber: form.contactNumber.trim(),
+      occupation: form.occupation.trim(),
+      otherInterests: form.education.trim(),
+      languages: form.languages
+        .split(',')
+        .map((s) => s.trim())
+        .filter(Boolean),
+      nationality: form.nationality.trim(),
+      residentialAddress: form.address.trim(),
+      volunteerAvailability: form.availability.trim(),
+      skills: form.expertise
+        .split(',')
+        .map((s) => s.trim())
+        .filter(Boolean),
+      hasVolunteerExperience: form.experience == 'Yes' ? true : false,
+    };
+
+    const updated = await updateUserProfile(payload);
+    setPartnerProfile(updated as PartnerProfile);
+    setIsEditing(false);
+    alert('Profile updated successfully!');
   };
 
   return (
     <div className="h-full overflow-y-auto bg-white">
       <div className="mx-auto w-full max-w-6xl px-6 py-10">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-slate-900">My Profile</h1>
-          <p className="mt-1 text-sm text-slate-500">
-            Last updated: 04 Oct 2025
-          </p>
+        <div className="flex items-start justify-between">
+          <div className="mb-8">
+            <h1 className="text-3xl font-bold text-slate-900">My Profile</h1>
+            <p className="mt-1 text-sm text-slate-500">
+              Last updated: 04 Oct 2025
+            </p>
+          </div>
+
+          {!isEditing ? (
+            <Button
+              label="Edit Profile Details"
+              onClick={() => setIsEditing(true)}
+            />
+          ) : (
+            <div className="flex gap-3">
+              <Button label="Cancel" onClick={onCancel} />
+              <Button label="Save Profile Details" onClick={onSave} />
+            </div>
+          )}
         </div>
 
-        {/* Main grid */}
+        {/* SAME layout for view + edit */}
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-          {/* LEFT COLUMN */}
-          <div className="space-y-6">
-            {/* Avatar placeholder */}
-            <div className="flex items-start">
-              <div className="relative h-44 w-44">
-                {/* Outer circle */}
-                <div className="absolute inset-0 rounded-full border-2 border-slate-300 bg-white" />
-                {/* Head */}
-                <div className="absolute left-1/2 top-[26%] h-12 w-12 -translate-x-1/2 rounded-full border-2 border-slate-300 bg-white" />
-                {/* Shoulders */}
-                <div className="absolute left-1/2 top-[56%] h-20 w-28 -translate-x-1/2 rounded-b-full border-2 border-t-0 border-slate-300 bg-white" />
-              </div>
-            </div>
+          {/* avatar */}
+          <div className="flex items-start justify-center">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 32 32"
+              className="h-40 w-40 text-slate-400"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.5"
+            >
+              <circle cx="16" cy="16" r="14" />
+              <circle cx="16" cy="12" r="4" />
+              <path d="M6 26c2.5-5 17.5-5 20 0" />
+            </svg>
+          </div>
 
-            {/* My Profile card */}
-            <div className="rounded-2xl bg-sky-50 p-6 shadow-sm">
-              <h2 className="text-lg font-bold text-slate-900">My Profile</h2>
+          {/* My Profile */}
+          <div className="rounded-2xl bg-sky-50 p-6 shadow-sm">
+            <h2 className="text-lg font-bold text-slate-900">My Profile</h2>
 
-              <div className="mt-4 space-y-1">
-                <div className="flex items-center justify-between gap-6 py-2">
-                  <span className="text-sm font-semibold text-slate-900">
-                    Name:
-                  </span>
-                  <span className="text-sm text-slate-500">
-                    {profile.name?.trim() ? profile.name : empty}
-                  </span>
-                </div>
-
-                <div className="flex items-center justify-between gap-6 py-2">
-                  <span className="text-sm font-semibold text-slate-900">
-                    Email:
-                  </span>
-                  <span className="text-sm text-slate-500">
-                    {profile.email?.trim() ? profile.email : empty}
-                  </span>
-                </div>
-
-                <div className="flex items-center justify-between gap-6 py-2">
-                  <span className="text-sm font-semibold text-slate-900">
-                    Contact No:
-                  </span>
-                  <span className="text-sm text-slate-500">
-                    {profile.contactNumber?.trim() ? profile.contactNumber : empty}
-                  </span>
-                </div>
-              </div>
-
-              <div className="mt-6 flex justify-end">
-                <button
-                  onClick={onEdit}
-                  className="rounded-lg bg-emerald-200 px-8 py-2 text-sm font-semibold text-slate-900 hover:bg-emerald-300 active:scale-[0.99]"
-                >
-                  Edit
-                </button>
-              </div>
+            <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <FieldBox
+                label="First Name"
+                value={form.firstName}
+                editable={isEditing}
+                onChange={(v) => setForm((p) => ({ ...p, firstName: v }))}
+              />
+              <FieldBox
+                label="Last Name"
+                value={form.lastName}
+                editable={isEditing}
+                onChange={(v) => setForm((p) => ({ ...p, lastName: v }))}
+              />
+              <FieldBox
+                label="Email"
+                value={form.email}
+                editable={isEditing}
+                onChange={(v) => setForm((p) => ({ ...p, email: v }))}
+              />
+              <FieldBox
+                label="Contact Number"
+                value={form.contactNumber}
+                editable={isEditing}
+                onChange={(v) => setForm((p) => ({ ...p, contactNumber: v }))}
+              />
             </div>
           </div>
 
-          {/* RIGHT COLUMN */}
-          <div className="space-y-6">
-            {/* My Details */}
-            <div className="rounded-2xl bg-sky-50 p-6 shadow-sm">
-              <h2 className="text-lg font-bold text-slate-900">My Details</h2>
+          {/* My Interests */}
+          <div className="rounded-2xl bg-sky-50 p-6 shadow-sm">
+            <h2 className="text-lg font-bold text-slate-900">My Interests</h2>
 
-              <div className="mt-4">
-                <Field label="Occupation:" value={profile.occupation} />
-                <Field label="Education:" value={profile.education} />
-                <Field label="Languages:" value={profile.languages} />
-                <Field label="Nationality:" value={profile.nationality} />
-                <Field label="Address:" value={profile.address} />
-              </div>
+            <div className="mt-4 space-y-4">
+              <FieldBox
+                label="Availability"
+                value={form.availability}
+                editable={isEditing}
+                onChange={(v) => setForm((p) => ({ ...p, availability: v }))}
+              />
+              <FieldBox
+                label="Volunteer Experience"
+                value={form.experience}
+                editable={isEditing}
+                onChange={(v) => setForm((p) => ({ ...p, experience: v }))}
+              />
+              <FieldBox
+                label="Expertise"
+                value={form.expertise}
+                editable={isEditing}
+                onChange={(v) => setForm((p) => ({ ...p, expertise: v }))}
+              />
             </div>
+          </div>
 
-            {/* My Interests */}
-            <div className="rounded-2xl bg-sky-50 p-6 shadow-sm">
-              <h2 className="text-lg font-bold text-slate-900">My Interests</h2>
+          {/* My Details */}
+          <div className="rounded-2xl bg-sky-50 p-6 shadow-sm">
+            <h2 className="text-lg font-bold text-slate-900">My Details</h2>
 
-              <div className="mt-4">
-                <Field label="Availability:" value={profile.availability} />
-                <Field label="Expertise:" value={profile.expertise} />
-                <Field label="Experience:" value={profile.experience} />
-              </div>
+            <div className="mt-4 space-y-4">
+              <FieldBox
+                label="Address"
+                value={form.address}
+                editable={isEditing}
+                onChange={(v) => setForm((p) => ({ ...p, address: v }))}
+              />
+              <FieldBox
+                label="Languages"
+                value={form.languages}
+                editable={isEditing}
+                onChange={(v) => setForm((p) => ({ ...p, languages: v }))}
+              />
+              <FieldBox
+                label="Occupation"
+                value={form.occupation}
+                editable={isEditing}
+                onChange={(v) => setForm((p) => ({ ...p, occupation: v }))}
+              />
             </div>
           </div>
         </div>

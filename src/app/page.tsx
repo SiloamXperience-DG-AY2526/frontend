@@ -47,7 +47,7 @@ export default function LandingPage() {
 
       {/* Main */}
       <main className="relative z-20 min-h-[calc(100vh-96px)] flex items-center justify-center px-6 pb-10">
-        <div className="w-full max-w-6xl flex items-center justify-between gap-16">
+        <div className="w-full max-w-7xl flex items-center justify-between">
           {/* LEFT: text */}
           <div className="max-w-md">
             <h1 className="text-5xl font-bold leading-tight text-black">
