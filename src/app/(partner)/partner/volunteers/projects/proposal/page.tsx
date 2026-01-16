@@ -19,6 +19,7 @@ type FrequencyUI = 'weekly' | 'monthly' | 'ad-hoc';
 type PositionForm = {
   role: string;
   description: string;
+  totalSlots: string;
   skills: string[];
 };
 const TEMP_PDF_URL = 'https://example.com/sample-proposal.pdf';
@@ -26,7 +27,6 @@ const TEMP_IMAGE_URL =
   'https://nvpc.org.sg/wp-content/uploads/2025/04/two-women-gardening-1024x682.jpg';
 
 export default function VolunteerProjectProposalPage() {
-
   const router = useRouter();
 
   // Project details
@@ -53,7 +53,7 @@ export default function VolunteerProjectProposalPage() {
 
   // Positions
   const [positions, setPositions] = useState<PositionForm[]>([
-    { role: '', description: '', skills: [''] },
+    { role: '', description: '', totalSlots: '1', skills: [''] },
   ]);
 
   const [toastOpen, setToastOpen] = useState(false);
@@ -99,7 +99,11 @@ export default function VolunteerProjectProposalPage() {
       endTime;
 
     const positionsOk = positions.every(
-      (p) => p.role.trim() && p.description.trim()
+      (p) =>
+        p.role.trim() &&
+        p.description.trim() &&
+        Number.isFinite(Number(p.totalSlots)) &&
+        Number(p.totalSlots) >= 1
     );
 
     return Boolean(basicOk && positionsOk);
@@ -124,7 +128,7 @@ export default function VolunteerProjectProposalPage() {
   const addPosition = () =>
     setPositions((prev) => [
       ...prev,
-      { role: '', description: '', skills: [''] },
+      { role: '', description: '', totalSlots: '1', skills: [''] },
     ]);
 
   const removePosition = (idx: number) =>
@@ -149,7 +153,6 @@ export default function VolunteerProjectProposalPage() {
   const onSubmit = async () => {
     try {
       setSubmitting(true);
-     
 
       const payload: ProposeVolunteerProjectPayload = {
         title: title.trim(),
@@ -178,17 +181,19 @@ export default function VolunteerProjectProposalPage() {
         positions: positions.map((p) => ({
           role: p.role.trim(),
           description: p.description.trim(),
+
+          totalSlots: Math.max(1, Number(p.totalSlots) || 1),
           skills: p.skills.map((s) => s.trim()).filter(Boolean),
         })),
       };
 
       await proposeVolunteerProject(payload);
- 
+
       setToastType('success');
       setToastTitle('Application submitted');
       setToastMsg('We’ll contact you soon with the next steps.');
       setToastOpen(true);
-       setTimeout(() => {
+      setTimeout(() => {
         router.push('/partner/volunteers');
       }, 2000);
     } catch (e: unknown) {
@@ -203,15 +208,15 @@ export default function VolunteerProjectProposalPage() {
 
   return (
     <div className="flex h-screen bg-gray-50">
-       {/* Toast popup */}
-            <Toast
-              open={toastOpen}
-              type={toastType}
-              title={toastTitle}
-              message={toastMsg}
-              duration={3500}
-              onClose={() => setToastOpen(false)}
-            />
+      {/* Toast popup */}
+      <Toast
+        open={toastOpen}
+        type={toastType}
+        title={toastTitle}
+        message={toastMsg}
+        duration={3500}
+        onClose={() => setToastOpen(false)}
+      />
       <main className="flex-1 px-10 py-8 overflow-y-auto">
         {/* Header */}
         <div className="mb-10 flex items-start gap-3">
@@ -521,12 +526,19 @@ export default function VolunteerProjectProposalPage() {
                     label="Logistics Required"
                     value=""
                     onChange={() => {}}
-                  />
+                  /> */}
                   <Input
                     label="Estimated Number of Volunteers Needed *"
-                    value=""
-                    readOnly
-                  /> */}
+                    placeholder="e.g. 5"
+                    value={pos.totalSlots}
+                    onChange={(v) =>
+                      setPositions((prev) =>
+                        prev.map((x, i) =>
+                          i === pIdx ? { ...x, totalSlots: v } : x
+                        )
+                      )
+                    }
+                  />
                 </div>
 
                 {pIdx !== positions.length - 1 && (
@@ -575,8 +587,6 @@ export default function VolunteerProjectProposalPage() {
             {submitting ? 'Submitting...' : 'Submit Project'}
           </button>
         </div>
-
-
       </main>
     </div>
   );
