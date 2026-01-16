@@ -161,11 +161,7 @@ export function AnalyticsSection({ partnerInfo }: { partnerInfo: PartnerInfoResp
   }, [partnerInfo.projects.length, totalHoursCompleted]);
 
   const averageScore = useMemo(() => {
-    if (partnerInfo.performance.length === 0) return 0;
-    const avg =
-      partnerInfo.performance.reduce((sum, r) => sum + (r.score || 0), 0) /
-      partnerInfo.performance.length;
-    return Math.round(avg * 100) / 100;
+    return 69.69; // TODO: What is "average score" based on in the Figma mockup??
   }, [partnerInfo.performance]);
 
   return (
