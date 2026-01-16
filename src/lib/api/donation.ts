@@ -4,6 +4,7 @@
 import {
   DonationProjectsResponse,
   DonationProject,
+  DonationProjectWithFinance,
 } from '@/types/DonationProject';
 import {
   SubmitDonationApplication,
@@ -169,27 +170,230 @@ const sample = {
 
 // Get all donation projects for finance manager with pagination
 export async function getFinanceManagerProjects(
-  page: number = 1,
-  limit: number = 20
+  _page: number = 1,
+  _limit: number = 20
 ): Promise<DonationProjectsResponse> {
-  const params = new URLSearchParams({
-    page: page.toString(),
-    limit: limit.toString(),
-  });
+  // TODO: Implement actual API call with pagination
+  // const params = new URLSearchParams({
+  //   page: page.toString(),
+  //   limit: limit.toString(),
+  // });
+  // const res = await fetch(
+  //   `/api/v1/finance/donation-projects?${params.toString()}`
+  // );
+  // if (!res.ok) {
+  //   throw new Error('Failed to fetch donation projects for finance manager.');
+  // }
+  // const data = await res.json();
+  // return data;
 
-  // Placeholder API endpoint - replace with actual endpoint later
-  /**
-  const res = await fetch(
-    `/api/v1/finance/donation-projects?${params.toString()}`
-  );
-
-  if (!res.ok) {
-    throw new Error('Failed to fetch donation projects for finance manager.');
-  }
-
-  const data = await res.json();
-
-   */
+  // Temporary: return sample data
   const data = sample;
   return data;
+}
+
+// Get donation project finance details (donations and refunds)
+export async function getDonationProjectFinance(
+  projectId: string
+): Promise<DonationProjectWithFinance> {
+  // TODO: Replace with fetch(`/api/v1/finance/donation-projects/${projectId}`)
+
+  // Dummy data matching the design
+  const dummyData: DonationProjectWithFinance = {
+    id: projectId,
+    title: 'Project Name',
+    location: 'Singapore',
+    about: 'Project description',
+    objectives: 'Project objectives',
+    beneficiaries: 'Community members',
+    initiatorName: 'John Doe',
+    organisingTeam: 'Finance Team',
+    targetFund: 5000,
+    currentFund: 4500,
+    brickSize: 100,
+    deadline: '2026-12-31T23:59:59.000Z',
+    type: 'ONGOING',
+    startDate: '2026-01-01T00:00:00.000Z',
+    endDate: '2026-12-31T23:59:59.000Z',
+    submissionStatus: 'APPROVED',
+    approvalStatus: 'APPROVED',
+    approvalNotes: null,
+    image: null,
+    attachments: null,
+    managerId: 'manager_123',
+    createdAt: '2026-01-01T00:00:00.000Z',
+    updatedAt: '2026-01-15T00:00:00.000Z',
+    donations: [
+      {
+        donorName: 'Donor Name',
+        amount: 200,
+        date: '2025-11-18',
+        paymentMode: 'PayNow',
+      },
+      {
+        donorName: 'Donor Name',
+        amount: 200,
+        date: '2025-11-18',
+        paymentMode: 'PayNow',
+      },
+      {
+        donorName: 'Donor Name',
+        amount: 200,
+        date: '2025-11-18',
+        paymentMode: 'PayNow',
+      },
+      {
+        donorName: 'Donor Name',
+        amount: 200,
+        date: '2025-11-18',
+        paymentMode: 'PayNow',
+      },
+      {
+        donorName: 'Donor Name',
+        amount: 200,
+        date: '2025-11-18',
+        paymentMode: 'PayNow',
+      },
+      {
+        donorName: 'Donor Name',
+        amount: 200,
+        date: '2025-11-18',
+        paymentMode: 'PayNow',
+      },
+      {
+        donorName: 'Donor Name',
+        amount: 200,
+        date: '2025-11-18',
+        paymentMode: 'PayNow',
+      },
+    ],
+    refunds: [
+      {
+        requestorName: 'Project Name',
+        startDate: '2025-11-18',
+        endDate: '2025-12-19',
+        amount: 200,
+        paymentMode: '-',
+        refundStatus: 'pending',
+      },
+      {
+        requestorName: 'Project Name',
+        startDate: '2025-11-18',
+        endDate: '2025-12-19',
+        amount: 200,
+        paymentMode: 'PayNow',
+        refundStatus: 'refunded',
+      },
+      {
+        requestorName: 'Project Name',
+        startDate: '2025-11-18',
+        endDate: '2025-12-19',
+        amount: 200,
+        paymentMode: '-',
+        refundStatus: 'pending',
+      },
+      {
+        requestorName: 'Project Name',
+        startDate: '2025-11-18',
+        endDate: '2025-12-19',
+        amount: 200,
+        paymentMode: 'PayNow',
+        refundStatus: 'pending',
+      },
+      {
+        requestorName: 'Project Name',
+        startDate: '2025-11-18',
+        endDate: '2025-12-19',
+        amount: 200,
+        paymentMode: 'PayNow',
+        refundStatus: 'pending',
+      },
+      {
+        requestorName: 'Project Name',
+        startDate: '2025-11-18',
+        endDate: '2025-12-19',
+        amount: 200,
+        paymentMode: 'PayNow',
+        refundStatus: 'pending',
+      },
+      {
+        requestorName: 'Project Name',
+        startDate: '2025-11-18',
+        endDate: '2025-12-19',
+        amount: 200,
+        paymentMode: 'PayNow',
+        refundStatus: 'pending',
+      },
+    ],
+    donors: [
+      {
+        donorId: '1',
+        partnerName: 'Tan Siew Mei',
+        projects: ['Project Recycle', 'Project Health'],
+        cumulativeAmount: 100,
+        gender: 'female',
+        contactNumber: '91111111',
+        status: 'Active',
+      },
+      {
+        donorId: '2',
+        partnerName: 'Tan Siew Mei',
+        projects: ['Project Recycle', 'Project Health'],
+        cumulativeAmount: 100,
+        gender: 'female',
+        contactNumber: '91111111',
+        status: 'Inactive',
+      },
+      {
+        donorId: '3',
+        partnerName: 'Tan Siew Mei',
+        projects: ['Project Recycle'],
+        cumulativeAmount: 100,
+        gender: 'female',
+        contactNumber: '91111111',
+        status: 'Active',
+      },
+      {
+        donorId: '4',
+        partnerName: 'Tan Siew Mei',
+        projects: ['Project Recycle'],
+        cumulativeAmount: 100,
+        gender: 'female',
+        contactNumber: '91111111',
+        status: 'Active',
+      },
+      {
+        donorId: '5',
+        partnerName: 'Tan Siew Mei',
+        projects: ['Project Recycle', 'Project Health'],
+        cumulativeAmount: 100,
+        gender: 'female',
+        contactNumber: '91111111',
+        status: 'Active',
+      },
+      {
+        donorId: '6',
+        partnerName: 'Tan Siew Mei',
+        projects: ['Project Health'],
+        cumulativeAmount: 100,
+        gender: 'female',
+        contactNumber: '91111111',
+        status: 'Active',
+      },
+      {
+        donorId: '7',
+        partnerName: 'Tan Siew Mei',
+        projects: ['Project Health'],
+        cumulativeAmount: 100,
+        gender: 'female',
+        contactNumber: '91111111',
+        status: 'Active',
+      },
+    ],
+  };
+
+  // Simulate API delay
+  return new Promise((resolve) => {
+    setTimeout(() => resolve(dummyData), 300);
+  });
 }

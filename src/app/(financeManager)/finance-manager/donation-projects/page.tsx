@@ -7,7 +7,7 @@ import ProjectsDataTable from './_components/ProjectsDataTable';
 import Pagination from '@/components/ui/Pagination';
 import { getFinanceManagerProjects } from '@/lib/api/donation';
 import { DonationProject } from '@/types/DonationProject';
-import { FunnelIcon } from '@heroicons/react/24/outline';
+import FilterButton from '@/components/ui/FilterButton';
 
 export default function DonationProjectsPage() {
   const router = useRouter();
@@ -82,13 +82,7 @@ export default function DonationProjectsPage() {
         <PageHeader title="All Projects" />
 
         <div className="mt-6 mb-4">
-          <button
-            onClick={handleFilterClick}
-            className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50 transition"
-          >
-            <FunnelIcon className="h-5 w-5 text-gray-600" />
-            <span className="text-sm text-gray-700">Filters</span>
-          </button>
+          <FilterButton onClick={handleFilterClick} />
         </div>
 
         <ProjectsDataTable

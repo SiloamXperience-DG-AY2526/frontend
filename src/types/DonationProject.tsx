@@ -2,7 +2,11 @@
 
 export type DonationProjectType = 'ONGOING' | 'SPECIFIC';
 
-export type DonationProjectSubmissionStatus = 'DRAFT' | 'SUBMITTED' | 'APPROVED' | 'REJECTED';
+export type DonationProjectSubmissionStatus =
+  | 'DRAFT'
+  | 'SUBMITTED'
+  | 'APPROVED'
+  | 'REJECTED';
 
 export type DonationProjectApprovalStatus = 'PENDING' | 'APPROVED' | 'REJECTED';
 
@@ -40,4 +44,39 @@ export type DonationProjectsResponse = {
     total: number;
     totalPages: number;
   };
+};
+
+// Finance-related types for donation projects
+export type ProjectDonation = {
+  donorName: string;
+  amount: number;
+  date: string;
+  paymentMode: string;
+};
+
+export type ProjectRefund = {
+  requestorName: string;
+  startDate: string;
+  endDate: string;
+  amount: number;
+  paymentMode: string;
+  refundStatus: 'pending' | 'refunded';
+};
+
+// Extended DonationProject type with financial details (for finance manager views)
+export type DonationProjectWithFinance = DonationProject & {
+  donations: ProjectDonation[];
+  refunds: ProjectRefund[];
+  donors: ProjectDonor[];
+};
+
+// Donor information for a specific donation project
+export type ProjectDonor = {
+  donorId: string;
+  partnerName: string;
+  projects: string[];
+  cumulativeAmount: number;
+  gender: 'male' | 'female' | 'others';
+  contactNumber: string;
+  status: 'Active' | 'Inactive';
 };

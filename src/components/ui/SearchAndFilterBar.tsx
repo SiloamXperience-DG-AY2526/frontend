@@ -1,4 +1,5 @@
-import { MagnifyingGlassIcon, FunnelIcon } from '@heroicons/react/24/outline';
+import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
+import FilterButton from './FilterButton';
 
 interface SearchAndFilterBarProps {
   searchQuery: string;
@@ -16,13 +17,7 @@ export default function SearchAndFilterBar({
   return (
     <div className="mb-6 flex items-center gap-4">
       {/* Filter Button */}
-      <button
-        onClick={onFilterClick}
-        className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-md bg-white hover:bg-gray-50 transition"
-      >
-        <span className="text-sm font-medium">Filters</span>
-        <FunnelIcon className="h-5 w-5" />
-      </button>
+      <FilterButton onClick={onFilterClick} />
 
       {/* Search Input */}
       <div className="flex-1 relative max-w-md">
