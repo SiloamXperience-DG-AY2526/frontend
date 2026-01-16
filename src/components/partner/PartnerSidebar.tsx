@@ -48,9 +48,9 @@ export default function PartnerSidebar() {
         ))}
       </nav>
       <div className="px-3">
-        <button
-          type="button"
-          className="flex items-center gap-3 rounded-md px-3 py-2 text-sm hover:bg-emerald-800 hover:cursor-pointer transition w-full text-left"
+        <button 
+          type="button" 
+          className='flex items-center gap-3 rounded-md px-3 py-2 text-sm hover:bg-emerald-800 hover:cursor-pointer transition w-full text-left'
           onClick={handleLogout}
         >
           <ArrowLeftStartOnRectangleIcon className="h-5 w-5" />
