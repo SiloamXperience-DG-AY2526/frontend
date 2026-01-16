@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import Sidebar from '@/components/sidebar';
+import Sidebar from '@/components/Sidebar';
 import StarRating from '@/components/ui/StarRating';
 import Textarea from '@/components/ui/Textarea';
 import Button from '@/components/ui/Button';
