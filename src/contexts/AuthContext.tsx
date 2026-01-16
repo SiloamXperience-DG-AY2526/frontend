@@ -1,8 +1,15 @@
-'use client';
+"use client";
 
-import { getAuthUser, login, logout } from '@/lib/api/auth';
-import { AuthUser, AuthPayload, AuthContextValue } from '@/types/AuthData';
-import { createContext, useCallback, useContext, useMemo, useState } from 'react';
+import { getAuthUser, login, logout } from "@/lib/api/auth";
+import { AuthUser, AuthPayload, AuthContextValue } from "@/types/AuthData";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
@@ -10,31 +17,34 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 export function useAuth() {
   const authCtx = useContext(AuthContext);
 
-  if (!authCtx) throw new Error('useAuth must be used within <AuthProvider />');
+  if (!authCtx) throw new Error("useAuth must be used within <AuthProvider />");
 
   return authCtx;
-};
+}
 
 // auth provider
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  const authLogin = useCallback(async (payload: AuthPayload): Promise<AuthUser> => { 
-    const authUser = await login(payload);
+  const authLogin = useCallback(
+    async (payload: AuthPayload): Promise<AuthUser> => {
+      const authUser = await login(payload);
 
-    setUser(authUser);
+      setUser(authUser);
+      setIsLoading(false);
+      return authUser;
+    },
+    []
+  );
 
-    return authUser;
-  }, []);
-
-  const authLogout = useCallback( async () => {
+  const authLogout = useCallback(async () => {
     await logout();
     setUser(null);
+    setIsLoading(false);
   }, []);
 
   const authRefresh = useCallback(async () => {
-
     setIsLoading(true);
 
     const authUser = await getAuthUser();
@@ -43,13 +53,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setIsLoading(false);
   }, []);
 
+
   const value = useMemo(
     () => ({ user, isLoading, authLogin, authLogout, authRefresh }),
     [user, isLoading, authLogin, authLogout, authRefresh]
   );
 
-  return <AuthContext.Provider value={value}>{ children }</AuthContext.Provider>;
-} 
-
-
-
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+}

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { fetchVolunteerApplications } from '@/lib/api/volunteer';
+import { fetchMyVolunteerApplications } from '@/lib/api/volunteer';
 import { VolunteerApplicationDTO } from '@/types/Volunteer';
 import { StatusBadge, formatProjectDateTime } from './ui';
 import {
@@ -10,7 +10,7 @@ import {
   UserIcon,
 } from '@heroicons/react/24/outline';
 
-export default function ApplicationsTab({ userId }: { userId: string }) {
+export default function ApplicationsTab() {
   const [loading, setLoading] = useState(true);
   const [items, setItems] = useState<VolunteerApplicationDTO[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -20,8 +20,7 @@ export default function ApplicationsTab({ userId }: { userId: string }) {
 
     (async () => {
       try {
-        const data = await fetchVolunteerApplications({
-          userId,
+        const data = await fetchMyVolunteerApplications({
           status: 'reviewing',
         });
         if (mounted) setItems(data);
@@ -38,7 +37,7 @@ export default function ApplicationsTab({ userId }: { userId: string }) {
     return () => {
       mounted = false;
     };
-  }, [userId]);
+  }, []);
 
   return (
     <div>

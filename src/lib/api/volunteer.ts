@@ -53,8 +53,6 @@ export async function submitVolunteerApplication(
   return json;
 }
 
-
-
 export async function getVolunteerProjectDetails(
   projectId: string
 ): Promise<VolunteerProjectDetailResponse> {
@@ -71,6 +69,28 @@ export async function getVolunteerProjectDetails(
   }
 
   return json as VolunteerProjectDetailResponse;
+}
+
+export async function fetchMyVolunteerApplications(args?: {
+  status?: string;
+}): Promise<VolunteerApplicationDTO[]> {
+  const qs = new URLSearchParams();
+  if (args?.status) qs.set("status", args.status);
+
+  const res = await fetch(`/api/contribution/volunteerApplication${qs.toString() ? `?${qs}` : ""}`, {
+    method: "GET",
+    credentials: "include",
+    cache: "no-store",
+  });
+
+  const json = await res.json().catch(() => null);
+
+  if (!res.ok) {
+    throw new Error(json?.message ?? `Unable to fetch applications (${res.status})`);
+  }
+
+
+    return (json?.data ?? []) as VolunteerApplicationDTO[];
 }
 
 export async function submitVolunteerFeedback(args: {
@@ -96,31 +116,7 @@ export async function submitVolunteerFeedback(args: {
   return JSON.parse(bodyText) as FeedbackSubmitResponse;
 }
 
-export async function fetchVolunteerApplications(args: {
-  userId: string;
-  status?: string;
-}): Promise<VolunteerApplicationDTO[]> {
-  const query = args.status ? `?status=${args.status}` : '';
 
-  const res = await fetch(
-    `${API_BASE}/volunteer/${args.userId}/volunteer-applications${query}`,
-    {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      cache: 'no-store',
-    }
-  );
-
-  if (!res.ok) {
-    const bodyText = await res.json();
-    throw new Error(`Unable to fetch volunteer applications ${res.status} - ${bodyText}`);
-  }
-
-  const result = await res.json();
-  return result.data as VolunteerApplicationDTO[];
-}
 export async function proposeVolunteerProject(
   payload: ProposeVolunteerProjectPayload
 ) {
