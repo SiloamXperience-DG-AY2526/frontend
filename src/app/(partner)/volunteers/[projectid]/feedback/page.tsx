@@ -4,8 +4,14 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Sidebar from '@/components/sidebar';
+<<<<<<< HEAD
 import StarRating from '@/components/ui/StarRating';
 import TextArea from '@/components/ui/TextArea';
+=======
+import PageHeader from '@/components/ui/PageHeader';
+import StarRating from '@/components/ui/StarRating';
+import Textarea from '@/components/ui/TextArea';
+>>>>>>> main
 import Button from '@/components/ui/Button';
 import { useParams } from 'next/navigation';
 import { FeedbackPayload } from '@/types/Volunteer';
@@ -134,6 +140,7 @@ export default function FeedbackPage() {
         onClose={() => setToastOpen(false)}
       />
       <main className="flex-1 px-10 py-8">
+<<<<<<< HEAD
         <div className="mb-8 flex items-start gap-3">
           <div className="w-[5px] h-[39px] bg-[#56E0C2] mt-1" />
           <div>
@@ -143,6 +150,12 @@ export default function FeedbackPage() {
             </p>
           </div>
         </div>
+=======
+        <PageHeader
+          title="Volunteer Feedback Form"
+          subtitle="Track your volunteer activities, donations, and applications"
+        />
+>>>>>>> main
 
         {/* Rate your experience */}
         <div className="rounded-lg border bg-white p-6 mb-6">
