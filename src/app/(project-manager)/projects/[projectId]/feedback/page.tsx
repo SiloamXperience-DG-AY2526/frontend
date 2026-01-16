@@ -43,9 +43,6 @@ export default function FeedbackAnalyticsPage() {
     const params = useParams();
     const projectId = params?.projectId as string;
 
-    console.log('Params:', params);
-    console.log('Project ID:', projectId);
-
     const [feedbackData, setFeedbackData] = useState<FeedbackData[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -54,9 +51,7 @@ export default function FeedbackAnalyticsPage() {
         const fetchFeedback = async () => {
             try {
                 setIsLoading(true);
-                console.log('Fetching feedback for project:', projectId);
                 const data = await getProjectPeerFeedback(projectId);
-                console.log('Received data:', data);
                 setFeedbackData(data);
             } catch (err) {
                 console.error('Error fetching feedback:', err);
