@@ -112,7 +112,7 @@ export default function VolunteerPage() {
           </div>
 
           <Link
-            href="/volunteers/projects/proposal"
+            href="/partner/volunteers/projects/proposal"
             className="inline-flex items-center justify-center
         rounded-xl px-6 py-2.5 text-sm font-bold text-white
         bg-gradient-to-r from-[#1F7A67] to-[#2AAE92]

@@ -1,7 +1,6 @@
 'use client';
 import React, { useMemo, useState } from 'react';
 
-import Sidebar from '@/components/sidebar';
 import VolunteeringTab from '@/components/contribution/VolunteeringTab';
 import ApplicationTab from '@/components/contribution/ApplicationTab';
 
@@ -26,7 +25,7 @@ export default function MyContributions() {
 
   return (
     <div className="flex min-h-screen bg-gray-50">
-      <Sidebar />
+     
 
       <main className="flex-1 px-10 py-8">
         {/* Header */}

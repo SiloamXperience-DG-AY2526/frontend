@@ -193,7 +193,7 @@ export type ProjectFrequency =
   | 'yearly';
 
 export type ProposeVolunteerProjectPayload = {
-  userId: string;
+ 
 
   title: string;
   initiatorName?: string;

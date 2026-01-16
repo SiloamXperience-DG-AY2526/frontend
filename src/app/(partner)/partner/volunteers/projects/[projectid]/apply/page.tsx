@@ -1,7 +1,6 @@
 'use client';
 
 import React, { use, useEffect, useMemo, useState } from 'react';
-import Sidebar from '@/components/sidebar';
 import Input from '@/components/ui/Input';
 import Toast from '@/components/ui/Toast';
 import {
@@ -123,7 +122,7 @@ export default function VolunteerApplication({
       setToastOpen(true);
 
       setTimeout(() => {
-        router.push(`/volunteers/projects/${data.id}`);
+        router.push(`/partner/volunteers/projects/${data.id}`);
       }, 2000);
     } catch (e: unknown) {
       console.error(e);
@@ -138,7 +137,7 @@ export default function VolunteerApplication({
 
   return (
     <div className="flex min-h-screen w-full bg-white">
-      <Sidebar />
+   
 
       {/* Toast popup */}
       <Toast

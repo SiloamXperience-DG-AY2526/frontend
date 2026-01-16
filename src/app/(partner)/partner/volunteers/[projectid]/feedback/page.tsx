@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Sidebar from '@/components/sidebar';
+
 import PageHeader from '@/components/ui/PageHeader';
 import StarRating from '@/components/ui/StarRating';
 import Textarea from '@/components/ui/TextArea';
@@ -92,7 +92,7 @@ export default function FeedbackPage() {
       setRatings({ overall: 0, management: 0, planning: 0, facilities: 0 });
       setFeedback({ experience: '', improvement: '', comments: '' });
       setTimeout(() => {
-        router.replace('/volunteers');
+        router.replace('/partner/volunteers');
       }, 2000);
 
       console.log('Feedback response:', resp);
@@ -108,7 +108,7 @@ export default function FeedbackPage() {
 
   return (
     <div className="flex min-h-screen bg-gray-50">
-      <Sidebar />
+
       <Toast
         open={toastOpen}
         type={toastType}

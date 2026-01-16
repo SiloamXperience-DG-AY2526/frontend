@@ -7,7 +7,7 @@ import {
 
 } from '@/types/Volunteer';
 
-const API_BASE = process.env.BACKEND_URL;
+
 
 export async function getAvailableVolunteerProjects(
   page: number,
@@ -119,41 +119,16 @@ export async function submitVolunteerFeedback(args: {
   return json as FeedbackSubmitResponse;
 }
 
-// export async function submitVolunteerFeedback(args: {
-//   userId: string;
-//   projectId: string;
-//   payload: FeedbackPayload;
-// }): Promise<FeedbackSubmitResponse> {
-//   const res = await fetch(
-//     `${API_BASE}/volunteer-projects/${args.projectId}/feedback`,
-//     {
-//       method: 'POST',
-//       headers: { 'Content-Type': 'application/json' },
-//       body: JSON.stringify({
-//         userId: args.userId,
-//         ...args.payload,
-//       }),
-//     }
-//   );
 
-//   const bodyText = await res.json();
-//   if (!res.ok) throw new Error(`Unable to Submit Feedback ${res.status} - ${bodyText}`);
-
-//   return JSON.parse(bodyText) as FeedbackSubmitResponse;
-// }
-
-
-export async function proposeVolunteerProject(
-  payload: ProposeVolunteerProjectPayload
-) {
-  const res = await fetch(`${API_BASE}/volunteer/project/proposal`, {
+export async function proposeVolunteerProject(payload: ProposeVolunteerProjectPayload) {
+  const res = await fetch('/api/volunteer/project/proposal', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
     body: JSON.stringify(payload),
   });
 
-  const bodyText = await res.json();
-  if (!res.ok) throw new Error(`Unable to submit project proposal ${res.status} - ${bodyText}`);
-
-  return JSON.parse(bodyText);
+  const json = await res.json().catch(() => null);
+  if (!res.ok) throw new Error(json?.message ?? `Unable to submit proposal (${res.status})`);
+  return json;
 }
