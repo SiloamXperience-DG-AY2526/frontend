@@ -202,7 +202,7 @@ export default function VolunteerProjectProposalPage() {
   };
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="flex h-screen bg-gray-50">
        {/* Toast popup */}
             <Toast
               open={toastOpen}
@@ -212,7 +212,7 @@ export default function VolunteerProjectProposalPage() {
               duration={3500}
               onClose={() => setToastOpen(false)}
             />
-      <main className="flex-1 px-10 py-8">
+      <main className="flex-1 px-10 py-8 overflow-y-auto">
         {/* Header */}
         <div className="mb-10 flex items-start gap-3">
           <div className="w-[5px] h-[39px] bg-[#56E0C2] mt-2" />
