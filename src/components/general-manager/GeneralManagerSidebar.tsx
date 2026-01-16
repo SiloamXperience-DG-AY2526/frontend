@@ -3,20 +3,25 @@
 import Link from 'next/link';
 import {
   UserGroupIcon,
-  ChartBarIcon,
   EnvelopeIcon,
   UserIcon,
+  HomeIcon,
+  CubeIcon,
+  StarIcon,
 } from '@heroicons/react/24/outline';
 import { ArrowLeftStartOnRectangleIcon } from '@heroicons/react/24/solid';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 
 const menu = [
-  { name: 'Projects', icon: ChartBarIcon, href: '/finance-manager/projects' },
-  { name: 'Partners', icon: UserGroupIcon, href: '/finance-manager/partners' },
-  { name: 'Mass Send Emails', icon: EnvelopeIcon, href: '/finance-manager/emails' },
-  { name: 'My Profile', icon: UserIcon, href: '/finance-manager/profile' },
+  { name: 'Dashboard', icon: HomeIcon, href: '/general-manager/home' },
+  { name: 'Projects', icon: CubeIcon, href: '/general-manager/projects' },
+  { name: 'Partners', icon: UserGroupIcon, href: '/general-manager/partners' },
+  { name: 'Mass Send Emails', icon: EnvelopeIcon, href: '/general-manager/emails' },
+  { name: 'Feedback', icon: StarIcon, href: '/general-manager/feedback' },
+  { name: 'My Profile', icon: UserIcon, href: '/general-manager/profile' },
 ];
+
 
 export default function GeneralManagerSidebar() {
   const router = useRouter();

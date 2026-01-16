@@ -5,6 +5,7 @@ import { SignUpData } from '@/types/SignUpData';
 import Button from '@/components/ui/Button';
 import Select from '../ui/Select';
 import Toast from '../ui/Toast';
+import { useRouter } from 'next/navigation';
 
 type LastSignUpFormProps = {
   data: SignUpData;
@@ -21,6 +22,8 @@ export default function StepCommunication({ data, setData, back }: LastSignUpFor
     title: string;
     message?: string;
   }>({ open: false, type: 'error', title: '' });
+
+  const router = useRouter();
 
   const validate = () => {
     const e: Record<string, string> = {};
@@ -79,6 +82,7 @@ export default function StepCommunication({ data, setData, back }: LastSignUpFor
       });
     } finally {
       setLoading(false);
+      router.replace('/login');
     }
   };
 
