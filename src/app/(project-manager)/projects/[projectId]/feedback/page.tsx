@@ -94,7 +94,7 @@ export default function FeedbackAnalyticsPage() {
 
     if (isLoading) {
         return (
-            <main className="flex-1 lg:ml-[190px] p-4 md:p-6 lg:p-8">
+            <main className="flex-1 p-4 md:p-6 lg:p-8">
                 <div className="flex items-center justify-center min-h-[400px]">
                     <div className="text-center">
                         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#56E0C2] mx-auto"></div>
@@ -107,7 +107,7 @@ export default function FeedbackAnalyticsPage() {
 
     if (error) {
         return (
-            <main className="flex-1 lg:ml-[190px] p-4 md:p-6 lg:p-8">
+            <main className="flex-1 p-4 md:p-6 lg:p-8">
                 <div className="flex items-center justify-center min-h-[400px]">
                     <div className="text-center">
                         <p className="text-red-600 font-medium">{error}</p>
