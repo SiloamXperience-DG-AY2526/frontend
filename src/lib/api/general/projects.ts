@@ -16,10 +16,10 @@ export async function getVolunteerProjects() {
 
 // Change the approval status of a proposed volunteer project
 export async function changeProposedProjectStatus(
-  id: string,
+  projectId: string,
   status: ProjectApprovalStatus
 ) {
-  const res = await fetch(`/api/v1/volunteer-projects/${id}/status`, {
+  const res = await fetch(`/api/v1/volunteer-projects/${projectId}/status`, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ status }),
