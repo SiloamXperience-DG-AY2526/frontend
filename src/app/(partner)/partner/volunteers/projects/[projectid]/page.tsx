@@ -97,7 +97,7 @@ export default function VolunteerProjectDetailPage({
   }
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="flex  h-screen overflow-y-auto bg-gray-50">
 
 
       <main className="w-full px-6 py-6 md:px-10">

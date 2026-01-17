@@ -136,7 +136,7 @@ export default function VolunteerApplication({
   }
 
   return (
-    <div className="flex min-h-screen w-full bg-white">
+    <div className="flex  h-screen overflow-y-auto w-full bg-white">
    
 
       {/* Toast popup */}
@@ -256,7 +256,7 @@ export default function VolunteerApplication({
 
               {/* register button only visible after consent */}
               {consent ? (
-                <div className="flex justify-end pt-4">
+                <div className="flex justify-end pt-4 ">
                   <button
                     onClick={onSubmit}
                     disabled={submitting || !consent || !availability.trim()}
@@ -264,7 +264,7 @@ export default function VolunteerApplication({
                       rounded-md bg-[#195D4B] px-10 py-3
                       text-sm font-semibold text-white
                       hover:bg-[#134A3B]
-                      disabled:opacity-60 disabled:cursor-not-allowed
+                      disabled:opacity-60 disabled:cursor-not-allowed mb-5
                     "
                   >
                     {submitting ? 'Registering...' : 'Register'}
