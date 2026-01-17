@@ -2,7 +2,7 @@
 
 import React, { useMemo, useState } from 'react';
 import Input from '@/components/ui/Input';
-import TextArea from '@/components/ui/Textarea';
+import TextArea from '@/components/ui/TextArea';
 import { proposeVolunteerProject } from '@/lib/api/volunteer';
 import {
   ProjectFrequency,

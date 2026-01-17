@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { SignUpData } from '@/types/SignUpData';
 import Button from '@/components/ui/Button';
 import { fetchNationalities, fetchLanguages } from '@/lib/countries';
-import TextArea from '../ui/Textarea';
+import TextArea from '../ui/TextArea';
 import Select from '../ui/Select';
 import Input from '../ui/Input';
 import MultiSelect from '../ui/MultiSelect';
