@@ -93,7 +93,7 @@ export default function VolunteerPage() {
   }, [page, limit, debouncedSearch]);
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="flex h-screen overflow-y-auto bg-gray-50">
       <Toast
         open={toastOpen}
         type={toastType}
@@ -103,7 +103,7 @@ export default function VolunteerPage() {
         onClose={() => setToastOpen(false)}
       />
 
-      <main className="w-full px-6 py-6 md:px-10">
+      <main className="w-full px-6 py-6 md:px-10 overflow-y-auto">
         {/* Header */}
         <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
           <div>
@@ -112,7 +112,7 @@ export default function VolunteerPage() {
           </div>
 
           <Link
-            href="/volunteers/projects/proposal"
+            href="/partner/volunteers/projects/proposal"
             className="inline-flex items-center justify-center
         rounded-xl px-6 py-2.5 text-sm font-bold text-white
         bg-gradient-to-r from-[#1F7A67] to-[#2AAE92]

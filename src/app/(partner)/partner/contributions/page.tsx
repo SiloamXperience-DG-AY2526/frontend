@@ -1,15 +1,14 @@
 'use client';
 import React, { useMemo, useState } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
-import Sidebar from '@/components/sidebar';
+
 import VolunteeringTab from '@/components/contribution/VolunteeringTab';
 import ApplicationTab from '@/components/contribution/ApplicationTab';
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+
 type TabKey = 'volunteering' | 'donations' | 'applications';
 
 export default function MyContributions() {
-  const router = useRouter();
-  const { user } = useAuth();
+
 
   const [activeTab, setActiveTab] = useState<TabKey>('volunteering');
 
@@ -21,31 +20,34 @@ export default function MyContributions() {
     ],
     []
   );
-  if (!user) {
-    return (
-      <div className="flex min-h-screen w-full items-center justify-center bg-white text-sm text-gray-600">
-        Kindly&nbsp;
-        <button
-          onClick={() => router.push('/login')}
-          className="font-semibold text-teal-600 hover:underline cursor-pointer"
-        >
-          login
-        </button>
-        &nbsp;to volunteer
-      </div>
-    );
-  }
-  const { userId } = user;
+
+
+
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
-      <Sidebar />
+    <div className="flex  h-screen overflow-y-auto bg-gray-50">
+     
 
       <main className="flex-1 px-10 py-8">
         {/* Header */}
+        <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+
         <div className="mb-6 flex items-start gap-3">
           <div className="w-[5px] h-[39px] bg-[#56E0C2] mt-1" />
           <h1 className="text-2xl mt-2 font-bold">My Contributions</h1>
+        </div>
+ <Link
+            href="/partner/volunteers/projects/proposal/view"
+            className="inline-flex items-center justify-center
+        rounded-xl px-6 py-2.5 text-sm font-bold text-white
+        bg-gradient-to-r from-[#1F7A67] to-[#2AAE92]
+        hover:from-[#1A6A59] hover:to-[#22997F]
+        shadow-sm
+        active:scale-[0.99]
+        transition cursor-pointer"
+          >
+            View My Proposed Projects
+          </Link>
         </div>
 
         {/* Tabs */}
@@ -78,9 +80,9 @@ export default function MyContributions() {
         </div>
 
         {/* Content */}
-        {activeTab === 'volunteering' && <VolunteeringTab userId={userId} />}
+        {activeTab === 'volunteering' && <VolunteeringTab  />}
 
-        {activeTab === 'applications' && <ApplicationTab userId={userId} />}
+        {activeTab === 'applications' && <ApplicationTab  />}
 
         {activeTab === 'donations' && (
           <div className="text-sm text-gray-500 mt-6">
