@@ -103,7 +103,7 @@ export default function VolunteerProjectProposalPage() {
         p.role.trim() &&
         p.description.trim() &&
         Number.isFinite(Number(p.totalSlots)) &&
-        Number(p.totalSlots) >= 1,
+        Number(p.totalSlots) >= 1
     );
 
     return Boolean(basicOk && positionsOk);
@@ -500,11 +500,11 @@ export default function VolunteerProjectProposalPage() {
                                       ? {
                                           ...x,
                                           skills: x.skills.map((sv, si) =>
-                                            si === sIdx ? v : sv,
+                                            si === sIdx ? v : sv
                                           ),
                                         }
-                                      : x,
-                                  ),
+                                      : x
+                                  )
                                 )
                               }
                             />
@@ -524,6 +524,11 @@ export default function VolunteerProjectProposalPage() {
                     </div>
                   </div>
 
+                  {/* <TextArea
+                    label="Logistics Required"
+                    value=""
+                    onChange={() => {}}
+                  /> */}
                   <Input
                     label="Estimated Number of Volunteers Needed *"
                     placeholder="e.g. 5"
@@ -531,8 +536,8 @@ export default function VolunteerProjectProposalPage() {
                     onChange={(v) =>
                       setPositions((prev) =>
                         prev.map((x, i) =>
-                          i === pIdx ? { ...x, totalSlots: v } : x,
-                        ),
+                          i === pIdx ? { ...x, totalSlots: v } : x
+                        )
                       )
                     }
                   />
