@@ -6,7 +6,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import Sidebar from '@/components/sidebar';
 import Button from '@/components/ui/Button';
 import { getDonationProjectById, submitDonation } from '@/lib/api/donation';
-import { DonationProject } from '@/types/DonationProject';
+import { DonationProject } from '@/types/DonationProjectData';
 import { DonationType } from '@/types/DonationData';
 
 const PRESET_AMOUNTS = [50, 100, 200, 500, 1000, 2000];
@@ -28,7 +28,7 @@ export default function DonatePage() {
   const [paymentMethod, setPaymentMethod] = useState('');
   const [donationType] = useState<DonationType>('INDIVIDUAL');
   const [countryOfResidence] = useState('Singapore');
-  
+
   // Success/Failure state
   const [donationResult, setDonationResult] = useState<{
     success: boolean;
@@ -48,7 +48,7 @@ export default function DonatePage() {
 
   useEffect(() => {
     if (!projectId) return;
-    
+
     const loadProjectDetails = async () => {
       setLoading(true);
       try {
@@ -62,7 +62,7 @@ export default function DonatePage() {
         setLoading(false);
       }
     };
-    
+
     loadProjectDetails();
   }, [projectId, router]);
 
@@ -121,10 +121,12 @@ export default function DonatePage() {
 
       // Simulate success/failure (80% success rate for demo)
       const isSuccess = Math.random() > 0.2;
-      
+
       setDonationResult({
         success: isSuccess,
-        receiptId: isSuccess ? `DN${Math.floor(Math.random() * 1000000)}` : undefined,
+        receiptId: isSuccess
+          ? `DN${Math.floor(Math.random() * 1000000)}`
+          : undefined,
         amount: getDonationAmount(),
         projectTitle: project?.title,
       });
@@ -183,7 +185,7 @@ export default function DonatePage() {
         {/* Back Button */}
         {step < 4 && (
           <button
-            onClick={() => step === 1 ? router.back() : setStep(step - 1)}
+            onClick={() => (step === 1 ? router.back() : setStep(step - 1))}
             className="mb-6 text-gray-600 hover:text-gray-900 flex items-center gap-2 cursor-pointer"
           >
             <span className="text-2xl">←</span>
@@ -273,7 +275,9 @@ export default function DonatePage() {
 
                 {/* Custom Amount */}
                 <div className="mb-8">
-                  <label className="block font-semibold mb-3">Or enter a custom amount</label>
+                  <label className="block font-semibold mb-3">
+                    Or enter a custom amount
+                  </label>
                   <div className="relative">
                     <span className="absolute left-4 top-1/2 -translate-y-1/2 text-xl font-bold text-gray-600">
                       $
@@ -302,14 +306,18 @@ export default function DonatePage() {
             {/* STEP 2: Payment */}
             {step === 2 && (
               <div>
-                <h2 className="text-2xl font-bold mb-6">Select payment method</h2>
+                <h2 className="text-2xl font-bold mb-6">
+                  Select payment method
+                </h2>
 
                 {/* Payment Method List */}
                 <div className="space-y-4 mb-8">
                   {savedCards.map((card) => (
                     <button
                       key={card.id}
-                      onClick={() => setPaymentMethod(`${card.type} ****${card.last4}`)}
+                      onClick={() =>
+                        setPaymentMethod(`${card.type} ****${card.last4}`)
+                      }
                       className={`w-full p-4 border-b-2 text-left flex items-center gap-3 hover:bg-gray-50 transition ${
                         paymentMethod === `${card.type} ****${card.last4}`
                           ? 'border-black bg-gray-50'
@@ -338,7 +346,9 @@ export default function DonatePage() {
             {/* STEP 3: Review */}
             {step === 3 && (
               <div>
-                <h2 className="text-2xl font-bold mb-6">Review your donation</h2>
+                <h2 className="text-2xl font-bold mb-6">
+                  Review your donation
+                </h2>
 
                 <div className="space-y-4 mb-8">
                   <div className="flex justify-between py-3 border-b">
@@ -347,17 +357,23 @@ export default function DonatePage() {
                   </div>
                   <div className="flex justify-between py-3 border-b">
                     <span className="font-semibold">Donation Amount</span>
-                    <span className="font-bold">{formatCurrency(getDonationAmount())}</span>
+                    <span className="font-bold">
+                      {formatCurrency(getDonationAmount())}
+                    </span>
                   </div>
                   <div className="flex justify-between py-3 border-b">
                     <span className="font-semibold">Total</span>
-                    <span className="font-bold">{formatCurrency(getDonationAmount())}</span>
+                    <span className="font-bold">
+                      {formatCurrency(getDonationAmount())}
+                    </span>
                   </div>
                   <div className="py-3">
                     <p className="font-semibold mb-2">Payment method</p>
                     <p className="text-gray-700 flex items-center gap-2">
                       <span>💳</span>
-                      <span>[icon] credit card ******** {paymentMethod.slice(-4)}</span>
+                      <span>
+                        [icon] credit card ******** {paymentMethod.slice(-4)}
+                      </span>
                     </p>
                   </div>
                 </div>
@@ -396,7 +412,8 @@ export default function DonatePage() {
                       <label className="flex items-center justify-center gap-2">
                         <input type="checkbox" className="w-4 h-4" />
                         <span className="text-sm text-gray-600">
-                          Subscribe for email reminder emails for recurring donations?
+                          Subscribe for email reminder emails for recurring
+                          donations?
                         </span>
                       </label>
                     </div>
@@ -423,7 +440,8 @@ export default function DonatePage() {
                       Your donation was unsuccessful!
                     </h2>
                     <p className="text-gray-600 mb-6">
-                      Please try again. The merchant will redirect in 5 seconds...
+                      Please try again. The merchant will redirect in 5
+                      seconds...
                     </p>
                   </>
                 )}

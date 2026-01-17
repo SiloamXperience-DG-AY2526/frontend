@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { changeProposedProjectStatus } from '@/lib/api/general/projects';
+import { changeProposedProjectStatus } from '@/lib/api/project';
 import { getMyProposedProjects } from '@/lib/api/project';
 import { ProjectApprovalStatus } from '@/types/ProjectData';
 import { MyProposedProject } from '@/types/Volunteer';

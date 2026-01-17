@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import FinanceManagerSidebar from '@/components/finance-manager/FinanceManagerSidebar';
 import PageHeader from '@/components/ui/PageHeader';
 import SearchAndFilterBar from '@/components/ui/SearchAndFilterBar';
 import DonorsDataTable from './_components/DonorsDataTable';
@@ -40,8 +39,6 @@ export default function DonorsPage() {
 
   return (
     <div className="flex min-h-screen bg-gray-50">
-      <FinanceManagerSidebar />
-
       <main className="flex-1 px-10 py-8">
         <PageHeader title="Donors" />
 

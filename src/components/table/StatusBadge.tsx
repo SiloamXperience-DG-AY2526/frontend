@@ -22,11 +22,16 @@ function StatusBadge({
   customColor,
   className = '',
 }: StatusBadgeProps) {
-  const colorClass = customColor || getVariantColor(variant);
+  const badgeStyle = customColor ? { backgroundColor: customColor } : {};
+  const colorClass = customColor ? '' : getVariantColor(variant);
   const badgeClassName =
     `inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${colorClass} text-white ${className}`.trim();
 
-  return <span className={badgeClassName}>{label}</span>;
+  return (
+    <span className={badgeClassName} style={badgeStyle}>
+      {label}
+    </span>
+  );
 }
 
 function getVariantColor(variant: BadgeVariant): string {
