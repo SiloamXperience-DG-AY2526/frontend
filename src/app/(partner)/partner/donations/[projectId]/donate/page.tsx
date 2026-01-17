@@ -157,50 +157,77 @@ export default function DonatePage() {
 
   if (loading) {
     return (
-      <main className="flex-1 px-10 py-8 overflow-y-auto">
-        <div className="text-center py-12">
-          <p className="text-gray-500">Loading project details...</p>
-        </div>
-      </main>
+      <div className="flex min-h-screen bg-gray-50">
+        <main className="w-full px-6 py-6 md:px-10">
+          <div className="rounded-2xl border bg-white p-8 text-sm text-gray-600 shadow-sm">
+            Loading project details...
+          </div>
+        </main>
+      </div>
     );
   }
 
   if (!project) {
     return (
-      <main className="flex-1 px-10 py-8 overflow-y-auto">
-        <div className="text-center py-12">
-          <p className="text-gray-500">Project not found</p>
-        </div>
-      </main>
+      <div className="flex min-h-screen bg-gray-50">
+        <main className="w-full px-6 py-6 md:px-10">
+          <div className="rounded-2xl border bg-white p-8 text-sm text-gray-600 shadow-sm">
+            Project not found.
+          </div>
+        </main>
+      </div>
     );
   }
 
   return (
-    <main className="flex-1 px-10 py-8 overflow-y-auto">
+    <div className="flex h-screen overflow-y-auto bg-gray-50">
+      <main className="w-full px-6 py-6 md:px-10">
         {/* Back Button */}
         {step < 4 && (
           <button
             onClick={() => (step === 1 ? router.back() : setStep(step - 1))}
-            className="mb-6 text-gray-600 hover:text-gray-900 flex items-center gap-2 cursor-pointer"
+            aria-label="Go back"
+            className="mt-1 inline-flex h-8 w-8 rounded-lg cursor-pointer focus:outline-none focus:ring-2 focus:ring-teal-600/40"
           >
-            <span className="text-2xl">←</span>
-            <span>Back</span>
+            <svg
+              width="9"
+              height="17"
+              viewBox="0 0 9 17"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M8 15.0468L1 8.02338L8 1"
+                stroke="#333333"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
           </button>
         )}
 
         {/* Header */}
-        <div className="mb-8 text-center">
-          <h1 className="text-3xl font-bold mb-2">Complete Your Donation</h1>
-          <p className="text-gray-600">
-            You&apos;re one step away from creating meaningful change.
-          </p>
+        <div className="mb-8 mt-1 flex items-start gap-3">
+          <div className="w-[5px] h-[39px] bg-[#56E0C2]" />
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">
+              Complete Your Donation
+            </h1>
+            <p className="mt-2 text-sm text-gray-600">
+              You&apos;re one step away from creating meaningful change.
+            </p>
+          </div>
         </div>
 
         <div className="max-w-4xl mx-auto">
-          {/* Project Title Box (Top Right) */}
-          <div className="flex justify-end mb-6">
-            <div className="bg-gray-300 rounded-lg px-8 py-4">
-              <h2 className="font-bold">{project.title}</h2>
+          {/* Project Title Box */}
+          <div className="mb-6 rounded-2xl border bg-white p-5 shadow-sm flex items-center justify-between">
+            <div>
+              <p className="text-xs uppercase text-gray-500">Project</p>
+              <h2 className="text-lg font-semibold text-gray-900">
+                {project.title}
+              </h2>
             </div>
           </div>
 
@@ -210,19 +237,19 @@ export default function DonatePage() {
               <div key={s} className="flex items-center">
                 <div className="flex flex-col items-center">
                   <div
-                    className={`w-12 h-12 rounded-full flex items-center justify-center font-bold border-2 ${
+                    className={`w-11 h-11 rounded-full flex items-center justify-center text-sm font-bold border ${
                       step === s
-                        ? 'bg-black text-white border-black'
+                        ? 'bg-teal-600 text-white border-teal-600'
                         : step > s
-                        ? 'bg-gray-400 text-gray-700 border-gray-400'
-                        : 'bg-white text-gray-400 border-gray-400'
+                        ? 'bg-[#E3F0EC] text-[#195D4B] border-[#E3F0EC]'
+                        : 'bg-white text-gray-400 border-gray-300'
                     }`}
                   >
                     {s}
                   </div>
                   <p
-                    className={`mt-2 text-sm font-semibold ${
-                      step === s ? 'text-black' : 'text-gray-400'
+                    className={`mt-2 text-xs font-semibold ${
+                      step === s ? 'text-gray-900' : 'text-gray-400'
                     }`}
                   >
                     {s === 1 && 'Amount'}
@@ -233,8 +260,8 @@ export default function DonatePage() {
                 </div>
                 {s < 4 && (
                   <div
-                    className={`w-20 h-1 mx-2 ${
-                      step > s ? 'bg-black' : 'bg-gray-300'
+                    className={`w-16 h-1 mx-2 ${
+                      step > s ? 'bg-teal-600' : 'bg-gray-200'
                     }`}
                   />
                 )}
@@ -243,7 +270,7 @@ export default function DonatePage() {
           </div>
 
           {/* Step Content */}
-          <div className="bg-white rounded-lg border-2 border-black p-12">
+          <div className="rounded-2xl border bg-white p-8 shadow-sm">
             {/* STEP 1: Amount */}
             {step === 1 && (
               <div>
@@ -252,15 +279,15 @@ export default function DonatePage() {
                 </h2>
 
                 {/* Preset Amount Buttons */}
-                <div className="grid grid-cols-3 gap-4 mb-6">
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-6">
                   {PRESET_AMOUNTS.map((amount) => (
                     <button
                       key={amount}
                       onClick={() => handleAmountSelect(amount)}
-                      className={`py-6 rounded-lg border-2 font-bold text-xl transition cursor-pointer ${
+                      className={`py-5 rounded-xl border text-lg font-semibold transition cursor-pointer ${
                         selectedAmount === amount
-                          ? 'border-black bg-gray-100'
-                          : 'border-gray-300 hover:border-gray-400'
+                          ? 'border-teal-600 bg-[#E3F0EC] text-[#195D4B]'
+                          : 'border-gray-200 hover:border-gray-300'
                       }`}
                     >
                       ${amount}
@@ -274,15 +301,15 @@ export default function DonatePage() {
                     Or enter a custom amount
                   </label>
                   <div className="relative">
-                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-xl font-bold text-gray-600">
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-lg font-bold text-gray-500">
                       $
                     </span>
                     <input
                       type="number"
                       value={customAmount}
                       onChange={(e) => handleCustomAmountChange(e.target.value)}
-                      placeholder="xx"
-                      className="w-full py-4 pl-10 pr-4 text-xl font-bold border-2 border-gray-300 rounded-lg focus:border-[#195D4B] outline-none transition"
+                      placeholder="0"
+                      className="w-full py-4 pl-10 pr-4 text-lg font-semibold border border-gray-200 rounded-xl focus:border-teal-600 outline-none transition"
                     />
                   </div>
                 </div>
@@ -291,7 +318,7 @@ export default function DonatePage() {
                 <div className="flex justify-end">
                   <button
                     onClick={handleContinueFromAmount}
-                    className="px-8 py-3 bg-gray-800 hover:bg-gray-900 text-white font-semibold rounded-lg transition-colors duration-200"
+                    className="px-6 py-3 bg-teal-600 hover:bg-teal-700 text-white text-sm font-semibold rounded-lg transition-colors duration-200"
                   >
                     Continue
                   </button>
@@ -314,15 +341,15 @@ export default function DonatePage() {
                       onClick={() =>
                         setPaymentMethod(`${card.type} ****${card.last4}`)
                       }
-                      className={`w-full p-4 border-b-2 text-left flex items-center gap-3 hover:bg-gray-50 transition ${
+                      className={`w-full rounded-xl border p-4 text-left flex items-center gap-3 transition ${
                         paymentMethod === `${card.type} ****${card.last4}`
-                          ? 'border-black bg-gray-50'
-                          : 'border-gray-300'
+                          ? 'border-teal-600 bg-[#E3F0EC]'
+                          : 'border-gray-200 hover:bg-gray-50'
                       }`}
                     >
                       <span className="text-2xl">💳</span>
-                      <span className="font-semibold">
-                        [icon] {card.type} {card.last4}
+                      <span className="font-semibold text-gray-800">
+                        {card.type} •••• {card.last4}
                       </span>
                     </button>
                   ))}
@@ -332,7 +359,7 @@ export default function DonatePage() {
                 <div className="flex justify-end">
                   <button
                     onClick={handleContinueFromPayment}
-                    className="px-8 py-3 bg-gray-800 hover:bg-gray-900 text-white font-semibold rounded-lg transition-colors duration-200"
+                    className="px-6 py-3 bg-teal-600 hover:bg-teal-700 text-white text-sm font-semibold rounded-lg transition-colors duration-200"
                   >
                     Continue
                   </button>
@@ -348,17 +375,17 @@ export default function DonatePage() {
                 </h2>
 
                 <div className="space-y-4 mb-8">
-                  <div className="flex justify-between py-3 border-b">
+                  <div className="flex justify-between py-3 border-b border-gray-200">
                     <span className="font-semibold">Project</span>
                     <span className="font-bold">{project.title}</span>
                   </div>
-                  <div className="flex justify-between py-3 border-b">
+                  <div className="flex justify-between py-3 border-b border-gray-200">
                     <span className="font-semibold">Donation Amount</span>
                     <span className="font-bold">
                       {formatCurrency(getDonationAmount())}
                     </span>
                   </div>
-                  <div className="flex justify-between py-3 border-b">
+                  <div className="flex justify-between py-3 border-b border-gray-200">
                     <span className="font-semibold">Total</span>
                     <span className="font-bold">
                       {formatCurrency(getDonationAmount())}
@@ -368,9 +395,7 @@ export default function DonatePage() {
                     <p className="font-semibold mb-2">Payment method</p>
                     <p className="text-gray-700 flex items-center gap-2">
                       <span>💳</span>
-                      <span>
-                        [icon] credit card ******** {paymentMethod.slice(-4)}
-                      </span>
+                      <span>•••• {paymentMethod.slice(-4)}</span>
                     </p>
                   </div>
                 </div>
@@ -379,7 +404,7 @@ export default function DonatePage() {
                 <button
                   onClick={handleConfirmDonation}
                   disabled={submitting}
-                  className="w-full px-8 py-3 bg-gray-800 hover:bg-gray-900 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold rounded-lg transition-colors duration-200"
+                  className="w-full px-6 py-3 bg-teal-600 hover:bg-teal-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white text-sm font-semibold rounded-lg transition-colors duration-200"
                 >
                   {submitting ? 'Processing...' : 'Confirm donation'}
                 </button>
@@ -392,9 +417,9 @@ export default function DonatePage() {
                 {donationResult.success ? (
                   <>
                     {/* Success */}
-                    <div className="text-6xl mb-6">✓</div>
+                    <div className="text-5xl mb-6 text-teal-600">✓</div>
                     <h2 className="text-3xl font-bold mb-4">
-                      Donation Successful !
+                      Donation Successful
                     </h2>
                     <p className="text-gray-600 mb-2">
                       Thank you for your generous donation of{' '}
@@ -417,16 +442,16 @@ export default function DonatePage() {
                     </div>
 
                     {/* Action Buttons */}
-                    <div className="flex gap-4 justify-center">
+                    <div className="flex flex-wrap gap-3 justify-center">
                       <button
                         onClick={() => router.push('/partner/donations')}
-                        className="px-8 py-3 bg-gray-300 hover:bg-gray-400 text-gray-900 font-semibold rounded-lg transition-colors duration-200"
+                        className="px-6 py-3 bg-gray-200 hover:bg-gray-300 text-gray-900 text-sm font-semibold rounded-lg transition-colors duration-200"
                       >
                         Request Receipt
                       </button>
                       <button
                         onClick={() => router.push('/partner/donations')}
-                        className="px-8 py-3 bg-gray-800 hover:bg-gray-900 text-white font-semibold rounded-lg transition-colors duration-200"
+                        className="px-6 py-3 bg-teal-600 hover:bg-teal-700 text-white text-sm font-semibold rounded-lg transition-colors duration-200"
                       >
                         Home
                       </button>
@@ -435,9 +460,9 @@ export default function DonatePage() {
                 ) : (
                   <>
                     {/* Failure */}
-                    <div className="text-6xl mb-6">✗</div>
+                    <div className="text-5xl mb-6 text-red-500">✗</div>
                     <h2 className="text-3xl font-bold mb-4">
-                      Your donation was unsuccessful!
+                      Your donation was unsuccessful
                     </h2>
                     <p className="text-gray-600 mb-6">
                       Please try again. The merchant will redirect in 5
@@ -450,5 +475,6 @@ export default function DonatePage() {
           </div>
         </div>
       </main>
+    </div>
   );
 }
