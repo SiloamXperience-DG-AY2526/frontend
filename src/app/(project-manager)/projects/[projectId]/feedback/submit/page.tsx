@@ -58,8 +58,7 @@ export default function FeedbackPage() {
                 strengths: '',
                 improvements: '',
             });
-        } catch (error) {
-            console.error(error);
+        } catch {
             alert('Something went wrong. Please try again.');
         } finally {
             setLoading(false);
