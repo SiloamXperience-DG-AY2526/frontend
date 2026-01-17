@@ -10,8 +10,7 @@ import {
   SubmitDonationApplication,
   DonationApplication,
   DonationHistoryResponse,
-  DonationDetail,
-  DonationHomepage,
+  DonationHomepage 
 } from '@/types/DonationData';
 
 // Get donation homepage data (statistics and featured projects)
@@ -19,6 +18,8 @@ export async function getDonationHomepage(): Promise<DonationHomepage> {
   const res = await fetch('/api/v1/donations/home');
 
   if (!res.ok) {
+    const errorData = await res.json().catch(() => ({ error: 'Unknown error' }));
+    console.error('Failed to fetch donation homepage:', res.status, errorData);
     throw new Error('Failed to fetch donation homepage data.');
   }
 
@@ -28,15 +29,18 @@ export async function getDonationHomepage(): Promise<DonationHomepage> {
 
 // Get all donation projects with optional filters
 export async function getDonationProjects(
-  type?: 'ongoing' | 'specific' | 'all',
+  type?: 'all' | 'ongoing' | 'specific' | 'brick' | 'sponsor' | 'partnerLed',
   page: number = 1,
   limit: number = 20
 ): Promise<DonationProjectsResponse> {
   const params = new URLSearchParams({
-    type: type || 'all',
     page: page.toString(),
     limit: limit.toString(),
   });
+  
+  if (type && type !== 'all') {
+    params.append('type', type);
+  }
 
   const res = await fetch(`/api/donation-projects?${params.toString()}`);
 
@@ -104,9 +108,7 @@ export async function getMyDonations(
 }
 
 // Get a specific donation detail
-export async function getDonationDetail(
-  donationId: string
-): Promise<DonationDetail> {
+export async function getDonationDetail(donationId: string): Promise<DonationApplication> {
   const res = await fetch(`/api/v1/donations/me/${donationId}`);
 
   if (!res.ok) {
@@ -117,18 +119,15 @@ export async function getDonationDetail(
   return data;
 }
 
-// Download donation receipt
-export async function downloadDonationReceipt(
-  donationId: string
-): Promise<Blob> {
-  const res = await fetch(`/api/v1/donations/me/${donationId}/receipt`);
+// Download donation receipt (returns URL to receipt)
+export async function downloadDonationReceipt(donationId: string): Promise<{ receiptUrl: string }> {
+  const res = await fetch(`/api/v1/donations/${donationId}/receipt`);
 
   if (!res.ok) {
     throw new Error('Failed to download donation receipt.');
   }
 
-  const blob = await res.blob();
-  return blob;
+  return res.json();
 }
 
 // Get all donation projects for finance manager with pagination

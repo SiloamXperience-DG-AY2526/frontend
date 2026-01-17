@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { z } from 'zod';
-import { ProjectDetailResponseSchema } from '@/types/DonationProjectData';
+import { DonationProjectSchema } from '@/types/DonationProjectData';
 
 const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:3000/api/v1';
 
@@ -28,8 +28,11 @@ export async function GET(
       },
     });
 
+    console.log('Backend response status:', response.status);
+
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
+      console.error('Backend error response:', errorData);
       return NextResponse.json(
         { error: errorData.message || 'Failed to fetch donation project' },
         { status: response.status }
@@ -38,8 +41,10 @@ export async function GET(
 
     const data = await response.json();
 
+    console.log('Raw project detail data from backend:', JSON.stringify(data, null, 2));
+
     // Validate backend response with Zod
-    const validatedData = ProjectDetailResponseSchema.parse(data);
+    const validatedData = DonationProjectSchema.parse(data);
 
     return NextResponse.json(validatedData, { status: 200 });
   } catch (error) {
@@ -59,6 +64,7 @@ export async function GET(
     }
 
     console.error('Error fetching donation project:', error);
+    console.error('Error details:', error instanceof Error ? error.stack : error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

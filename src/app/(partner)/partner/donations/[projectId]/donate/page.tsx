@@ -3,8 +3,6 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
-import Sidebar from '@/components/sidebar';
-import Button from '@/components/ui/Button';
 import { getDonationProjectById, submitDonation } from '@/lib/api/donation';
 import { DonationProject } from '@/types/DonationProjectData';
 import { DonationType } from '@/types/DonationData';
@@ -12,7 +10,7 @@ import { DonationType } from '@/types/DonationData';
 const PRESET_AMOUNTS = [50, 100, 200, 500, 1000, 2000];
 
 export default function DonatePage() {
-  const { user } = useAuth();
+  const { user, isLoading: authLoading } = useAuth();
   const router = useRouter();
   const params = useParams();
   const projectId = params?.projectId as string;
@@ -26,7 +24,7 @@ export default function DonatePage() {
   const [selectedAmount, setSelectedAmount] = useState<number | null>(null);
   const [customAmount, setCustomAmount] = useState('');
   const [paymentMethod, setPaymentMethod] = useState('');
-  const [donationType] = useState<DonationType>('INDIVIDUAL');
+  const [donationType] = useState<DonationType>('individual');
   const [countryOfResidence] = useState('Singapore');
 
   // Success/Failure state
@@ -47,8 +45,14 @@ export default function DonatePage() {
   ];
 
   useEffect(() => {
-    if (!projectId) return;
+    // Redirect to login if not authenticated
+    if (!authLoading && !user) {
+      router.push('/partner/login');
+      return;
+    }
 
+    if (!projectId || !user) return;
+    
     const loadProjectDetails = async () => {
       setLoading(true);
       try {
@@ -64,7 +68,7 @@ export default function DonatePage() {
     };
 
     loadProjectDetails();
-  }, [projectId, router]);
+  }, [projectId, router, user, authLoading]);
 
   const getDonationAmount = () => {
     if (selectedAmount) return selectedAmount;
@@ -153,35 +157,26 @@ export default function DonatePage() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen bg-gray-50">
-        <Sidebar />
-        <main className="flex-1 px-10 py-8">
-          <div className="text-center py-12">
-            <p className="text-gray-500">Loading project details...</p>
-          </div>
-        </main>
-      </div>
+      <main className="flex-1 px-10 py-8 overflow-y-auto">
+        <div className="text-center py-12">
+          <p className="text-gray-500">Loading project details...</p>
+        </div>
+      </main>
     );
   }
 
   if (!project) {
     return (
-      <div className="flex min-h-screen bg-gray-50">
-        <Sidebar />
-        <main className="flex-1 px-10 py-8">
-          <div className="text-center py-12">
-            <p className="text-gray-500">Project not found</p>
-          </div>
-        </main>
-      </div>
+      <main className="flex-1 px-10 py-8 overflow-y-auto">
+        <div className="text-center py-12">
+          <p className="text-gray-500">Project not found</p>
+        </div>
+      </main>
     );
   }
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
-      <Sidebar />
-
-      <main className="flex-1 px-10 py-8">
+    <main className="flex-1 px-10 py-8 overflow-y-auto">
         {/* Back Button */}
         {step < 4 && (
           <button
@@ -294,11 +289,12 @@ export default function DonatePage() {
 
                 {/* Continue Button */}
                 <div className="flex justify-end">
-                  <Button
-                    label="Continue"
+                  <button
                     onClick={handleContinueFromAmount}
-                    variant="primary"
-                  />
+                    className="px-8 py-3 bg-gray-800 hover:bg-gray-900 text-white font-semibold rounded-lg transition-colors duration-200"
+                  >
+                    Continue
+                  </button>
                 </div>
               </div>
             )}
@@ -334,11 +330,12 @@ export default function DonatePage() {
 
                 {/* Continue Button */}
                 <div className="flex justify-end">
-                  <Button
-                    label="Continue"
+                  <button
                     onClick={handleContinueFromPayment}
-                    variant="primary"
-                  />
+                    className="px-8 py-3 bg-gray-800 hover:bg-gray-900 text-white font-semibold rounded-lg transition-colors duration-200"
+                  >
+                    Continue
+                  </button>
                 </div>
               </div>
             )}
@@ -379,12 +376,13 @@ export default function DonatePage() {
                 </div>
 
                 {/* Confirm Button */}
-                <Button
-                  label={submitting ? 'Processing...' : 'Confirm donation'}
+                <button
                   onClick={handleConfirmDonation}
                   disabled={submitting}
-                  variant="primary"
-                />
+                  className="w-full px-8 py-3 bg-gray-800 hover:bg-gray-900 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold rounded-lg transition-colors duration-200"
+                >
+                  {submitting ? 'Processing...' : 'Confirm donation'}
+                </button>
               </div>
             )}
 
@@ -420,16 +418,18 @@ export default function DonatePage() {
 
                     {/* Action Buttons */}
                     <div className="flex gap-4 justify-center">
-                      <Button
-                        label="Request Receipt"
+                      <button
                         onClick={() => router.push('/partner/donations')}
-                        variant="secondary"
-                      />
-                      <Button
-                        label="Home"
+                        className="px-8 py-3 bg-gray-300 hover:bg-gray-400 text-gray-900 font-semibold rounded-lg transition-colors duration-200"
+                      >
+                        Request Receipt
+                      </button>
+                      <button
                         onClick={() => router.push('/partner/donations')}
-                        variant="primary"
-                      />
+                        className="px-8 py-3 bg-gray-800 hover:bg-gray-900 text-white font-semibold rounded-lg transition-colors duration-200"
+                      >
+                        Home
+                      </button>
                     </div>
                   </>
                 ) : (
@@ -450,6 +450,5 @@ export default function DonatePage() {
           </div>
         </div>
       </main>
-    </div>
   );
 }

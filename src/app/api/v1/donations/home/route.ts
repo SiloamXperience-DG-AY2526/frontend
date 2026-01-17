@@ -1,31 +1,42 @@
 import { NextResponse } from 'next/server';
+import { cookies } from 'next/headers';
+
+const BACKEND_URL = process.env.BACKEND_URL!;
 
 export async function GET() {
-  // Mock homepage statistics
-  return NextResponse.json({
-    totalBeneficiaries: 1250,
-    totalFundsRaised: 547500,
-    totalDonors: 1623,
-    totalProjects: 6,
-    featuredProjects: [
-      {
-        id: '550e8400-e29b-41d4-a716-446655440001',
-        title: 'Emergency Relief Fund',
-        currentFund: 25000,
-        targetFund: 50000,
-      },
-      {
-        id: '550e8400-e29b-41d4-a716-446655440002',
-        title: 'Children Education Fund',
-        currentFund: 45000,
-        targetFund: 100000,
-      },
-      {
-        id: '550e8400-e29b-41d4-a716-446655440003',
-        title: 'Senior Care Program',
-        currentFund: 130000,
-        targetFund: null,
-      },
-    ],
-  });
+  try {
+    const cookieStore = await cookies();
+    const token = cookieStore.get('access_token')?.value;
+
+    const headers: HeadersInit = {
+      'Content-Type': 'application/json',
+    };
+
+    // Include auth token if available (for authenticated stats)
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    const res = await fetch(`${BACKEND_URL}/donations/home`, {
+      headers,
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      console.error('Backend error:', res.status, data);
+      return NextResponse.json(
+        { error: 'Failed to fetch donation homepage', details: data },
+        { status: res.status }
+      );
+    }
+
+    return NextResponse.json(data);
+  } catch (error) {
+    console.error('Error fetching donation homepage:', error);
+    return NextResponse.json(
+      { error: 'Internal server error', details: String(error) },
+      { status: 500 }
+    );
+  }
 }

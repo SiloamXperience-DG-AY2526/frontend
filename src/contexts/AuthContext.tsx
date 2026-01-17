@@ -2,7 +2,7 @@
 
 import { getAuthUser, login, logout } from '@/lib/api/auth';
 import { AuthUser, AuthPayload, AuthContextValue } from '@/types/AuthData';
-import { createContext, useCallback, useContext, useMemo, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
@@ -41,6 +41,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setUser(authUser);
 
     setIsLoading(false);
+  }, []);
+
+  // Check authentication status on mount
+  useEffect(() => {
+    const initAuth = async () => {
+      setIsLoading(true);
+      try {
+        const authUser = await getAuthUser();
+        setUser(authUser);
+      } catch {
+        // Silently fail if not authenticated
+        setUser(null);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    initAuth();
   }, []);
 
   const value = useMemo(

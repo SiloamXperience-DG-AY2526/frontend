@@ -40,17 +40,17 @@ const DonationProjectBaseSchema = z.object({
   organisingTeam: z.string().nullable(),
   targetFund: z.string().nullable(),
   brickSize: z.string().nullable(),
-  deadline: z.string(),
+  deadline: z.string().nullable(),
   type: DonationProjectTypeSchema,
   startDate: z.string(),
   endDate: z.string(),
   image: z.string().nullable(),
   attachments: z.string().nullable(),
-  projectManager: ProjectManagerSchema,
+  project_manager: ProjectManagerSchema,
   createdAt: z.string(),
-  approvalStatus: DonationProjectApprovalStatusSchema,
-  submissionStatus: DonationProjectSubmissionStatusSchema,
-  operationStatus: DonationProjectOperationStatusSchema,
+  approvalStatus: DonationProjectApprovalStatusSchema.optional(),
+  submissionStatus: DonationProjectSubmissionStatusSchema.optional(),
+  operationStatus: DonationProjectOperationStatusSchema.optional(),
 });
 
 const DonationProjectSchema = DonationProjectBaseSchema.extend({
@@ -65,7 +65,7 @@ const PaginationSchema = z.object({
 });
 
 const DonationProjectsResponseSchema = z.object({
-  projects: z.array(DonationProjectSchema),
+  projectsWithTotals: z.array(DonationProjectSchema),
   pagination: PaginationSchema,
 });
 
@@ -117,10 +117,10 @@ const ProjectObjectiveSchema = z.object({
 });
 
 const DonationProjectDetailSchema = DonationProjectBaseSchema.extend({
-  managedBy: z.string().uuid(),
-  approvalNotes: z.string().nullable(),
-  updatedAt: z.string(),
-  objectivesList: z.array(ProjectObjectiveSchema),
+  managedBy: z.string().uuid().optional(),
+  approvalNotes: z.string().nullable().optional(),
+  updatedAt: z.string().optional(),
+  objectivesList: z.array(ProjectObjectiveSchema).optional(),
 });
 
 const ProjectDonationsResponseSchema = z.object({

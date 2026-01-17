@@ -3,22 +3,28 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Image from 'next/image';
-import Sidebar from '@/components/sidebar';
-import Button from '@/components/ui/Button';
 import { getDonationProjectById } from '@/lib/api/donation';
-import { DonationProject } from '@/types/DonationProjectData';
+import { DonationProject } from '@/types/DonationProject';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function ProjectDetailPage() {
   const router = useRouter();
   const params = useParams();
   const projectId = params?.projectId as string;
+  const { user, isLoading: authLoading } = useAuth();
 
   const [project, setProject] = useState<DonationProject | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!projectId) return;
+    // Redirect to login if not authenticated
+    if (!authLoading && !user) {
+      router.push('/partner/login');
+      return;
+    }
 
+    if (!projectId || !user) return;
+    
     const loadProject = async () => {
       setLoading(true);
       try {
@@ -34,21 +40,25 @@ export default function ProjectDetailPage() {
     };
 
     loadProject();
-  }, [projectId, router]);
+  }, [projectId, router, user, authLoading]);
   const handleDonate = () => {
     router.push(`/partner/donations/${projectId}/donate`);
   };
 
-  const formatCurrency = (amount: number) => {
+  const formatCurrency = (amount: string | number | null) => {
+    const numAmount = typeof amount === 'string' ? parseFloat(amount) : amount || 0;
     return new Intl.NumberFormat('en-SG', {
       style: 'currency',
       currency: 'SGD',
-    }).format(amount);
+    }).format(numAmount);
   };
 
-  const calculateProgress = (current: number, target: number | null) => {
-    if (!target || target === 0) return 0;
-    return Math.min((current / target) * 100, 100);
+  const calculateProgress = (current: string | null, target: string | null) => {
+    if (!target || !current) return 0;
+    const currentNum = parseFloat(current);
+    const targetNum = parseFloat(target);
+    if (targetNum === 0) return 0;
+    return Math.min((currentNum / targetNum) * 100, 100);
   };
 
   const formatDate = (dateString: string) => {
@@ -61,27 +71,21 @@ export default function ProjectDetailPage() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen bg-gray-50">
-        <Sidebar />
-        <main className="flex-1 px-10 py-8">
-          <div className="text-center py-12">
-            <p className="text-gray-500">Loading project details...</p>
-          </div>
-        </main>
-      </div>
+      <main className="flex-1 px-10 py-8 overflow-y-auto">
+        <div className="text-center py-12">
+          <p className="text-gray-500">Loading project details...</p>
+        </div>
+      </main>
     );
   }
 
   if (!project) {
     return (
-      <div className="flex min-h-screen bg-gray-50">
-        <Sidebar />
-        <main className="flex-1 px-10 py-8">
-          <div className="text-center py-12">
-            <p className="text-gray-500">Project not found</p>
-          </div>
-        </main>
-      </div>
+      <main className="flex-1 px-10 py-8 overflow-y-auto">
+        <div className="text-center py-12">
+          <p className="text-gray-500">Project not found</p>
+        </div>
+      </main>
     );
   }
 
@@ -91,10 +95,7 @@ export default function ProjectDetailPage() {
     : [];
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
-      <Sidebar />
-
-      <main className="flex-1 px-10 py-8">
+    <main className="flex-1 px-10 py-8 overflow-y-auto">
         {/* Back Button */}
         <button
           onClick={() => router.back()}
@@ -201,7 +202,7 @@ export default function ProjectDetailPage() {
               <div className="bg-white rounded p-4 mb-4">
                 <div className="flex justify-between mb-2">
                   <span className="font-bold">
-                    {formatCurrency(parseFloat(project.totalRaised))}
+                    {formatCurrency(project.totalRaised || '0')}
                   </span>
                   {project.targetFund && (
                     <span className="text-gray-600">
@@ -214,10 +215,7 @@ export default function ProjectDetailPage() {
                     <div
                       className="h-full bg-black"
                       style={{
-                        width: `${calculateProgress(
-                          parseFloat(project.totalRaised),
-                          parseFloat(project.targetFund)
-                        )}%`,
+                        width: `${calculateProgress(project.totalRaised || '0', project.targetFund)}%`,
                       }}
                     />
                   </div>
@@ -225,15 +223,15 @@ export default function ProjectDetailPage() {
               </div>
 
               {/* Donate Button */}
-              <Button
-                label="I want to donate"
+              <button
                 onClick={handleDonate}
-                variant="primary"
-              />
+                className="w-full px-6 py-3 bg-gray-800 hover:bg-gray-900 text-white font-semibold rounded-lg transition-colors duration-200"
+              >
+                I want to donate
+              </button>
             </div>
           </div>
         </div>
       </main>
-    </div>
   );
 }
