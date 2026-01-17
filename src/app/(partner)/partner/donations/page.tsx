@@ -6,7 +6,7 @@ import Image from 'next/image';
 import Sidebar from '@/components/sidebar';
 import Button from '@/components/ui/Button';
 import { getDonationHomepage, getDonationProjects } from '@/lib/api/donation';
-import { DonationProject } from '@/types/DonationProject';
+import { DonationProject } from '@/types/DonationProjectData';
 
 export default function DonationsPage() {
   const [projects, setProjects] = useState<DonationProject[]>([]);
@@ -63,10 +63,11 @@ export default function DonationsPage() {
     return Math.min((current / target) * 100, 100);
   };
 
-  const filteredProjects = projects.filter((project) =>
-    project.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    project.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    project.about.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredProjects = projects.filter(
+    (project) =>
+      project.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      project.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      project.about.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
@@ -80,7 +81,8 @@ export default function DonationsPage() {
             Make a Difference Today
           </h1>
           <p className="text-center text-gray-600">
-            Support causes that matter to you. Every donation helps create positive change in our community.
+            Support causes that matter to you. Every donation helps create
+            positive change in our community.
           </p>
         </div>
 
@@ -109,16 +111,14 @@ export default function DonationsPage() {
             <div className="text-3xl font-bold mb-1">
               {statistics.totalDonors}
             </div>
-            <div className="text-gray-700 font-semibold">
-              Active Donors
-            </div>
+            <div className="text-gray-700 font-semibold">Active Donors</div>
           </div>
         </div>
 
         {/* Fund a Project Section */}
         <div className="mb-6">
           <h2 className="text-2xl font-bold mb-4">Fund a Project Today</h2>
-          
+
           {/* Search Bar */}
           <div className="mb-6 bg-gray-200 rounded-lg p-3">
             <div className="flex items-center gap-2">
@@ -180,10 +180,12 @@ export default function DonationsPage() {
                   {/* Raised Amount */}
                   <div className="mb-3">
                     <p className="text-xl font-bold">
-                      {formatCurrency(project.currentFund)}
+                      {formatCurrency(parseFloat(project.totalRaised))}
                       {project.targetFund && (
                         <span className="text-sm font-normal text-gray-600">
-                          {' '}raised of {formatCurrency(project.targetFund)}
+                          {' '}
+                          raised of{' '}
+                          {formatCurrency(parseFloat(project.targetFund))}
                         </span>
                       )}
                     </p>
@@ -193,8 +195,8 @@ export default function DonationsPage() {
                           className="h-full bg-black"
                           style={{
                             width: `${calculateProgress(
-                              project.currentFund,
-                              project.targetFund
+                              parseFloat(project.totalRaised),
+                              parseFloat(project.targetFund)
                             )}%`,
                           }}
                         />

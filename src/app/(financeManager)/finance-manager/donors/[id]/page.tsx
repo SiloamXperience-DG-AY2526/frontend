@@ -1,7 +1,6 @@
 'use client';
 
 import { use } from 'react';
-import FinanceManagerSidebar from '@/components/finance-manager/FinanceManagerSidebar';
 import PageHeader from '@/components/ui/PageHeader';
 import BackButton from '@/components/ui/BackButton';
 import UnauthorizedAccessCard from '@/components/UnauthorizedAccessCard';
@@ -20,7 +19,6 @@ export default function DonorDetailPage({
   if (loading) {
     return (
       <div className="flex min-h-screen bg-gray-50">
-        <FinanceManagerSidebar />
         <main className="flex-1 px-10 py-8">
           <div className="text-center py-20">Loading donor details...</div>
         </main>
@@ -35,7 +33,6 @@ export default function DonorDetailPage({
   if (error || !donor) {
     return (
       <div className="flex min-h-screen bg-gray-50">
-        <FinanceManagerSidebar />
         <main className="flex-1 px-10 py-8">
           <div className="text-center py-20 text-red-600">
             Error loading donor details. Please try again.

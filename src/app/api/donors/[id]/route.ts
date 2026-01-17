@@ -2,7 +2,6 @@ import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { z } from 'zod';
 import { BackendDonorDetailResponseSchema } from '@/types/DonorData';
-import { formatDate } from '@/lib/formatDate';
 
 const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:3000/api/v1';
 
@@ -54,33 +53,37 @@ export async function GET(
     // Transform backend response to match frontend schema
     const donorDetails = validatedBackendData.donorDetails;
     const user = donorDetails.user;
-    const donationHistory = validatedBackendData.donationHistory;
+    const donations = validatedBackendData.donationHistory.donations;
+
+    // Calculate cumulative amount from donations if not provided
+    const cumulativeAmount = donorDetails.totalDonations
+      ? parseFloat(donorDetails.totalDonations.toString())
+      : donations.reduce((sum, d) => sum + parseFloat(d.amount), 0);
 
     const transformedDonor = {
-      donorId: user.id,
+      donorId: donorDetails.id,
       fullName: `${user.firstName} ${user.lastName}`,
       prefixTitle: user.title || '',
-      birthday: formatDate(donorDetails.dob),
-      gender: donorDetails.gender,
-      occupation: donorDetails.occupation,
-      nationality: donorDetails.nationality,
-      phoneNumber: donorDetails.contactNumber,
-      preferredCommunicationMethod: [
-        ...donorDetails.contactModes.map((c) => c.mode),
-        donorDetails.otherContactModes,
-      ]
-        .filter(Boolean)
-        .join(', '),
-      donations: donationHistory.donations.map((donation) => ({
-        id: donation.id || '',
-        project: donation.project || '',
-        amount: donation.amount || 0,
-        receipt: donation.receipt || 'Pending',
-        date: donation.date || '',
+      birthday: donorDetails.dob,
+      gender: donorDetails.gender || '',
+      occupation: donorDetails.occupation || '',
+      nationality: donorDetails.nationality || '',
+      phoneNumber: `${donorDetails.countryCode || ''} ${
+        donorDetails.contactNumber
+      }`,
+      preferredCommunicationMethod:
+        donorDetails.contactModes.map((c) => c.mode).join(', ') ||
+        'Not specified',
+      donations: donations.map((donation) => ({
+        id: donation.id,
+        project: donation.project.title,
+        amount: parseFloat(donation.amount),
+        receipt: donation.receiptStatus,
+        date: donation.date,
       })),
-      cumulativeAmount: 0, // Calculate from donations or get from backend if available
-      projects: user.managedDonationProjects || [],
-      status: 'Active', // Default status, adjust if backend provides this
+      cumulativeAmount,
+      projects: user.managedDonationProjects.map((p) => p.title),
+      status: donorDetails.isActive ? 'Active' : 'Inactive',
     };
 
     console.log(
