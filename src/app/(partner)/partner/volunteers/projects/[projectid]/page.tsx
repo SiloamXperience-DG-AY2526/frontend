@@ -10,6 +10,7 @@ import {
 } from '@heroicons/react/24/outline';
 import type { VolunteerProjectDetail } from '@/types/Volunteer';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 
 import Link from 'next/link';
 import capitalizeFirst from '@/lib/utils/capitalizeFirst';
@@ -23,6 +24,7 @@ export default function VolunteerProjectDetailPage({
   params: Promise<{ projectid: string }>;
 }) {
   const { projectid } = use(params);
+  const router = useRouter();
 
   const [data, setData] = useState<VolunteerProjectDetail | null>(null);
   const [loading, setLoading] = useState(true);
@@ -102,7 +104,34 @@ export default function VolunteerProjectDetailPage({
 
       <main className="w-full px-6 py-6 md:px-10">
         <div className="flex flex-col gap-6 lg:flex-row">
+          
           <div className="flex-1">
+                  <button
+                type="button"
+                onClick={() => router.back()}
+                aria-label="Go back"
+                className="
+      mt-1 inline-flex h-8 w-8 
+      rounded-lg hover:bg-gray-100 active:bg-gray-200
+      focus:outline-none focus:ring-2 focus:ring-teal-600/40
+    "
+              >
+                <svg
+                  width="9"
+                  height="17"
+                  viewBox="0 0 9 17"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M8 15.0468L1 8.02338L8 1"
+                    stroke="#333333"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </button>
             <div className="mb-8 flex items-start mt-1 gap-3">
               <div className="w-[5px] h-[39px] bg-[#56E0C2]" />
               <h1 className="text-3xl font-bold text-gray-900">{data.title}</h1>

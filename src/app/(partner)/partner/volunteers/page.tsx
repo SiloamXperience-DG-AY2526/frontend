@@ -106,11 +106,18 @@ export default function VolunteerPage() {
       <main className="w-full px-6 py-6 md:px-10 overflow-y-auto">
         {/* Header */}
         <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+         
+ <div className="mt-1 flex items-start gap-3">
+          <div className="w-[5px] h-[39px] bg-[#56E0C2] mt-2" />
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Volunteer</h1>
-            <p className="mt-1 text-gray-600">Join our volunteer community</p>
+            <h1 className="text-3xl font-bold text-[#0F172A]">
+             Volunteer
+            </h1>
+            <p className="mt-2 text-sm text-gray-600">
+           Join our volunteer community
+            </p>
           </div>
-
+        </div>
           <Link
             href="/partner/volunteers/projects/proposal"
             className="inline-flex items-center justify-center
