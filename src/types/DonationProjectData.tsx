@@ -135,7 +135,7 @@ const ProjectDonorsResponseSchema = z.object({
 
 const ProjectDetailResponseSchema = z.object({
   project: DonationProjectDetailSchema,
-  totalRaised: z.string(),
+  totalRaised: z.union([z.string(), z.number()]),
 });
 
 const DonationProjectWithFinanceSchema = z.object({

@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { z } from 'zod';
-import { DonationProjectSchema } from '@/types/DonationProjectData';
+import { ProjectDetailResponseSchema } from '@/types/DonationProjectData';
 
 const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:3000/api/v1';
 
@@ -41,10 +41,13 @@ export async function GET(
 
     const data = await response.json();
 
-    console.log('Raw project detail data from backend:', JSON.stringify(data, null, 2));
+    console.log(
+      'Raw project detail data from backend:',
+      JSON.stringify(data, null, 2)
+    );
 
     // Validate backend response with Zod
-    const validatedData = DonationProjectSchema.parse(data);
+    const validatedData = ProjectDetailResponseSchema.parse(data);
 
     return NextResponse.json(validatedData, { status: 200 });
   } catch (error) {

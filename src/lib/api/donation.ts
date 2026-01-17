@@ -56,14 +56,41 @@ export async function getDonationProjects(
 export async function getDonationProjectById(
   projectId: string
 ): Promise<DonationProject> {
-  const res = await fetch(`/api/donation-projects/${projectId}`);
+  const res = await fetch(`/api/v1/donation-projects/${projectId}`);
 
-  if (!res.ok) {
+  if (res.ok) {
+    const data = await res.json();
+    return {
+      ...data.project,
+      totalRaised:
+        data.totalRaised?.toString?.() ?? String(data.totalRaised ?? '0'),
+    };
+  }
+
+  if (res.status !== 403 && res.status !== 404) {
     throw new Error('Failed to fetch donation project details.');
   }
 
-  const data = await res.json();
-  return data;
+  const params = new URLSearchParams({
+    page: '1',
+    limit: '100',
+  });
+  const listRes = await fetch(`/api/v1/donation-projects?${params.toString()}`);
+
+  if (!listRes.ok) {
+    throw new Error('Failed to fetch donation project details.');
+  }
+
+  const listData = await listRes.json();
+  const project = listData.projects?.find(
+    (item: DonationProject) => item.id === projectId
+  );
+
+  if (!project) {
+    throw new Error('Donation project not found.');
+  }
+
+  return project;
 }
 
 // Submit a donation application
