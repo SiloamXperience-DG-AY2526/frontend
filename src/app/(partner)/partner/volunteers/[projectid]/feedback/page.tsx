@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 
 import PageHeader from '@/components/ui/PageHeader';
 import StarRating from '@/components/ui/StarRating';
-import Textarea from '@/components/ui/TextArea';
+import Textarea from '@/components/ui/Textarea';
 import Button from '@/components/ui/Button';
 import { useParams } from 'next/navigation';
 import { FeedbackPayload } from '@/types/Volunteer';

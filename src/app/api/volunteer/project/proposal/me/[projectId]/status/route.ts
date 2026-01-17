@@ -5,8 +5,9 @@ const BACKEND_URL = process.env.BACKEND_URL!;
 
 export async function PATCH(
   req: Request,
-  { params }: { params: { projectId: string } }
+  { params }: { params: Promise<{ projectId: string }> }
 ) {
+  const { projectId } = await params;
   const cookieStore = await cookies();
   const token = cookieStore.get('access_token')?.value;
 
@@ -26,7 +27,7 @@ export async function PATCH(
   }
 
   const res = await fetch(
-    `${BACKEND_URL}/volunteer-projects/proposal/me/${params.projectId}/status`,
+    `${BACKEND_URL}/volunteer-projects/proposal/me/${projectId}/status`,
     {
       method: 'PATCH',
       headers: {
