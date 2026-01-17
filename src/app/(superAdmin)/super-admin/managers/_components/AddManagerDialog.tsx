@@ -87,8 +87,8 @@ export default function AddManagerDialog({
         
         <div className="flex-1 overflow-y-auto pr-2">
           <div className="space-y-5">
-            <Input label="First Name *" value={firstName} onChange={setFirstName} type="firstname" />
-            <Input label="Last Name *" value={lastName} onChange={setLastName} type="email" />
+            <Input label="First Name *" value={firstName} onChange={setFirstName} type="text" />
+            <Input label="Last Name *" value={lastName} onChange={setLastName} type="text" />
             <RadioGroup
               label="Prefix *"
               value={prefix}
