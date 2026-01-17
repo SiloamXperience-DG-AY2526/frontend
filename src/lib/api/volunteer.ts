@@ -132,3 +132,4 @@ export async function proposeVolunteerProject(payload: ProposeVolunteerProjectPa
   if (!res.ok) throw new Error(json?.message ?? `Unable to submit proposal (${res.status})`);
   return json;
 }
+

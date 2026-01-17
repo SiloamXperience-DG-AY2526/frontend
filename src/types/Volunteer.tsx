@@ -1,3 +1,5 @@
+import { ProjectApprovalStatus } from './ProjectData';
+
 export type FeedbackPayload = {
   ratings: {
     overall: number;
@@ -192,6 +194,8 @@ export type ProjectFrequency =
   | 'monthly'
   | 'yearly';
 
+
+
 export type ProposeVolunteerProjectPayload = {
  
 
@@ -224,4 +228,16 @@ export type ProposeVolunteerProjectPayload = {
   attachments?: string;
   image?: string;
   organisingTeam?: string;
+};
+
+export type MyProposedProject = {
+  id: string;
+  name: string;
+  startDate: string;
+  endDate: string;
+  location: string;
+  initiatorName: string;
+  approvalStatus: ProjectApprovalStatus;
+  totalCapacity: number;
+  acceptedCount: number;
 };

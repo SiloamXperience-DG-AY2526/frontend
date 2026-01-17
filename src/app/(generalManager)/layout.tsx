@@ -14,7 +14,7 @@ export default async function GeneralManagerLayout({ children }: { children: Rea
   return (
     <div className="flex h-screen overflow-hidden bg-gray-50">
       <GeneralManagerSidebar />
-      <main className="flex-1 overflow-hidden">{children}</main>
+      <main className="flex-1 overflow-y-auto">{children}</main>
     </div>
   );
 }

@@ -1,7 +1,7 @@
 // data
 export type SignUpData = {
   //page 1 - Personal Details
-  salutation: string;
+
   firstName: string;
   lastName: string;
   email: string;
@@ -29,7 +29,6 @@ export type SignUpData = {
   healthNotes?: string;
 
   //page 5 - Emergency
-  emergencyContactName?: string;
   emergencyCountryCode?: string;
   emergencyContactNumber?: string;
   skills?: string;

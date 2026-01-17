@@ -3,6 +3,7 @@ import React, { useMemo, useState } from 'react';
 
 import VolunteeringTab from '@/components/contribution/VolunteeringTab';
 import ApplicationTab from '@/components/contribution/ApplicationTab';
+import Link from 'next/link';
 
 type TabKey = 'volunteering' | 'donations' | 'applications';
 
@@ -24,14 +25,29 @@ export default function MyContributions() {
 
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="flex  h-screen overflow-y-auto bg-gray-50">
      
 
       <main className="flex-1 px-10 py-8">
         {/* Header */}
+        <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+
         <div className="mb-6 flex items-start gap-3">
           <div className="w-[5px] h-[39px] bg-[#56E0C2] mt-1" />
           <h1 className="text-2xl mt-2 font-bold">My Contributions</h1>
+        </div>
+ <Link
+            href="/partner/volunteers/projects/proposal/view"
+            className="inline-flex items-center justify-center
+        rounded-xl px-6 py-2.5 text-sm font-bold text-white
+        bg-gradient-to-r from-[#1F7A67] to-[#2AAE92]
+        hover:from-[#1A6A59] hover:to-[#22997F]
+        shadow-sm
+        active:scale-[0.99]
+        transition cursor-pointer"
+          >
+            View My Proposed Projects
+          </Link>
         </div>
 
         {/* Tabs */}

@@ -15,16 +15,6 @@ interface Props {
   next: () => void;
 }
 
-const salutations = [
-  'Mr.',
-  'Ms.',
-  'Mrs.',
-  'Mx.',
-  'Dr.',
-  'Rev.',
-  'Prefer not to say',
-];
-
 export default function PersonalDetails({ data, setData, next }: Props) {
   const [countryCodes, setCountryCodes] = useState<string[]>([]);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -45,7 +35,6 @@ export default function PersonalDetails({ data, setData, next }: Props) {
   const validate = () => {
     const e: Record<string, string> = {};
 
-    if (!data.salutation) e.salutation = 'Required';
     if (!data.firstName?.trim()) e.firstName = 'Required';
     if (!data.lastName?.trim()) e.lastName = 'Required';
 
@@ -62,7 +51,15 @@ export default function PersonalDetails({ data, setData, next }: Props) {
       e.contact = 'Contact number must contain only numbers';
     }
 
-    if (!data.password) e.password = 'Required';
+    if (!data.password) {
+      e.password = 'Required';
+    } else {
+      if (data.password.length < 8) e.password = 'Min 8 characters';
+      if (!/[A-Z]/.test(data.password))
+        e.password = 'Must include 1 uppercase letter';
+      if (!/\d/.test(data.password)) e.password = 'Must include 1 number';
+    }
+
     if (!data.confirmPassword) e.confirmPassword = 'Required';
 
     if (
@@ -98,6 +95,14 @@ export default function PersonalDetails({ data, setData, next }: Props) {
       ) {
         title = 'Invalid contact number';
         message = 'Contact number must contain only numbers.';
+      } else if (validationErrors.password) {
+        title = 'Weak password';
+        message =
+          validationErrors.password === 'Min 8 characters'
+            ? 'Password must be at least 8 characters.'
+            : validationErrors.password === 'Must include 1 uppercase letter'
+            ? 'Password must include at least one uppercase letter (A–Z).'
+            : 'Password must include at least one number (0–9).';
       }
 
       setToast({
@@ -137,20 +142,7 @@ export default function PersonalDetails({ data, setData, next }: Props) {
 
       <div className="space-y-4">
         {/* Responsive grid */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <Select
-            label="Salutation"
-            value={data.salutation}
-            options={salutations}
-            onChange={(v) => {
-              setData({ ...data, salutation: v });
-              if (errors.salutation)
-                setErrors((p) => ({ ...p, salutation: '' }));
-            }}
-            required
-            error={errors.salutation}
-          />
-
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Input
             label="First Name"
             value={data.firstName}
@@ -162,18 +154,16 @@ export default function PersonalDetails({ data, setData, next }: Props) {
             error={errors.firstName}
           />
 
-          <div className="md:col-span-2">
-            <Input
-              label="Last Name"
-              value={data.lastName}
-              onChange={(v) => {
-                setData({ ...data, lastName: v });
-                if (errors.lastName) setErrors((p) => ({ ...p, lastName: '' }));
-              }}
-              required
-              error={errors.lastName}
-            />
-          </div>
+          <Input
+            label="Last Name"
+            value={data.lastName}
+            onChange={(v) => {
+              setData({ ...data, lastName: v });
+              if (errors.lastName) setErrors((p) => ({ ...p, lastName: '' }));
+            }}
+            required
+            error={errors.lastName}
+          />
         </div>
 
         <Input

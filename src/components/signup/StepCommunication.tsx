@@ -6,6 +6,8 @@ import Button from '@/components/ui/Button';
 import Select from '../ui/Select';
 import Toast from '../ui/Toast';
 import { useRouter } from 'next/navigation';
+import { mapContactMode, mapInterest, mapReferrer } from './mapper';
+
 
 type LastSignUpFormProps = {
   data: SignUpData;
@@ -13,7 +15,11 @@ type LastSignUpFormProps = {
   back: () => void;
 };
 
-export default function StepCommunication({ data, setData, back }: LastSignUpFormProps) {
+export default function StepCommunication({
+  data,
+  setData,
+  back,
+}: LastSignUpFormProps) {
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [toast, setToast] = useState<{
@@ -38,47 +44,98 @@ export default function StepCommunication({ data, setData, back }: LastSignUpFor
 
   const handleSubmit = async () => {
     const e = validate();
-
     if (Object.keys(e).length > 0) {
-      // Required-first toast
-      let title = 'Missing information';
-      let message = 'Please complete the required fields to submit.';
-
-      if (e.preferredContactMethod === 'Required') {
-        title = 'Preferred contact required';
-        message = 'Please select the best way to stay in touch.';
-      } else if (e.agreeUpdates === 'Required') {
-        title = 'Consent required';
-        message = 'You must agree to receive updates to continue.';
-      }
-
-      setToast({ open: true, type: 'error', title, message });
+      setToast({
+        open: true,
+        type: 'error',
+        title: 'Missing information',
+        message: 'Please complete the required fields to submit.',
+      });
       return;
     }
 
     setLoading(true);
 
     try {
-      const payload: SignUpData = { ...data };
+      const payload = {
+        firstName: data.firstName,
+        lastName: data.lastName,
+        email: data.email,
+        password: data.password,
 
-      // frontend test
-      console.log('Signup data:', payload);
+        partner: {
+          countryCode: data.countryCode,
+          contactNumber: data.contact,
+          dob: data.dob || undefined,
+          nationality: data.nationality,
+          occupation: data.occupation,
+          gender: data.gender,
+          residentialAddress: data.address,
+          identificationNumber: data.identificationNumber,
 
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+          emergencyCountryCode: data.emergencyCountryCode!,
+          emergencyContactNumber: data.emergencyContactNumber!,
+
+          hasVolunteerExperience: data.volunteeredBefore === 'Yes',
+          volunteerAvailability: data.availability!,
+
+          consentUpdatesCommunications: data.agreeUpdates === true,
+          subscribeNewsletterEvents: data.joinMailingList === true,
+
+          skills: data.skills
+            ? data.skills.split(',').map((s) => s.trim())
+            : [],
+
+          languages: data.languages,
+
+          contactModes: data.preferredContactMethod
+            ? [mapContactMode(data.preferredContactMethod)]
+            : [],
+
+          interests: data.interest.map(mapInterest),
+
+          referrers: data.foundUsThrough
+            ? [mapReferrer(data.foundUsThrough)]
+            : [],
+
+          tripForm: data.passportNumber
+            ? {
+                fullName: data.passportName!,
+                passportNumber: data.passportNumber!,
+                passportExpiry: data.passportExpiry!,
+                healthDeclaration: data.healthNotes,
+              }
+            : undefined,
+        },
+      };
+
+      const res = await fetch('/api/auth/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      const json = await res.json();
+
+      if (!res.ok) {
+        throw new Error(json?.message ?? 'Signup failed');
+      }
 
       setToast({
         open: true,
         type: 'success',
         title: 'Signup complete',
-        message: 'Your signup was submitted successfully.',
+        message: 'Your account has been created successfully.',
       });
-    } catch (error) {
-      console.error(error);
+      setTimeout(() => {
+        router.push('/login');
+      }, 2000);
+    } catch (err: unknown) {
       setToast({
         open: true,
         type: 'error',
         title: 'Submission failed',
-        message: 'There was an error submitting the form. Please try again.',
+        message: `Unable to sign up ${err}`,
       });
     } finally {
       setLoading(false);
@@ -96,7 +153,9 @@ export default function StepCommunication({ data, setData, back }: LastSignUpFor
         onClose={() => setToast((t) => ({ ...t, open: false }))}
       />
 
-      <h2 className="text-3xl font-bold text-black text-center mb-2">Stay Connected</h2>
+      <h2 className="text-3xl font-bold text-black text-center mb-2">
+        Stay Connected
+      </h2>
       <p className="text-sm text-gray-600 text-center mb-8">
         We promise not to spam! Just updates and opportunities that matter.
       </p>
@@ -105,7 +164,14 @@ export default function StepCommunication({ data, setData, back }: LastSignUpFor
         <Select
           label="How did you hear about us?"
           value={data.foundUsThrough || ''}
-          options={['Friend', 'Social Media', 'Church', 'Website', 'Event', 'Other']}
+          options={[
+            'Friend',
+            'Social Media',
+            'Church',
+            'Website',
+            'Event',
+            'Other',
+          ]}
           onChange={(v) => setData({ ...data, foundUsThrough: v })}
         />
 
@@ -122,7 +188,6 @@ export default function StepCommunication({ data, setData, back }: LastSignUpFor
           error={errors.preferredContactMethod}
         />
 
-
         <div className="space-y-3">
           <label className="flex items-start gap-3 text-sm text-black">
             <input
@@ -131,7 +196,8 @@ export default function StepCommunication({ data, setData, back }: LastSignUpFor
               checked={data.agreeUpdates === true}
               onChange={(e) => {
                 setData({ ...data, agreeUpdates: e.target.checked });
-                if (errors.agreeUpdates) setErrors((p) => ({ ...p, agreeUpdates: '' }));
+                if (errors.agreeUpdates)
+                  setErrors((p) => ({ ...p, agreeUpdates: '' }));
               }}
             />
             <span>
@@ -149,11 +215,13 @@ export default function StepCommunication({ data, setData, back }: LastSignUpFor
               type="checkbox"
               className="mt-1 h-4 w-4"
               checked={data.joinMailingList === true}
-              onChange={(e) => setData({ ...data, joinMailingList: e.target.checked })}
+              onChange={(e) =>
+                setData({ ...data, joinMailingList: e.target.checked })
+              }
             />
             <span>
-              I&apos;d like to join your mailing list for newsletters and event invitations{' '}
-              <span className="text-gray-500">(optional)</span>
+              I&apos;d like to join your mailing list for newsletters and event
+              invitations <span className="text-gray-500">(optional)</span>
             </span>
           </label>
         </div>
