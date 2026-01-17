@@ -16,7 +16,7 @@ export default function VolunteerSearch({
         <input
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          placeholder="Search through all projects to find one you’d like to volunteer for."
+          placeholder="Search volunteer projects"
           className="w-full bg-transparent text-sm text-gray-800 outline-none placeholder:text-gray-400"
         />
       </div>
