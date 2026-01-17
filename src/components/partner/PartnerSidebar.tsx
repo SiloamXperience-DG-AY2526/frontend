@@ -13,7 +13,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 
 const menu = [
-  { name: 'Home', icon: HomeIcon, href: '/' },
+  { name: 'Home', icon: HomeIcon, href: '/partner/home' },
   { name: 'Volunteer', icon: HandRaisedIcon, href: '/partner/volunteers' },
   { name: 'Donate', icon: HeartIcon, href: '/partner/donations' },
   { name: 'My Contributions', icon: ClipboardDocumentListIcon, href: '/partner/contributions' },
