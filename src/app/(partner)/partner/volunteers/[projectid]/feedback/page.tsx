@@ -1,9 +1,8 @@
 'use client';
 
-import { useAuth } from '@/contexts/AuthContext';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Sidebar from '@/components/sidebar';
+
 import PageHeader from '@/components/ui/PageHeader';
 import StarRating from '@/components/ui/StarRating';
 import Textarea from '@/components/ui/TextArea';
@@ -15,7 +14,7 @@ import Toast from '@/components/ui/Toast';
 
 export default function FeedbackPage() {
   const params = useParams<{ projectid: string }>();
-  const { user } = useAuth();
+
   const router = useRouter();
 
   const projectId = params.projectid;
@@ -37,21 +36,6 @@ export default function FeedbackPage() {
   });
 
   const [loading, setLoading] = useState(false);
-  if (!user) {
-    return (
-      <div className="flex min-h-screen w-full items-center justify-center bg-white text-sm text-gray-600">
-        Kindly&nbsp;
-        <button
-          onClick={() => router.push('/login')}
-          className="font-semibold text-teal-600 hover:underline cursor-pointer"
-        >
-          login
-        </button>
-        &nbsp;to volunteer
-      </div>
-    );
-  }
-  const { userId } = user;
 
   const handleSubmit = async () => {
     if (!projectId) {
@@ -90,12 +74,11 @@ export default function FeedbackPage() {
         improvement: feedback.improvement.trim(),
         comments: feedback.comments.trim() || undefined,
       },
-      submittedAt: new Date().toISOString(),
+   
     };
 
     try {
       const resp = await submitVolunteerFeedback({
-        userId: userId,
         projectId,
         payload,
       });
@@ -109,7 +92,7 @@ export default function FeedbackPage() {
       setRatings({ overall: 0, management: 0, planning: 0, facilities: 0 });
       setFeedback({ experience: '', improvement: '', comments: '' });
       setTimeout(() => {
-        router.replace('/volunteers');
+        router.replace('/partner/volunteers');
       }, 2000);
 
       console.log('Feedback response:', resp);
@@ -125,7 +108,7 @@ export default function FeedbackPage() {
 
   return (
     <div className="flex min-h-screen bg-gray-50">
-      <Sidebar />
+
       <Toast
         open={toastOpen}
         type={toastType}
