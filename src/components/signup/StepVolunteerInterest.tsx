@@ -2,7 +2,7 @@ import { SignUpData } from '@/types/SignUpData';
 import Button from '@/components/ui/Button';
 import Input from '../ui/Input';
 import MultiSelect from '../ui/MultiSelect';
-import TextArea from '../ui/Textarea';
+import TextArea from '../ui/TextArea';
 import { useState } from 'react';
 import Toast from '../ui/Toast';
 import RadioGroup from '../ui/RadioGroup';
