@@ -46,7 +46,7 @@ const DonationProjectBaseSchema = z.object({
   endDate: z.string(),
   image: z.string().nullable(),
   attachments: z.string().nullable(),
-  project_manager: ProjectManagerSchema,
+  projectManager: ProjectManagerSchema,
   createdAt: z.string(),
   approvalStatus: DonationProjectApprovalStatusSchema.optional(),
   submissionStatus: DonationProjectSubmissionStatusSchema.optional(),
@@ -65,7 +65,7 @@ const PaginationSchema = z.object({
 });
 
 const DonationProjectsResponseSchema = z.object({
-  projectsWithTotals: z.array(DonationProjectSchema),
+  projects: z.array(DonationProjectSchema),
   pagination: PaginationSchema,
 });
 

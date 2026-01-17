@@ -43,7 +43,7 @@ export default function DonationsPage() {
 
       // Load projects
       const response = await getDonationProjects('all');
-      setProjects(response.projectsWithTotals);
+      setProjects(response.projects);
     } catch (error) {
       console.error('Failed to load donation data:', error);
       alert('Failed to load donation data. Please try again.');
