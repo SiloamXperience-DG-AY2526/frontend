@@ -17,7 +17,7 @@ export async function changeProposedProjectStatus(
   approvalStatus: ProjectApprovalStatus
 ) {
   const res = await fetch(
-    `/api/volunteer/project/proposal/me/${projectId}/status`,
+    `/api/volunteer/project/proposal/me/status/${projectId}`,
     {
       method: 'PATCH',
       credentials: 'include',
