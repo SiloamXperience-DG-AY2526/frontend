@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import TextArea from '@/components/ui/TextArea';
+import TextArea from '@/components/ui/Textarea';
 import PageHeader from '@/components/ui/PageHeader';
 import StarRating from '@/components/ui/StarRating';
 import Button from '@/components/ui/Button';
@@ -73,7 +73,6 @@ export default function FeedbackPage() {
         improvement: feedback.improvement.trim(),
         comments: feedback.comments.trim() || undefined,
       },
-   
     };
 
     try {
@@ -107,7 +106,6 @@ export default function FeedbackPage() {
 
   return (
     <div className="flex min-h-screen bg-gray-50">
-
       <Toast
         open={toastOpen}
         type={toastType}

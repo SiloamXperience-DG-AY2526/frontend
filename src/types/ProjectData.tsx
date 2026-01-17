@@ -4,3 +4,9 @@ export enum ProjectApprovalStatus {
     approved = 'approved',
     rejected = 'rejected',
 }
+export enum ProjectOperationStatus {
+    ongoing = 'ongoing',
+    paused = 'paused',
+    cancelled = 'cancelled',
+    completed = 'completed',
+}

@@ -3,11 +3,7 @@ import { NextResponse } from 'next/server';
 
 const BACKEND_URL = process.env.BACKEND_URL!;
 
-export async function PATCH(
-  req: Request,
-  { params }: { params: Promise<{ projectId: string }> }
-) {
-  const { projectId } = await params;
+export async function POST(req: Request) {
   const cookieStore = await cookies();
   const token = cookieStore.get('access_token')?.value;
 
@@ -26,17 +22,14 @@ export async function PATCH(
     );
   }
 
-  const res = await fetch(
-    `${BACKEND_URL}/volunteer-projects/proposal/me/${projectId}/status`,
-    {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(body),
-    }
-  );
+  const res = await fetch(`${BACKEND_URL}/volunteer-projects`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(body),
+  });
 
   const data = await res.json().catch(() => null);
   return NextResponse.json(data, { status: res.status });

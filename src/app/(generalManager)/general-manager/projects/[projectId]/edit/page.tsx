@@ -1,30 +1,36 @@
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import React, { use, useEffect, useMemo, useState } from 'react';
 import Input from '@/components/ui/Input';
-import TextArea from '@/components/ui/Textarea';
-import { createVolunteerProject } from '@/lib/api/volunteer';
+import {
+  updateVolunteerProject,
+  getVolunteerProjectDetails,
+} from '@/lib/api/volunteer';
 import {
   EditVolunteerProjectPayload,
   ProjectFrequency,
+  VolunteerProjectDetail,
 } from '@/types/Volunteer';
 import RadioGroup from '@/components/ui/RadioGroup';
 import SectionTitle from '@/components/ui/FormSectionTitle';
 import UploadBox from '@/components/ui/UploadBox';
 import { useRouter } from 'next/navigation';
 import Toast from '@/components/ui/Toast';
-import {
-  ProjectApprovalStatus,
-  ProjectOperationStatus,
-} from '@/types/ProjectData';
+import TextArea from '@/components/ui/Textarea';
 type TimePeriod = 'one-time' | 'ongoing';
 type FrequencyUI = 'weekly' | 'monthly' | 'ad-hoc';
 
 type PositionForm = {
   role: string;
   description: string;
+  totalSlots: string;
   skills: string[];
 };
+
+import {
+  ProjectApprovalStatus,
+  ProjectOperationStatus,
+} from '@/types/ProjectData'; // wherever yours lives
 
 export const APPROVAL_STATUS_OPTIONS = [
   { value: ProjectApprovalStatus.pending, label: 'Pending' },
@@ -44,7 +50,37 @@ const TEMP_PDF_URL = 'https://example.com/sample-proposal.pdf';
 const TEMP_IMAGE_URL =
   'https://nvpc.org.sg/wp-content/uploads/2025/04/two-women-gardening-1024x682.jpg';
 
-export default function VolunteerProjectProposalPage() {
+const toDateInput = (d?: string | Date | null) => {
+  if (!d) return '';
+  const date = typeof d === 'string' ? new Date(d) : d;
+  const local = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+  return local.toISOString().slice(0, 10);
+};
+
+const toTimeInput = (d?: string | Date | null) => {
+  if (!d) return '';
+  const date = typeof d === 'string' ? new Date(d) : d;
+  const hh = String(date.getHours()).padStart(2, '0');
+  const mm = String(date.getMinutes()).padStart(2, '0');
+  return `${hh}:${mm}`;
+};
+
+const parseBullets = (text?: string | null) => {
+  if (!text) return [''];
+  const lines = text
+    .split('\n')
+    .map((l) => l.trim())
+    .filter(Boolean)
+    .map((l) => l.replace(/^-\s*/, ''));
+  return lines.length ? lines : [''];
+};
+
+export default function EditVolunteerProjectPage({
+  params,
+}: {
+  params: Promise<{ projectId: string }>;
+}) {
+  const { projectId } = use(params);
   const router = useRouter();
 
   // Project details
@@ -71,7 +107,7 @@ export default function VolunteerProjectProposalPage() {
 
   // Positions
   const [positions, setPositions] = useState<PositionForm[]>([
-    { role: '', description: '', skills: [''] },
+    { role: '', description: '', totalSlots: '1', skills: [''] },
   ]);
 
   // Status
@@ -93,6 +129,70 @@ export default function VolunteerProjectProposalPage() {
 
   // submit state
   const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    let mounted = true;
+
+    async function load() {
+      try {
+        const res = await getVolunteerProjectDetails(projectId);
+        console.log(res);
+        const p = res.data as VolunteerProjectDetail;
+
+        if (!mounted) return;
+
+        setTitle(p.title ?? '');
+        setInitiatorName(p.initiatorName ?? '');
+        setLocation(p.location ?? '');
+
+        setStartDate(toDateInput(p.startDate));
+        setEndDate(toDateInput(p.endDate));
+        setStartTime(toTimeInput(p.startTime));
+        setEndTime(toTimeInput(p.endTime));
+
+        // timePeriod + frequency UI mapping
+        const isOnce = p.frequency === 'once';
+        setTimePeriod(isOnce ? 'one-time' : 'ongoing');
+
+        if (p.frequency === 'weekly') setFrequencyUI('weekly');
+        else if (p.frequency === 'monthly') setFrequencyUI('monthly');
+        else setFrequencyUI('ad-hoc');
+
+        setFrequencyNotes(p.dayOfWeek ?? '');
+
+        setAboutDesc(p.aboutDesc ?? '');
+        setBeneficiaries(p.beneficiaries ?? '');
+        setProposedPlan(p.proposedPlan ?? '');
+
+        // TODO: objectives currently stored as a bullet string in db        
+        setObjectives(parseBullets(p.objectives));
+
+        // expecting p.positions like: { role, description, totalSlots, skills: string[] }
+        setPositions(
+          (p.positions?.length ? p.positions : []).map((pos) => ({
+            role: pos.role ?? '',
+            description: pos.description ?? '',
+            totalSlots: String(pos.totalSlots ?? 1),
+            skills: pos.skills?.length ? pos.skills : [''],
+          })) || [{ role: '', description: '', totalSlots: '1', skills: [''] }],
+        );
+
+        setApprovalStatus(p.approvalStatus);
+        setOperationStatus(p.operationStatus);
+      } catch (e: unknown) {
+        console.error(e);
+        setToastType('error');
+        setToastTitle('Failed to load');
+        setToastMsg(e instanceof Error ? e.message : String(e));
+        setToastOpen(true);
+      }
+    }
+
+    if (projectId) load();
+    return () => {
+      mounted = false;
+    };
+  }, [projectId]);
 
   const frequency: ProjectFrequency = useMemo(() => {
     if (timePeriod === 'one-time') return 'once';
@@ -124,7 +224,11 @@ export default function VolunteerProjectProposalPage() {
       endTime;
 
     const positionsOk = positions.every(
-      (p) => p.role.trim() && p.description.trim(),
+      (p) =>
+        p.role.trim() &&
+        p.description.trim() &&
+        Number.isFinite(Number(p.totalSlots)) &&
+        Number(p.totalSlots) >= 1,
     );
 
     return Boolean(basicOk && positionsOk);
@@ -149,7 +253,7 @@ export default function VolunteerProjectProposalPage() {
   const addPosition = () =>
     setPositions((prev) => [
       ...prev,
-      { role: '', description: '', skills: [''] },
+      { role: '', description: '', totalSlots: '1', skills: [''] },
     ]);
 
   const removePosition = (idx: number) =>
@@ -202,6 +306,8 @@ export default function VolunteerProjectProposalPage() {
         positions: positions.map((p) => ({
           role: p.role.trim(),
           description: p.description.trim(),
+
+          totalSlots: Math.max(1, Number(p.totalSlots) || 1),
           skills: p.skills.map((s) => s.trim()).filter(Boolean),
         })),
 
@@ -209,18 +315,18 @@ export default function VolunteerProjectProposalPage() {
         operationStatus,
       };
 
-      await createVolunteerProject(payload);
+      await updateVolunteerProject(projectId, payload);
 
       setToastType('success');
-      setToastTitle('Project Created Successfully');
+      setToastTitle('Project Updated Successfully!');
       setToastOpen(true);
       setTimeout(() => {
         router.push('/general-manager/projects');
       }, 2000);
     } catch (e: unknown) {
       setToastType('error');
-      setToastTitle('Submission failed');
-      setToastMsg(`Failed to create project: ${e} `);
+      setToastTitle('Update failed');
+      setToastMsg(`Failed to update project: ${e} `);
       setToastOpen(true);
     } finally {
       setSubmitting(false);
@@ -232,7 +338,7 @@ export default function VolunteerProjectProposalPage() {
   };
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="flex h-screen bg-gray-50">
       {/* Toast popup */}
       <Toast
         open={toastOpen}
@@ -242,17 +348,16 @@ export default function VolunteerProjectProposalPage() {
         duration={3500}
         onClose={() => setToastOpen(false)}
       />
-      <main className="flex-1 px-10 py-8">
+      <main className="flex-1 px-10 py-8 overflow-y-auto">
         {/* Header */}
         <div className="mb-10 flex items-start gap-3">
           <div className="w-[5px] h-[39px] bg-[#56E0C2] mt-2" />
           <div>
             <h1 className="text-3xl font-bold text-[#0F172A]">
-              Create Your Project
+              Edit Volunteer Project
             </h1>
             <p className="mt-2 text-sm text-gray-600">
-              Share an initiative you care about and invite others to volunteer
-              with you.
+              Edit volunteer project details.
             </p>
           </div>
         </div>
@@ -549,16 +654,18 @@ export default function VolunteerProjectProposalPage() {
                     </div>
                   </div>
 
-                  {/* <TextArea
-                    label="Logistics Required"
-                    value=""
-                    onChange={() => {}}
-                  />
                   <Input
                     label="Estimated Number of Volunteers Needed *"
-                    value=""
-                    readOnly
-                  /> */}
+                    placeholder="e.g. 5"
+                    value={pos.totalSlots}
+                    onChange={(v) =>
+                      setPositions((prev) =>
+                        prev.map((x, i) =>
+                          i === pIdx ? { ...x, totalSlots: v } : x,
+                        ),
+                      )
+                    }
+                  />
                 </div>
 
                 {pIdx !== positions.length - 1 && (

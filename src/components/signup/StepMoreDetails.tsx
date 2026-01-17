@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { SignUpData } from '@/types/SignUpData';
 import Button from '@/components/ui/Button';
 import { fetchNationalities, fetchLanguages } from '@/lib/countries';
-import Textarea from '../ui/TextArea';
+import TextArea from '../ui/Textarea';
 import Select from '../ui/Select';
 import Input from '../ui/Input';
 import MultiSelect from '../ui/MultiSelect';
@@ -45,10 +45,10 @@ export default function MoreAboutYou({
   const cachedMeta = getCachedMeta();
 
   const [countries, setCountries] = useState<string[]>(
-    cachedMeta?.countries ?? []
+    cachedMeta?.countries ?? [],
   );
   const [languages, setLanguages] = useState<string[]>(
-    cachedMeta?.languages ?? []
+    cachedMeta?.languages ?? [],
   );
   const [loading, setLoading] = useState(!cachedMeta);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -73,7 +73,7 @@ export default function MoreAboutYou({
 
         sessionStorage.setItem(
           CACHE_KEY,
-          JSON.stringify({ countries: c, languages: l })
+          JSON.stringify({ countries: c, languages: l }),
         );
       } finally {
         setLoading(false);
@@ -261,7 +261,7 @@ export default function MoreAboutYou({
         </div>
 
         {/* Address */}
-        <Textarea
+        <TextArea
           label="Address"
           value={data.address}
           onChange={(v) => {

@@ -125,7 +125,7 @@ export default function DonationsPage() {
               <span className="text-gray-600">🔍</span>
               <input
                 type="text"
-                placeholder="Search through all projects to find one you'd like to support"
+                placeholder="Search volunteer projects rt"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="flex-1 bg-transparent outline-none text-gray-700 placeholder-gray-500"

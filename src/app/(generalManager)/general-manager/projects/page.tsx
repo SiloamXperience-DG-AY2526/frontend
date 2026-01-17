@@ -3,17 +3,13 @@
 import React, { useEffect, useState } from 'react';
 
 import VolunteerSearch from '@/components/volunteer/Search';
-import VolunteerProjectGrid from '@/components/volunteer/VolunteerProjectGrid';
 import VolunteerPagination from '@/components/volunteer/VolunteerPagination';
 
-import { getAvailableVolunteerProjects } from '@/lib/api/volunteer';
-import { VolunteerProject } from '@/types/Volunteer';
-import StatCard from '@/components/volunteer/StatCard';
-import HumanStatIcon from '@/components/icons/HumanIcon';
-import ClockIcon from '@/components/icons/ClockIcon';
-import HeartIcon from '@/components/icons/HeartIcon';
+import { getAllVolunteerProjects } from '@/lib/api/volunteer';
+import { VolunteerProjectRow } from '@/types/Volunteer';
 import Link from 'next/link';
 import Toast from '@/components/ui/Toast';
+import VolunteerProjectsTable from '@/components/general-manager/VolunteerProjectsTable';
 
 function useDebouncedValue<T>(value: T, delayMs = 450) {
   const [debounced, setDebounced] = useState(value);
@@ -23,23 +19,6 @@ function useDebouncedValue<T>(value: T, delayMs = 450) {
   }, [value, delayMs]);
   return debounced;
 }
-const stats = [
-  {
-    value: '6000+',
-    label: 'Volunteers Currently Engaged',
-    Icon: HumanStatIcon,
-  },
-  {
-    value: '200+',
-    label: 'Total Hours Volunteered',
-    Icon: ClockIcon,
-  },
-  {
-    value: '450+',
-    label: 'Lives Touched',
-    Icon: HeartIcon,
-  },
-] as const;
 
 export default function VolunteerProjectsPage() {
   const [search, setSearch] = useState('');
@@ -49,7 +28,7 @@ export default function VolunteerProjectsPage() {
   const limit = 6;
 
   const [loading, setLoading] = useState(false);
-  const [projects, setProjects] = useState<VolunteerProject[]>([]);
+  const [projects, setProjects] = useState<VolunteerProjectRow[]>([]);
   const [totalPages, setTotalPages] = useState(1);
 
   const [toastOpen, setToastOpen] = useState(false);
@@ -65,7 +44,7 @@ export default function VolunteerProjectsPage() {
     async function load() {
       setLoading(true);
       try {
-        const { data, pagination } = await getAvailableVolunteerProjects(
+        const { data, pagination } = await getAllVolunteerProjects(
           page,
           limit,
           debouncedSearch,
@@ -87,7 +66,6 @@ export default function VolunteerProjectsPage() {
         setLoading(false);
       }
     }
-
     load();
     return () => controller.abort();
   }, [page, limit, debouncedSearch]);
@@ -107,8 +85,8 @@ export default function VolunteerProjectsPage() {
         {/* Header */}
         <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Volunteer</h1>
-            <p className="mt-1 text-gray-600">Join our volunteer community</p>
+            <h1 className="text-3xl font-bold text-gray-900">All Projects</h1>
+            <p className="mt-1 text-gray-600">Manage all Volunteer Projects</p>
           </div>
 
           <Link
@@ -125,23 +103,12 @@ export default function VolunteerProjectsPage() {
           </Link>
         </div>
 
-        {/* Stats */}
-        <div className="mt-6 grid gap-4 md:grid-cols-3">
-          {stats.map((s, idx) => (
-            <StatCard key={idx} value={s.value} label={s.label} Icon={s.Icon} />
-          ))}
-        </div>
-
-        {/* activities */}
         <div className="mt-10">
-          <h2 className="text-2xl font-bold text-gray-900">
-            Volunteer Where You’re Needed Most
-          </h2>
-
+  
           <VolunteerSearch value={search} onChange={setSearch} />
 
           <div className="mt-6">
-            <VolunteerProjectGrid loading={loading} projects={projects} />
+            <VolunteerProjectsTable loading={loading} projects={projects} />
             <VolunteerPagination
               page={page}
               totalPages={totalPages}
