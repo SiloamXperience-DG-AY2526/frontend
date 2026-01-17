@@ -43,8 +43,12 @@ export default function ScoreGauge({ score }: ScoreGaugeProps) {
 
             <div className="flex flex-col items-center justify-center py-4">
                 {/* Circular Progress */}
-                <div className="relative w-64 h-64">
-                    <svg className="w-full h-full transform -rotate-90">
+                <div 
+                    className="relative w-64 h-64"
+                    aria-label={`Overall score: ${score} out of 100, rated as ${getScoreLabel(score)}`}
+                    role="img"
+                >
+                    <svg className="w-full h-full transform -rotate-90" aria-hidden="true">
                         {/* Background circle */}
                         <circle
                             cx="128"
