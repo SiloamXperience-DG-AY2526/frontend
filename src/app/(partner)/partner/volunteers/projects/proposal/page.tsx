@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import Input from '@/components/ui/Input';
-import TextArea from '@/components/ui/TextArea';    
+import TextArea from '@/components/ui/Textarea';    
 import { proposeVolunteerProject } from '@/lib/api/volunteer';
 import {
   ProjectFrequency,
@@ -223,12 +223,6 @@ export default function VolunteerProjectProposalPage() {
           : p,
       ),
     );
-
-  const inputBase = 'w-full rounded-md px-3 py-2 outline-none transition';
-  const okBorder =
-    'border border-green-700 focus:border-green-800 focus:ring-1 focus:ring-green-800';
-  const errBorder =
-    'border border-red-500 focus:border-red-600 focus:ring-1 focus:ring-red-600';
 
   const inputBase = 'w-full rounded-md px-3 py-2 outline-none transition';
   const okBorder =
