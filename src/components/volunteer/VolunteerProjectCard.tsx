@@ -1,12 +1,12 @@
-import React from "react";
-import Link from "next/link";
-import { VolunteerProject } from "@/types/Volunteer";
-import { formatShortDate, formatTimeRange } from "@/lib/utils/date";
+import React from 'react';
+import Link from 'next/link';
+import { VolunteerProject } from '@/types/Volunteer';
+import { formatShortDate, formatTimeRange } from '@/lib/utils/date';
 import {
   CalendarIcon,
   ClockIcon,
   MapPinIcon,
-} from "@heroicons/react/24/outline";
+} from '@heroicons/react/24/outline';
 
 export default function VolunteerProjectCard({ p }: { p: VolunteerProject }) {
   const spotsLeft = p.projectAvailableSlots;
@@ -29,9 +29,9 @@ export default function VolunteerProjectCard({ p }: { p: VolunteerProject }) {
         )}
 
         {/* Spots left pill */}
-        {typeof spotsLeft === "number" && (
+        {typeof spotsLeft === 'number' && (
           <div className="absolute left-3 top-3 rounded-md bg-[#F3F4F6] px-3 py-1 text-xs font-semibold text-gray-800 shadow">
-            {spotsLeft} spot{spotsLeft === 1 ? "" : "s"} left
+            {spotsLeft} spot{spotsLeft === 1 ? '' : 's'} left
           </div>
         )}
       </div>
@@ -61,7 +61,7 @@ export default function VolunteerProjectCard({ p }: { p: VolunteerProject }) {
 
           <div className="flex items-center gap-3">
             <MapPinIcon className="h-5 w-5 text-gray-700" />
-            <span>{p.location ?? "—"}</span>
+            <span>{p.location ?? '—'}</span>
           </div>
         </div>
 
