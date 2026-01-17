@@ -226,7 +226,7 @@ export default function VolunteerProjectProposalPage() {
 
   const inputBase = 'w-full rounded-md px-3 py-2 outline-none transition';
   const okBorder =
-    'border border-green-700 focus:border-green-800 focus:ring-1 focus:ring-green-800';
+    'border border-[#0E5A4A] focus:border-[#0E5A4A] focus:ring-1 focus:ring-[#0E5A4A]';
   const errBorder =
     'border border-red-500 focus:border-red-600 focus:ring-1 focus:ring-red-600';
 
@@ -308,7 +308,7 @@ export default function VolunteerProjectProposalPage() {
   };
 
   return (
-    <div className="flex h-screen bg-gray-50">
+    <div className="flex min-h-screen bg-gray-50">
       <Toast
         open={toast.open}
         type={toast.type}
@@ -318,7 +318,7 @@ export default function VolunteerProjectProposalPage() {
         onClose={() => setToast((t) => ({ ...t, open: false }))}
       />
 
-      <main className="flex-1 px-10 py-8 overflow-y-auto">
+      <main className="flex-1 px-10 py-8">
         {/* Header */}
         <div className="mb-10 flex items-start gap-3">
           <div className="w-[5px] h-[39px] bg-[#56E0C2] mt-2" />
@@ -585,7 +585,7 @@ export default function VolunteerProjectProposalPage() {
                   addObjective();
                   clearError('objectives');
                 }}
-                className="text-sm font-bold text-green-800 hover:underline"
+                className="text-sm font-bold text-[#0E5A4A] hover:opacity-80"
               >
                 + Add objective
               </button>
@@ -646,7 +646,7 @@ export default function VolunteerProjectProposalPage() {
                 addPosition();
                 clearError('positions');
               }}
-              className="text-sm font-bold text-green-800 hover:underline"
+              className="text-sm font-bold text-[#0E5A4A] hover:opacity-80"
             >
               + Add another position
             </button>
@@ -723,7 +723,7 @@ export default function VolunteerProjectProposalPage() {
                             addSkill(pIdx);
                             clearError(skillsKey);
                           }}
-                          className="text-sm font-bold text-green-800 hover:underline"
+                          className="text-sm font-bold text-[#0E5A4A] hover:opacity-80"
                         >
                           + Add another skill
                         </button>
@@ -833,7 +833,7 @@ export default function VolunteerProjectProposalPage() {
             onClick={onSubmit}
             className={[
               'rounded-xl px-10 py-4 text-white font-bold',
-              'bg-[#0E5A4A] hover:opacity-95 transition',
+              'bg-gradient-to-r from-[#1F7A67] to-[#2AAE92] hover:from-[#1A6A59] hover:to-[#22997F] transition',
               submitting ? 'opacity-50 cursor-not-allowed' : '',
             ].join(' ')}
           >

@@ -8,7 +8,7 @@ export default function SectionTitle({
   return (
     <h2
       className={[
-        'text-3xl font-bold text-gray-700 underline underline-offset-4 mb-6',
+        'text-2xl md:text-3xl font-bold text-gray-900 tracking-tight mb-4',
         className,
       ].join(' ')}
     >
