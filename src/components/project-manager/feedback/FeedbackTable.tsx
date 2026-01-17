@@ -41,7 +41,7 @@ export default function FeedbackTable({ feedbackData }: FeedbackTableProps) {
                                     Strengths
                                 </th>
                                 <th className="px-4 py-3 text-left text-sm font-semibold">
-                                    Area of Improvements
+                                    Areas of Improvement
                                 </th>
                                 <th className="px-4 py-3 text-left text-sm font-semibold">
                                     Score
