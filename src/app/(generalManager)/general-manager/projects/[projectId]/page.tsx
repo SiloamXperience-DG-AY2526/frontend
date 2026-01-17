@@ -145,7 +145,7 @@ export default function VolunteerProjectDetailPage({
 
           <aside className="w-full lg:w-[340px]">
             <div className="mt-20">
-              <div className="h-[280px] rounded-2xl border bg-white p-6 shadow-sm flex flex-col justify-center">
+              <div className="rounded-2xl border bg-white p-6 shadow-sm flex flex-col gap-6">
                 {/* Info rows */}
                 <div className="space-y-5">
                   <InfoRow icon={CalendarIcon} text={dateText} />
@@ -153,17 +153,31 @@ export default function VolunteerProjectDetailPage({
                   <InfoRow icon={MapPinIcon} text={data.location ?? '—'} />
                 </div>
 
-                <button
-                  onClick={handleEditProject}
-                  className="
-          mt-8 w-full rounded-lg
-          bg-teal-600 px-4 py-3
-          text-sm font-semibold text-white
-          hover:bg-teal-700 active:bg-teal-800
-        "
-                >
-                  Edit Project
-                </button>
+                <div className="grid gap-3">
+                  <button
+                    onClick={handleEditProject}
+                    className="
+            w-full rounded-lg
+            bg-teal-600 px-4 py-2.5
+            text-sm font-semibold text-white
+            hover:bg-teal-700 active:bg-teal-800
+          "
+                  >
+                    Edit Project
+                  </button>
+                  <Link
+                    href={`/general-manager/projects/${data.id}/feedback`}
+                    className="w-full inline-flex items-center justify-center rounded-lg border border-teal-600 px-4 py-2.5 text-sm font-semibold text-teal-700 hover:bg-teal-50"
+                  >
+                    View Feedback
+                  </Link>
+                  <Link
+                    href={`/general-manager/projects/${data.id}/feedback/submit`}
+                    className="w-full inline-flex items-center justify-center rounded-lg border border-gray-200 px-4 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50"
+                  >
+                    Submit Feedback
+                  </Link>
+                </div>
               </div>
             </div>
           </aside>
