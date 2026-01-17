@@ -3,25 +3,43 @@
 import React, { useMemo, useState } from 'react';
 import Input from '@/components/ui/Input';
 import TextArea from '@/components/ui/Textarea';
-import { proposeVolunteerProject } from '@/lib/api/volunteer';
+import { createVolunteerProject } from '@/lib/api/volunteer';
 import {
+  EditVolunteerProjectPayload,
   ProjectFrequency,
-  ProposeVolunteerProjectPayload,
 } from '@/types/Volunteer';
 import RadioGroup from '@/components/ui/RadioGroup';
 import SectionTitle from '@/components/ui/FormSectionTitle';
 import UploadBox from '@/components/ui/UploadBox';
 import { useRouter } from 'next/navigation';
 import Toast from '@/components/ui/Toast';
+import {
+  ProjectApprovalStatus,
+  ProjectOperationStatus,
+} from '@/types/ProjectData';
 type TimePeriod = 'one-time' | 'ongoing';
 type FrequencyUI = 'weekly' | 'monthly' | 'ad-hoc';
 
 type PositionForm = {
   role: string;
   description: string;
-  totalSlots: string;
   skills: string[];
 };
+
+export const APPROVAL_STATUS_OPTIONS = [
+  { value: ProjectApprovalStatus.pending, label: 'Pending' },
+  { value: ProjectApprovalStatus.reviewing, label: 'Reviewing' },
+  { value: ProjectApprovalStatus.approved, label: 'Approved' },
+  { value: ProjectApprovalStatus.rejected, label: 'Rejected' },
+] as const;
+
+export const OPERATION_STATUS_OPTIONS = [
+  { value: ProjectOperationStatus.ongoing, label: 'Ongoing' },
+  { value: ProjectOperationStatus.paused, label: 'Paused' },
+  { value: ProjectOperationStatus.cancelled, label: 'Cancelled' },
+  { value: ProjectOperationStatus.completed, label: 'Completed' },
+] as const;
+
 const TEMP_PDF_URL = 'https://example.com/sample-proposal.pdf';
 const TEMP_IMAGE_URL =
   'https://nvpc.org.sg/wp-content/uploads/2025/04/two-women-gardening-1024x682.jpg';
@@ -53,8 +71,15 @@ export default function VolunteerProjectProposalPage() {
 
   // Positions
   const [positions, setPositions] = useState<PositionForm[]>([
-    { role: '', description: '', totalSlots: '1', skills: [''] },
+    { role: '', description: '', skills: [''] },
   ]);
+
+  // Status
+  const [approvalStatus, setApprovalStatus] = useState<ProjectApprovalStatus>(
+    ProjectApprovalStatus.pending,
+  );
+  const [operationStatus, setOperationStatus] =
+    useState<ProjectOperationStatus>(ProjectOperationStatus.ongoing);
 
   const [toastOpen, setToastOpen] = useState(false);
   const [toastType, setToastType] = useState<'success' | 'error'>('success');
@@ -99,11 +124,7 @@ export default function VolunteerProjectProposalPage() {
       endTime;
 
     const positionsOk = positions.every(
-      (p) =>
-        p.role.trim() &&
-        p.description.trim() &&
-        Number.isFinite(Number(p.totalSlots)) &&
-        Number(p.totalSlots) >= 1
+      (p) => p.role.trim() && p.description.trim(),
     );
 
     return Boolean(basicOk && positionsOk);
@@ -128,7 +149,7 @@ export default function VolunteerProjectProposalPage() {
   const addPosition = () =>
     setPositions((prev) => [
       ...prev,
-      { role: '', description: '', totalSlots: '1', skills: [''] },
+      { role: '', description: '', skills: [''] },
     ]);
 
   const removePosition = (idx: number) =>
@@ -154,7 +175,7 @@ export default function VolunteerProjectProposalPage() {
     try {
       setSubmitting(true);
 
-      const payload: ProposeVolunteerProjectPayload = {
+      const payload: EditVolunteerProjectPayload = {
         title: title.trim(),
         initiatorName: initiatorName.trim() || undefined,
         location: location.trim(),
@@ -181,33 +202,37 @@ export default function VolunteerProjectProposalPage() {
         positions: positions.map((p) => ({
           role: p.role.trim(),
           description: p.description.trim(),
-
-          totalSlots: Math.max(1, Number(p.totalSlots) || 1),
           skills: p.skills.map((s) => s.trim()).filter(Boolean),
         })),
+
+        approvalStatus,
+        operationStatus,
       };
 
-      await proposeVolunteerProject(payload);
+      await createVolunteerProject(payload);
 
       setToastType('success');
-      setToastTitle('Application submitted');
-      setToastMsg('We’ll contact you soon with the next steps.');
+      setToastTitle('Project Created Successfully');
       setToastOpen(true);
       setTimeout(() => {
-        router.push('/partner/volunteers');
+        router.push('/general-manager/projects');
       }, 2000);
     } catch (e: unknown) {
       setToastType('error');
       setToastTitle('Submission failed');
-      setToastMsg(`Failed to submit project: ${e} `);
+      setToastMsg(`Failed to create project: ${e} `);
       setToastOpen(true);
     } finally {
       setSubmitting(false);
     }
   };
 
+  const onCancel = () => {
+    router.push('/general-manager/projects');
+  };
+
   return (
-    <div className="flex h-screen bg-gray-50">
+    <div className="flex min-h-screen bg-gray-50">
       {/* Toast popup */}
       <Toast
         open={toastOpen}
@@ -217,7 +242,7 @@ export default function VolunteerProjectProposalPage() {
         duration={3500}
         onClose={() => setToastOpen(false)}
       />
-      <main className="flex-1 px-10 py-8 overflow-y-auto">
+      <main className="flex-1 px-10 py-8">
         {/* Header */}
         <div className="mb-10 flex items-start gap-3">
           <div className="w-[5px] h-[39px] bg-[#56E0C2] mt-2" />
@@ -500,11 +525,11 @@ export default function VolunteerProjectProposalPage() {
                                       ? {
                                           ...x,
                                           skills: x.skills.map((sv, si) =>
-                                            si === sIdx ? v : sv
+                                            si === sIdx ? v : sv,
                                           ),
                                         }
-                                      : x
-                                  )
+                                      : x,
+                                  ),
                                 )
                               }
                             />
@@ -528,19 +553,12 @@ export default function VolunteerProjectProposalPage() {
                     label="Logistics Required"
                     value=""
                     onChange={() => {}}
-                  /> */}
+                  />
                   <Input
                     label="Estimated Number of Volunteers Needed *"
-                    placeholder="e.g. 5"
-                    value={pos.totalSlots}
-                    onChange={(v) =>
-                      setPositions((prev) =>
-                        prev.map((x, i) =>
-                          i === pIdx ? { ...x, totalSlots: v } : x
-                        )
-                      )
-                    }
-                  />
+                    value=""
+                    readOnly
+                  /> */}
                 </div>
 
                 {pIdx !== positions.length - 1 && (
@@ -572,10 +590,65 @@ export default function VolunteerProjectProposalPage() {
             multiple={false}
             onFilesChange={setCoverImage}
           />
+
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+            {/* Approval Status */}
+            <div>
+              <label className="block text-black text-md mb-2 font-semibold">
+                Approval Status
+              </label>
+              <select
+                value={approvalStatus}
+                onChange={(e) =>
+                  setApprovalStatus(e.target.value as ProjectApprovalStatus)
+                }
+                className="w-full rounded-md border border-green-700 bg-white px-3 py-2 text-sm outline-none transition focus:border-green-800 focus:ring-1 focus:ring-green-800"
+              >
+                {APPROVAL_STATUS_OPTIONS.map((opt) => (
+                  <option key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Operation Status */}
+            <div>
+              <label className="block text-black text-md mb-2 font-semibold">
+                Operation Status
+              </label>
+              <select
+                value={operationStatus}
+                onChange={(e) =>
+                  setOperationStatus(e.target.value as ProjectOperationStatus)
+                }
+                className="w-full rounded-md border border-green-700 bg-white px-3 py-2 text-sm outline-none transition focus:border-green-800 focus:ring-1 focus:ring-green-800"
+              >
+                {OPERATION_STATUS_OPTIONS.map((opt) => (
+                  <option key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
         </div>
 
         {/* Submit */}
-        <div className="mt-10 flex items-center justify-end">
+        <div className="mt-10 flex items-center gap-3 justify-end">
+          <button
+            type="button"
+            onClick={onCancel}
+            disabled={submitting}
+            className={[
+              'rounded-xl px-10 py-4 font-bold',
+              'border border-gray-300 bg-white text-gray-700',
+              'hover:bg-gray-50 transition',
+              submitting ? 'opacity-50 cursor-not-allowed' : '',
+            ].join(' ')}
+          >
+            Cancel
+          </button>
           <button
             type="button"
             disabled={!canSubmit || submitting}
@@ -586,7 +659,7 @@ export default function VolunteerProjectProposalPage() {
               !canSubmit || submitting ? 'opacity-50 cursor-not-allowed' : '',
             ].join(' ')}
           >
-            {submitting ? 'Submitting...' : 'Submit Project'}
+            {submitting ? 'Saving...' : 'Save Changes'}
           </button>
         </div>
       </main>

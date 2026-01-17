@@ -108,7 +108,6 @@ export default function FeedbackPage() {
 
   return (
     <div className="flex min-h-screen bg-gray-50">
-
       <Toast
         open={toastOpen}
         type={toastType}

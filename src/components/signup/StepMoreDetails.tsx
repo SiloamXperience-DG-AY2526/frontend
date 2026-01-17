@@ -45,10 +45,10 @@ export default function MoreAboutYou({
   const cachedMeta = getCachedMeta();
 
   const [countries, setCountries] = useState<string[]>(
-    cachedMeta?.countries ?? []
+    cachedMeta?.countries ?? [],
   );
   const [languages, setLanguages] = useState<string[]>(
-    cachedMeta?.languages ?? []
+    cachedMeta?.languages ?? [],
   );
   const [loading, setLoading] = useState(!cachedMeta);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -73,7 +73,7 @@ export default function MoreAboutYou({
 
         sessionStorage.setItem(
           CACHE_KEY,
-          JSON.stringify({ countries: c, languages: l })
+          JSON.stringify({ countries: c, languages: l }),
         );
       } finally {
         setLoading(false);

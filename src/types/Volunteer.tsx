@@ -1,4 +1,4 @@
-import { ProjectApprovalStatus } from './ProjectData';
+import { ProjectApprovalStatus, ProjectOperationStatus } from './ProjectData';
 
 export type FeedbackPayload = {
   ratings: {
@@ -90,6 +90,28 @@ export type VolunteerProject = {
   positions?: VolunteerProjectListPosition[];
   sessions?: VolunteerProjectListSession[];
 };
+
+export type VolunteerProjectRow = {
+  id: string;
+  title: string;
+  startDate?: string | null;
+  endDate?: string | null;
+  startTime?: string | null;
+  endTime?: string | null;
+
+  aboutDesc?: string | null;
+
+  submissionStatus: string;
+  approvalStatus: ProjectApprovalStatus;
+  operationStatus: OperationStatus;
+
+  managedBy: string;
+
+  capacity: {
+    filled: number;
+    total: number;
+  };
+};
 export type VolunteerProjectsResponse = {
   status: 'success' | 'error';
   data: VolunteerProject[];
@@ -109,6 +131,11 @@ export type VolunteerPosition = {
   slotsFilled: number;
   slotsAvailable: number;
   skills: string[];
+};
+
+export type VolunteerProjectObjective = {
+  id: string;
+  objective: string;
 };
 
 export type VolunteerSession = {
@@ -150,6 +177,9 @@ export type VolunteerProjectDetail = {
 
   createdAt: string;
   updatedAt: string;
+
+  approvalStatus: ProjectApprovalStatus;
+  operationStatus: ProjectOperationStatus;
 };
 
 export type VolunteerProjectDetailResponse = {
@@ -228,6 +258,41 @@ export type ProposeVolunteerProjectPayload = {
   attachments?: string;
   image?: string;
   organisingTeam?: string;
+};
+
+export type EditVolunteerProjectPayload = {
+  title: string;
+  initiatorName?: string;
+  location: string;
+
+  // project plan fields
+  aboutDesc: string;
+  beneficiaries: string;
+  proposedPlan?: string;
+
+  objectives: string;
+
+  startDate: string;
+  endDate: string;
+  startTime: string;
+  endTime: string;
+
+  frequency: ProjectFrequency;
+  interval?: number | null;
+  dayOfWeek?: string | null;
+
+  positions: Array<{
+    role: string;
+    description: string;
+    skills: string[];
+  }>;
+
+  attachments?: string;
+  image?: string;
+  organisingTeam?: string;
+
+  approvalStatus: ProjectApprovalStatus;
+  operationStatus: ProjectOperationStatus;
 };
 
 export type MyProposedProject = {
