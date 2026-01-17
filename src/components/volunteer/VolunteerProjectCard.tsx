@@ -1,18 +1,18 @@
-import React from 'react';
-import Link from 'next/link';
-import { VolunteerProject } from '@/types/Volunteer';
-import { formatShortDate, formatTimeRange } from '@/lib/utils/date';
+import React from "react";
+import Link from "next/link";
+import { VolunteerProject } from "@/types/Volunteer";
+import { formatShortDate, formatTimeRange } from "@/lib/utils/date";
 import {
   CalendarIcon,
   ClockIcon,
   MapPinIcon,
-} from '@heroicons/react/24/outline';
+} from "@heroicons/react/24/outline";
 
 export default function VolunteerProjectCard({ p }: { p: VolunteerProject }) {
   const spotsLeft = p.projectAvailableSlots;
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-gray-200 bg-[#E4FAF4] shadow-sm">
+    <div className="flex h-full flex-col overflow-hidden rounded-2xl border border-gray-200 bg-[#E4FAF4] shadow-sm">
       {/* Image */}
       <div className="relative h-44 w-full bg-gray-100">
         {p.image ? (
@@ -29,15 +29,15 @@ export default function VolunteerProjectCard({ p }: { p: VolunteerProject }) {
         )}
 
         {/* Spots left pill */}
-        {typeof spotsLeft === 'number' && (
+        {typeof spotsLeft === "number" && (
           <div className="absolute left-3 top-3 rounded-md bg-[#F3F4F6] px-3 py-1 text-xs font-semibold text-gray-800 shadow">
-            {spotsLeft} spot{spotsLeft === 1 ? '' : 's'} left
+            {spotsLeft} spot{spotsLeft === 1 ? "" : "s"} left
           </div>
         )}
       </div>
 
       {/* Content */}
-      <div className="px-5 pb-5 pt-4">
+      <div className="flex flex-col px-5 pb-5 pt-4 h-full">
         <div className="text-xl font-bold text-gray-900">{p.title}</div>
         {p.aboutDesc ? (
           <div className="mt-1 text-md text-gray-700">{p.aboutDesc}</div>
@@ -61,12 +61,12 @@ export default function VolunteerProjectCard({ p }: { p: VolunteerProject }) {
 
           <div className="flex items-center gap-3">
             <MapPinIcon className="h-5 w-5 text-gray-700" />
-            <span>{p.location ?? '—'}</span>
+            <span>{p.location ?? "—"}</span>
           </div>
         </div>
 
         {/* Button aligned bottom-right */}
-        <div className="mt-5 flex justify-end">
+        <div className="mt-auto flex justify-end pt-5">
           <Link
             href={`/partner/volunteers/projects/${p.id}`}
             className="
