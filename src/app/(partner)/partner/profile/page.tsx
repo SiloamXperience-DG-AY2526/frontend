@@ -79,7 +79,7 @@ export default function ProfilePage() {
       email: form.email.trim(),
       contactNumber: form.contactNumber.trim(),
       occupation: form.occupation.trim(),
-      otherInterests: form.education.trim(),
+      otherInterests: form.education.trim() || undefined,
       languages: form.languages
         .split(',')
         .map((s) => s.trim())

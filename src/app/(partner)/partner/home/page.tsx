@@ -1,16 +1,49 @@
 'use client';
 
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import {
   HeartIcon,
   HandRaisedIcon,
   ClipboardDocumentListIcon,
-  RocketLaunchIcon,
+  CalendarIcon,
+  MapPinIcon,
+  UsersIcon,
 } from '@heroicons/react/24/outline';
+import { getAvailableVolunteerProjects } from '@/lib/api/volunteer';
+import { VolunteerProject } from '@/types/Volunteer';
 
 export default function PartnerHomePage() {
   const { user, isLoading: authLoading } = useAuth();
+  const [events, setEvents] = useState<VolunteerProject[]>([]);
+  const [eventsLoading, setEventsLoading] = useState(true);
+  const [eventsError, setEventsError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let mounted = true;
+
+    (async () => {
+      try {
+        setEventsLoading(true);
+        setEventsError(null);
+        const res = await getAvailableVolunteerProjects(1, 3);
+        if (!mounted) return;
+        setEvents(Array.isArray(res?.data) ? res.data : []);
+      } catch (e: unknown) {
+        if (!mounted) return;
+        setEventsError(
+          e instanceof Error ? e.message : 'Failed to load events'
+        );
+      } finally {
+        if (mounted) setEventsLoading(false);
+      }
+    })();
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   if (authLoading) {
     return (
@@ -54,7 +87,7 @@ export default function PartnerHomePage() {
           </div>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {[
             {
               title: 'Volunteer Opportunities',
@@ -74,12 +107,6 @@ export default function PartnerHomePage() {
               href: '/partner/contributions',
               Icon: ClipboardDocumentListIcon,
             },
-            {
-              title: 'Propose a Project',
-              description: 'Submit a new volunteer or donation idea.',
-              href: '/partner/volunteers/projects/proposal',
-              Icon: RocketLaunchIcon,
-            },
           ].map((card) => (
             <Link
               key={card.title}
@@ -95,6 +122,89 @@ export default function PartnerHomePage() {
               </p>
             </Link>
           ))}
+        </div>
+
+        <div className="mt-10">
+          <div className="flex items-center justify-between">
+            <h2 className="text-xl font-semibold text-gray-900">
+              Upcoming volunteering events
+            </h2>
+            <Link
+              href="/partner/volunteers"
+              className="text-sm font-semibold text-[#1F7A67] hover:text-[#195D4B] transition"
+            >
+              View all
+            </Link>
+          </div>
+
+          {eventsLoading ? (
+            <div className="mt-4 rounded-2xl border bg-white p-6 text-sm text-gray-600 shadow-sm">
+              Loading upcoming events...
+            </div>
+          ) : eventsError ? (
+            <div className="mt-4 rounded-2xl border border-rose-200 bg-white p-6 text-sm text-rose-700 shadow-sm">
+              {eventsError}
+            </div>
+          ) : events.length === 0 ? (
+            <div className="mt-4 rounded-2xl border bg-white p-6 text-sm text-gray-600 shadow-sm">
+              No upcoming events right now.
+            </div>
+          ) : (
+            <div className="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+              {events.map((event) => {
+                const start = event.startDate
+                  ? new Date(event.startDate).toLocaleDateString('en-SG', {
+                      month: 'short',
+                      day: '2-digit',
+                    })
+                  : 'TBD';
+                const end = event.endDate
+                  ? new Date(event.endDate).toLocaleDateString('en-SG', {
+                      month: 'short',
+                      day: '2-digit',
+                    })
+                  : 'TBD';
+
+                return (
+                  <div
+                    key={event.id}
+                    className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm"
+                  >
+                    <div className="text-xs font-semibold uppercase tracking-wide text-[#1F7A67]">
+                      {start} {event.endDate ? `- ${end}` : ''}
+                    </div>
+                    <div className="mt-2 text-lg font-semibold text-gray-900">
+                      {event.title}
+                    </div>
+                    <div className="mt-3 space-y-2 text-sm text-gray-600">
+                      <div className="flex items-center gap-2">
+                        <MapPinIcon className="h-4 w-4 text-gray-500" />
+                        <span>{event.location || 'Location TBD'}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <UsersIcon className="h-4 w-4 text-gray-500" />
+                        <span>
+                          {event.projectAvailableSlots ?? 0} slots available
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <CalendarIcon className="h-4 w-4 text-gray-500" />
+                        <span>
+                          {event.startDate ? 'Starts soon' : 'Dates TBD'}
+                        </span>
+                      </div>
+                    </div>
+                    <Link
+                      href={`/partner/volunteers/projects/${event.id}`}
+                      className="mt-4 inline-flex text-sm font-semibold text-[#195D4B] hover:text-[#13473A] transition"
+                    >
+                      View details →
+                    </Link>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
 
         <div className="mt-10 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
