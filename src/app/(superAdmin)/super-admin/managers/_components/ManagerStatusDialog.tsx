@@ -37,18 +37,18 @@ export default function ManagerStatusDialog({
         <div className="flex justify-end gap-3 mt-3">
           {/* Confirm button (left) */}
           <button
-            onClick={manager.status ? onDeactivate : onActivate}
+            onClick={manager.status === 'Active' ? onDeactivate : onActivate}
             className={[
               'rounded-md px-5 py-2 text-sm font-medium text-white',
               'transition-colors duration-200',
-              manager.status
+              manager.status === 'Active'
                 ? 'bg-[#0E5A4A] hover:opacity-90'
                 : 'bg-[#0E5A4A] hover:opacity-90',
               updating ? 'opacity-50 cursor-not-allowed' : '',
             ].join(' ')}
             disabled={updating}
           >
-            {manager.status ? 'Deactivate user' : 'Activate user'}
+            {manager.status === 'Active' ? 'Deactivate user' : 'Activate user'}
           </button>
 
           {/* Cancel button (right) */}
