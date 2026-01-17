@@ -29,7 +29,7 @@ const ProjectManagerSchema = z.object({
   lastName: z.string(),
 });
 
-const DonationProjectSchema = z.object({
+const DonationProjectBaseSchema = z.object({
   id: z.string().uuid(),
   title: z.string(),
   location: z.string(),
@@ -39,7 +39,6 @@ const DonationProjectSchema = z.object({
   initiatorName: z.string().nullable(),
   organisingTeam: z.string().nullable(),
   targetFund: z.string().nullable(),
-  totalRaised: z.string(),
   brickSize: z.string().nullable(),
   deadline: z.string(),
   type: DonationProjectTypeSchema,
@@ -52,6 +51,10 @@ const DonationProjectSchema = z.object({
   approvalStatus: DonationProjectApprovalStatusSchema,
   submissionStatus: DonationProjectSubmissionStatusSchema,
   operationStatus: DonationProjectOperationStatusSchema,
+});
+
+const DonationProjectSchema = DonationProjectBaseSchema.extend({
+  totalRaised: z.string(),
 });
 
 const PaginationSchema = z.object({
@@ -67,34 +70,78 @@ const DonationProjectsResponseSchema = z.object({
 });
 
 const ProjectDonationSchema = z.object({
-  donorName: z.string(),
-  amount: z.number(),
+  id: z.string().uuid(),
+  donorId: z.string().uuid(),
+  projectId: z.string().uuid(),
+  recurringDonationId: z.string().uuid().nullable(),
+  type: z.enum(['individual', 'corporate']),
+  countryOfResidence: z.string(),
+  paymentMode: z.string(),
   date: z.string(),
-  paymentMode: z.string(),
-});
-
-const ProjectRefundSchema = z.object({
-  requestorName: z.string(),
-  startDate: z.string(),
-  endDate: z.string(),
-  amount: z.number(),
-  paymentMode: z.string(),
-  refundStatus: z.enum(['pending', 'refunded']),
+  amount: z.string(),
+  receipt: z.string().nullable(),
+  isThankYouSent: z.boolean(),
+  isAdminNotified: z.boolean(),
+  submissionStatus: z.string(),
+  receiptStatus: z.string(),
+  createdAt: z.string(),
+  updatedAt: z.string(),
 });
 
 const ProjectDonorSchema = z.object({
-  donorId: z.string(),
-  partnerName: z.string(),
-  projects: z.array(z.string()),
-  cumulativeAmount: z.number(),
-  gender: z.enum(['male', 'female', 'others']),
+  id: z.string().uuid(),
+  firstName: z.string(),
+  lastName: z.string(),
+  email: z.string().email(),
+  isActive: z.boolean(),
+  gender: z.string(),
   contactNumber: z.string(),
-  status: z.enum(['Active', 'Inactive']),
+  countryCode: z.string(),
+  totalDonated: z.string(),
+  partner: z
+    .object({
+      id: z.string().uuid(),
+      dob: z.string(),
+    })
+    .nullable(),
+  createdAt: z.string(),
 });
 
-const DonationProjectWithFinanceSchema = DonationProjectSchema.extend({
+const ProjectObjectiveSchema = z.object({
+  id: z.string().uuid(),
+  projectId: z.string().uuid(),
+  objective: z.string(),
+  order: z.number(),
+  createdAt: z.string(),
+  updatedAt: z.string(),
+});
+
+const DonationProjectDetailSchema = DonationProjectBaseSchema.extend({
+  managedBy: z.string().uuid(),
+  approvalNotes: z.string().nullable(),
+  updatedAt: z.string(),
+  objectivesList: z.array(ProjectObjectiveSchema),
+});
+
+const ProjectDonationsResponseSchema = z.object({
   donations: z.array(ProjectDonationSchema),
-  refunds: z.array(ProjectRefundSchema),
+  pagination: PaginationSchema,
+});
+
+const ProjectDonorsResponseSchema = z.object({
+  donors: z.array(ProjectDonorSchema),
+  pagination: PaginationSchema,
+});
+
+const ProjectDetailResponseSchema = z.object({
+  project: DonationProjectDetailSchema,
+  totalRaised: z.string(),
+});
+
+const DonationProjectWithFinanceSchema = z.object({
+  project: DonationProjectDetailSchema,
+  totalRaised: z.string(),
+  donations: z.array(ProjectDonationSchema),
   donors: z.array(ProjectDonorSchema),
 });
 
@@ -110,8 +157,9 @@ export type DonationProjectsResponse = z.infer<
   typeof DonationProjectsResponseSchema
 >;
 export type ProjectDonation = z.infer<typeof ProjectDonationSchema>;
-export type ProjectRefund = z.infer<typeof ProjectRefundSchema>;
 export type ProjectDonor = z.infer<typeof ProjectDonorSchema>;
+export type ProjectObjective = z.infer<typeof ProjectObjectiveSchema>;
+export type DonationProjectDetail = z.infer<typeof DonationProjectDetailSchema>;
 export type DonationProjectWithFinance = z.infer<
   typeof DonationProjectWithFinanceSchema
 >;
@@ -123,7 +171,11 @@ export {
   DonationProjectSchema,
   DonationProjectsResponseSchema,
   ProjectDonationSchema,
-  ProjectRefundSchema,
   ProjectDonorSchema,
+  ProjectObjectiveSchema,
+  DonationProjectDetailSchema,
+  ProjectDonationsResponseSchema,
+  ProjectDonorsResponseSchema,
+  ProjectDetailResponseSchema,
   DonationProjectWithFinanceSchema,
 };

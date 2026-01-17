@@ -136,7 +136,6 @@ export async function getFinanceManagerProjects(
   page: number = 1,
   limit: number = 20
 ): Promise<DonationProjectsResponse> {
-  // TODO: Implement actual API call with pagination
   const params = new URLSearchParams({
     page: page.toString(),
     limit: limit.toString(),
@@ -147,214 +146,47 @@ export async function getFinanceManagerProjects(
   }
   const data = await res.json();
   return data;
-
-  // Temporary: return sample data
-  // const data = sample;
-  // return data;
 }
 
-// Get donation project finance details (donations and refunds)
+// Get donation project finance details (donations and donors)
 export async function getDonationProjectFinance(
   projectId: string
 ): Promise<DonationProjectWithFinance> {
-  // TODO: Replace with fetch(`/api/v1/finance/donation-projects/${projectId}`)
+  // Fetch all three endpoints in parallel
+  const [projectRes, donationsRes, donorsRes] = await Promise.all([
+    fetch(`/api/donation-projects/${projectId}`),
+    fetch(`/api/donation-projects/${projectId}/donations`),
+    fetch(`/api/donation-projects/${projectId}/donors`),
+  ]);
 
-  // Dummy data matching the design
-  const dummyData: DonationProjectWithFinance = {
-    id: projectId,
-    title: 'Project Name',
-    location: 'Singapore',
-    about: 'Project description',
-    objectives: 'Project objectives',
-    beneficiaries: 'Community members',
-    initiatorName: 'John Doe',
-    organisingTeam: 'Finance Team',
-    targetFund: 5000,
-    currentFund: 4500,
-    brickSize: 100,
-    deadline: '2026-12-31T23:59:59.000Z',
-    type: 'ONGOING',
-    startDate: '2026-01-01T00:00:00.000Z',
-    endDate: '2026-12-31T23:59:59.000Z',
-    submissionStatus: 'APPROVED',
-    approvalStatus: 'APPROVED',
-    approvalNotes: null,
-    image: null,
-    attachments: null,
-    managerId: 'manager_123',
-    createdAt: '2026-01-01T00:00:00.000Z',
-    updatedAt: '2026-01-15T00:00:00.000Z',
-    donations: [
-      {
-        donorName: 'Donor Name',
-        amount: 200,
-        date: '2025-11-18',
-        paymentMode: 'PayNow',
-      },
-      {
-        donorName: 'Donor Name',
-        amount: 200,
-        date: '2025-11-18',
-        paymentMode: 'PayNow',
-      },
-      {
-        donorName: 'Donor Name',
-        amount: 200,
-        date: '2025-11-18',
-        paymentMode: 'PayNow',
-      },
-      {
-        donorName: 'Donor Name',
-        amount: 200,
-        date: '2025-11-18',
-        paymentMode: 'PayNow',
-      },
-      {
-        donorName: 'Donor Name',
-        amount: 200,
-        date: '2025-11-18',
-        paymentMode: 'PayNow',
-      },
-      {
-        donorName: 'Donor Name',
-        amount: 200,
-        date: '2025-11-18',
-        paymentMode: 'PayNow',
-      },
-      {
-        donorName: 'Donor Name',
-        amount: 200,
-        date: '2025-11-18',
-        paymentMode: 'PayNow',
-      },
-    ],
-    refunds: [
-      {
-        requestorName: 'Project Name',
-        startDate: '2025-11-18',
-        endDate: '2025-12-19',
-        amount: 200,
-        paymentMode: '-',
-        refundStatus: 'pending',
-      },
-      {
-        requestorName: 'Project Name',
-        startDate: '2025-11-18',
-        endDate: '2025-12-19',
-        amount: 200,
-        paymentMode: 'PayNow',
-        refundStatus: 'refunded',
-      },
-      {
-        requestorName: 'Project Name',
-        startDate: '2025-11-18',
-        endDate: '2025-12-19',
-        amount: 200,
-        paymentMode: '-',
-        refundStatus: 'pending',
-      },
-      {
-        requestorName: 'Project Name',
-        startDate: '2025-11-18',
-        endDate: '2025-12-19',
-        amount: 200,
-        paymentMode: 'PayNow',
-        refundStatus: 'pending',
-      },
-      {
-        requestorName: 'Project Name',
-        startDate: '2025-11-18',
-        endDate: '2025-12-19',
-        amount: 200,
-        paymentMode: 'PayNow',
-        refundStatus: 'pending',
-      },
-      {
-        requestorName: 'Project Name',
-        startDate: '2025-11-18',
-        endDate: '2025-12-19',
-        amount: 200,
-        paymentMode: 'PayNow',
-        refundStatus: 'pending',
-      },
-      {
-        requestorName: 'Project Name',
-        startDate: '2025-11-18',
-        endDate: '2025-12-19',
-        amount: 200,
-        paymentMode: 'PayNow',
-        refundStatus: 'pending',
-      },
-    ],
-    donors: [
-      {
-        donorId: '1',
-        partnerName: 'Tan Siew Mei',
-        projects: ['Project Recycle', 'Project Health'],
-        cumulativeAmount: 100,
-        gender: 'female',
-        contactNumber: '91111111',
-        status: 'Active',
-      },
-      {
-        donorId: '2',
-        partnerName: 'Tan Siew Mei',
-        projects: ['Project Recycle', 'Project Health'],
-        cumulativeAmount: 100,
-        gender: 'female',
-        contactNumber: '91111111',
-        status: 'Inactive',
-      },
-      {
-        donorId: '3',
-        partnerName: 'Tan Siew Mei',
-        projects: ['Project Recycle'],
-        cumulativeAmount: 100,
-        gender: 'female',
-        contactNumber: '91111111',
-        status: 'Active',
-      },
-      {
-        donorId: '4',
-        partnerName: 'Tan Siew Mei',
-        projects: ['Project Recycle'],
-        cumulativeAmount: 100,
-        gender: 'female',
-        contactNumber: '91111111',
-        status: 'Active',
-      },
-      {
-        donorId: '5',
-        partnerName: 'Tan Siew Mei',
-        projects: ['Project Recycle', 'Project Health'],
-        cumulativeAmount: 100,
-        gender: 'female',
-        contactNumber: '91111111',
-        status: 'Active',
-      },
-      {
-        donorId: '6',
-        partnerName: 'Tan Siew Mei',
-        projects: ['Project Health'],
-        cumulativeAmount: 100,
-        gender: 'female',
-        contactNumber: '91111111',
-        status: 'Active',
-      },
-      {
-        donorId: '7',
-        partnerName: 'Tan Siew Mei',
-        projects: ['Project Health'],
-        cumulativeAmount: 100,
-        gender: 'female',
-        contactNumber: '91111111',
-        status: 'Active',
-      },
-    ],
+  if (!projectRes.ok) {
+    throw new Error('Failed to fetch donation project details.');
+  }
+
+  const projectData = await projectRes.json();
+
+  // Handle donations - default to empty array if fails
+  let donations = [];
+  if (donationsRes.ok) {
+    const donationsData = await donationsRes.json();
+    donations = donationsData.donations || [];
+  } else {
+    console.warn('Failed to fetch project donations, using empty array');
+  }
+
+  // Handle donors - default to empty array if fails
+  let donors = [];
+  if (donorsRes.ok) {
+    const donorsData = await donorsRes.json();
+    donors = donorsData.donors || [];
+  } else {
+    console.warn('Failed to fetch project donors, using empty array');
+  }
+
+  return {
+    project: projectData.project,
+    totalRaised: projectData.totalRaised,
+    donations,
+    donors,
   };
-
-  // Simulate API delay
-  return new Promise((resolve) => {
-    setTimeout(() => resolve(dummyData), 300);
-  });
 }

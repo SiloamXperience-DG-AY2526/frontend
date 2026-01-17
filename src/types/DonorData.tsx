@@ -43,13 +43,19 @@ export type DonorDetail = z.infer<typeof DonorDetailSchema>;
 
 // Backend response Zod schemas for validation
 const BackendDonorSchema = z.object({
+  id: z.string(),
   user: z.object({
     id: z.string(),
     title: z.string().nullable(),
     firstName: z.string(),
     lastName: z.string(),
     email: z.string(),
-    managedDonationProjects: z.array(z.string()),
+    managedDonationProjects: z.array(
+      z.object({
+        id: z.string(),
+        title: z.string(),
+      })
+    ),
   }),
   gender: z.string(),
   contactNumber: z.string(),
@@ -63,11 +69,12 @@ const BackendDonorSchema = z.object({
       mode: z.string(),
     })
   ),
-  totalDonations: z.number(),
+  totalDonations: z.union([z.string(), z.number()]),
 });
 
 export const BackendDonorsResponseSchema = z.object({
-  donorsWithTotals: z.array(BackendDonorSchema),
+  donor: z.array(BackendDonorSchema).optional(),
+  donors: z.array(BackendDonorSchema).optional(),
   pagination: z.object({
     page: z.number(),
     limit: z.number(),
@@ -92,7 +99,12 @@ export const BackendDonorDetailResponseSchema = z.object({
       firstName: z.string(),
       lastName: z.string(),
       email: z.string(),
-      managedDonationProjects: z.array(z.string()),
+      managedDonationProjects: z.array(
+        z.object({
+          id: z.string(),
+          title: z.string(),
+        })
+      ),
     }),
     gender: z.string(),
     contactNumber: z.string(),

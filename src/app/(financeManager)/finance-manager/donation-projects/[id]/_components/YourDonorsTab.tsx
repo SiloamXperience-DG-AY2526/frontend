@@ -2,10 +2,10 @@
 
 import Link from 'next/link';
 import DataTable, { Column } from '@/components/table/DataTable';
-import StatusBadge from '@/components/table/StatusBadge';
 import EditButton from '@/components/ui/EditButton';
 import { ProjectDonor } from '@/types/DonationProjectData';
 import FilterButton from '@/components/ui/FilterButton';
+import { formatDateDDMMYYYY } from '@/lib/formatDate';
 
 interface YourDonorsTabProps {
   donors: ProjectDonor[];
@@ -21,50 +21,46 @@ export default function YourDonorsTab({ donors }: YourDonorsTabProps) {
     console.log(`Edit donor ${donorId} - functionality to be implemented`);
   };
 
-  // Donors table columns (following the donors/page.tsx structure)
+  const formatCurrency = (amount: string) => {
+    return `$${parseFloat(amount).toLocaleString()}`;
+  };
+
+  // Donors table columns
   const donorColumns: Column<ProjectDonor>[] = [
     {
-      header: 'Partner Name',
+      header: 'Donor Name',
       accessor: (donor: ProjectDonor) => (
         <Link
-          href={`/finance-manager/donors/${donor.donorId}`}
+          href={`/finance-manager/donors/${donor.id}`}
           className="hover:underline"
           style={{ color: '#2C89A5' }}
         >
-          {donor.partnerName}
+          {`${donor.firstName} ${donor.lastName}`}
         </Link>
       ),
     },
     {
-      header: 'Projects',
-      accessor: (donor: ProjectDonor) => donor.projects.join(', '),
+      header: 'Email',
+      accessor: (donor: ProjectDonor) => donor.email,
     },
     {
-      header: 'Cumulative Amount Donated',
-      accessor: (donor: ProjectDonor) => `$${donor.cumulativeAmount}`,
+      header: 'Contact',
+      accessor: (donor: ProjectDonor) =>
+        `${donor.countryCode} ${donor.contactNumber}`,
     },
     {
-      header: 'Gender',
-      accessor: (donor: ProjectDonor) => donor.gender,
+      header: 'Total Donated',
+      accessor: (donor: ProjectDonor) => formatCurrency(donor.totalDonated),
     },
     {
-      header: 'Contact Number',
-      accessor: (donor: ProjectDonor) => donor.contactNumber,
-    },
-    {
-      header: 'Status',
-      accessor: (donor: ProjectDonor) => (
-        <StatusBadge
-          label={donor.status}
-          variant={donor.status === 'Active' ? 'success' : 'neutral'}
-        />
-      ),
+      header: 'Created At',
+      accessor: (donor: ProjectDonor) => formatDateDDMMYYYY(donor.createdAt),
     },
     {
       header: '',
       accessor: (donor: ProjectDonor) => (
         <EditButton
-          onClick={() => handleEditClick(donor.donorId)}
+          onClick={() => handleEditClick(donor.id)}
           ariaLabel="Edit donor"
         />
       ),
@@ -83,7 +79,7 @@ export default function YourDonorsTab({ donors }: YourDonorsTabProps) {
         columns={donorColumns}
         data={donors}
         emptyMessage="No donors found"
-        getRowKey={(donor) => donor.donorId}
+        getRowKey={(donor) => donor.id}
         headerBgColor="#206378"
         headerTextColor="#ffffff"
       />

@@ -68,11 +68,15 @@ export default function DonationProjectDetail() {
     <div className="min-h-screen bg-gray-50 p-8">
       {/* Page Header with Funds Card */}
       <div className="flex items-start justify-between gap-6 mb-6">
-        <PageHeader title={projectData.title} />
+        <PageHeader title={projectData.project.title} />
         <div className="w-full max-w-md">
           <TotalFundsRaisedCard
-            currentFund={projectData.currentFund}
-            targetFund={projectData.targetFund}
+            currentFund={parseFloat(projectData.totalRaised)}
+            targetFund={
+              projectData.project.targetFund
+                ? parseFloat(projectData.project.targetFund)
+                : null
+            }
           />
         </div>
       </div>

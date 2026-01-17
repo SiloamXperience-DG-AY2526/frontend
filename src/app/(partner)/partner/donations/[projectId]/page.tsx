@@ -192,7 +192,7 @@ export default function ProjectDetailPage() {
                 <div className="bg-gray-400 rounded p-3 mb-4">
                   <p className="text-sm text-gray-700">goal</p>
                   <p className="font-semibold">
-                    {formatCurrency(project.targetFund)}
+                    {formatCurrency(parseFloat(project.targetFund))}
                   </p>
                 </div>
               )}
@@ -201,11 +201,11 @@ export default function ProjectDetailPage() {
               <div className="bg-white rounded p-4 mb-4">
                 <div className="flex justify-between mb-2">
                   <span className="font-bold">
-                    {formatCurrency(project.currentFund)}
+                    {formatCurrency(parseFloat(project.totalRaised))}
                   </span>
                   {project.targetFund && (
                     <span className="text-gray-600">
-                      {formatCurrency(project.targetFund)}
+                      {formatCurrency(parseFloat(project.targetFund))}
                     </span>
                   )}
                 </div>
@@ -215,8 +215,8 @@ export default function ProjectDetailPage() {
                       className="h-full bg-black"
                       style={{
                         width: `${calculateProgress(
-                          project.currentFund,
-                          project.targetFund
+                          parseFloat(project.totalRaised),
+                          parseFloat(project.targetFund)
                         )}%`,
                       }}
                     />

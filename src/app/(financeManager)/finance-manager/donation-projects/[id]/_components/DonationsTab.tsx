@@ -15,16 +15,24 @@ export default function DonationsTab({ donations }: DonationsTabProps) {
     console.log('Filter button clicked - filters to be implemented');
   };
 
-  const formatCurrency = (amount: number) => {
-    return `$${amount.toLocaleString()}`;
+  const formatCurrency = (amount: string) => {
+    return `$${parseFloat(amount).toLocaleString()}`;
   };
 
   // Donations table columns
   const donationColumns: Column<ProjectDonation>[] = [
     {
-      header: 'Donor Name',
+      header: 'Donor ID',
       accessor: (donation: ProjectDonation) => (
-        <span className="text-sm text-[#2C89A5]">{donation.donorName}</span>
+        <span className="text-sm text-[#2C89A5]">{donation.donorId}</span>
+      ),
+    },
+    {
+      header: 'Type',
+      accessor: (donation: ProjectDonation) => (
+        <span className="text-sm text-gray-700 capitalize">
+          {donation.type}
+        </span>
       ),
     },
     {
@@ -47,6 +55,14 @@ export default function DonationsTab({ donations }: DonationsTabProps) {
       header: 'Payment Mode',
       accessor: (donation: ProjectDonation) => (
         <span className="text-sm text-gray-700">{donation.paymentMode}</span>
+      ),
+    },
+    {
+      header: 'Receipt Status',
+      accessor: (donation: ProjectDonation) => (
+        <span className="text-sm text-gray-700 capitalize">
+          {donation.receiptStatus}
+        </span>
       ),
     },
     {
@@ -76,10 +92,7 @@ export default function DonationsTab({ donations }: DonationsTabProps) {
         columns={donationColumns}
         data={donations}
         emptyMessage="No donations found"
-        getRowKey={(donation) => {
-          const index = donations.indexOf(donation);
-          return `donation-${index}-${donation.date}-${donation.amount}`;
-        }}
+        getRowKey={(donation) => donation.id}
         headerBgColor="#206378"
         headerTextColor="#ffffff"
       />

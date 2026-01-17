@@ -180,11 +180,12 @@ export default function DonationsPage() {
                   {/* Raised Amount */}
                   <div className="mb-3">
                     <p className="text-xl font-bold">
-                      {formatCurrency(project.currentFund)}
+                      {formatCurrency(parseFloat(project.totalRaised))}
                       {project.targetFund && (
                         <span className="text-sm font-normal text-gray-600">
                           {' '}
-                          raised of {formatCurrency(project.targetFund)}
+                          raised of{' '}
+                          {formatCurrency(parseFloat(project.targetFund))}
                         </span>
                       )}
                     </p>
@@ -194,8 +195,8 @@ export default function DonationsPage() {
                           className="h-full bg-black"
                           style={{
                             width: `${calculateProgress(
-                              project.currentFund,
-                              project.targetFund
+                              parseFloat(project.totalRaised),
+                              parseFloat(project.targetFund)
                             )}%`,
                           }}
                         />
