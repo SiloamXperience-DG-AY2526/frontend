@@ -8,6 +8,7 @@ const nextConfig: NextConfig = {
         hostname: 'images.unsplash.com',
       },
     ],
+    domains: ['nvpc.org.sg'],
   },
 };
 

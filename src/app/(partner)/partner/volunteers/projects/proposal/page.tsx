@@ -137,8 +137,8 @@ export default function VolunteerProjectProposalPage() {
   const addSkill = (posIdx: number) =>
     setPositions((prev) =>
       prev.map((p, i) =>
-        i === posIdx ? { ...p, skills: [...p.skills, ''] } : p
-      )
+        i === posIdx ? { ...p, skills: [...p.skills, ''] } : p,
+      ),
     );
 
   const removeSkill = (posIdx: number, skillIdx: number) =>
@@ -146,8 +146,8 @@ export default function VolunteerProjectProposalPage() {
       prev.map((p, i) =>
         i === posIdx
           ? { ...p, skills: p.skills.filter((_, si) => si !== skillIdx) }
-          : p
-      )
+          : p,
+      ),
     );
 
   const onSubmit = async () => {
@@ -394,7 +394,7 @@ export default function VolunteerProjectProposalPage() {
                       value={obj}
                       onChange={(v) =>
                         setObjectives((prev) =>
-                          prev.map((x, i) => (i === idx ? v : x))
+                          prev.map((x, i) => (i === idx ? v : x)),
                         )
                       }
                     />
@@ -451,7 +451,9 @@ export default function VolunteerProjectProposalPage() {
                     value={pos.role}
                     onChange={(v) =>
                       setPositions((prev) =>
-                        prev.map((x, i) => (i === pIdx ? { ...x, role: v } : x))
+                        prev.map((x, i) =>
+                          i === pIdx ? { ...x, role: v } : x,
+                        ),
                       )
                     }
                   />
@@ -462,8 +464,8 @@ export default function VolunteerProjectProposalPage() {
                     onChange={(v) =>
                       setPositions((prev) =>
                         prev.map((x, i) =>
-                          i === pIdx ? { ...x, description: v } : x
-                        )
+                          i === pIdx ? { ...x, description: v } : x,
+                        ),
                       )
                     }
                   />

@@ -20,7 +20,6 @@ export default function StepCommunication({
   setData,
   back,
 }: LastSignUpFormProps) {
-  const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [toast, setToast] = useState<{
@@ -29,6 +28,8 @@ export default function StepCommunication({
     title: string;
     message?: string;
   }>({ open: false, type: 'error', title: '' });
+
+  const router = useRouter();
 
   const validate = () => {
     const e: Record<string, string> = {};
@@ -138,6 +139,7 @@ export default function StepCommunication({
       });
     } finally {
       setLoading(false);
+      router.replace('/login');
     }
   };
 

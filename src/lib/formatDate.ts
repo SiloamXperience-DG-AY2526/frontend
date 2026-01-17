@@ -32,3 +32,23 @@ export function formatDateForInput(dateString: string): string {
 
   return date.toISOString().split('T')[0];
 }
+
+/**
+ * Formats an ISO date string into DD/MM/YYYY format
+ * @param dateString - ISO date string (e.g., "2025-11-18T00:00:00.000Z")
+ * @returns Formatted date string (e.g., "18/11/2025")
+ */
+export function formatDateDDMMYYYY(dateString: string): string {
+  if (!dateString) return '';
+
+  const date = new Date(dateString);
+
+  // Check if date is valid
+  if (isNaN(date.getTime())) return dateString;
+
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const year = date.getFullYear();
+
+  return `${day}/${month}/${year}`;
+}

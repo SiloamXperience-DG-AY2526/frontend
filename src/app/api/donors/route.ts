@@ -38,18 +38,23 @@ export async function GET() {
     // Validate backend response with Zod
     const validatedBackendData = BackendDonorsResponseSchema.parse(data);
 
+    // Handle both 'donor' and 'donors' keys from backend
+    const donorsList =
+      validatedBackendData.donor || validatedBackendData.donors || [];
+
     // Transform backend response to match frontend schema
-    const transformedDonors = validatedBackendData.donorsWithTotals.map(
-      (donor) => ({
-        donorId: donor.user.id,
-        partnerName: `${donor.user.firstName} ${donor.user.lastName}`,
-        projects: donor.user.managedDonationProjects || [],
-        cumulativeAmount: donor.totalDonations || 0,
-        gender: donor.gender,
-        contactNumber: donor.contactNumber,
-        status: 'Active' as const, // Default status, adjust if backend provides this
-      })
-    );
+    const transformedDonors = donorsList.map((donor) => ({
+      donorId: donor.user.id,
+      partnerName: `${donor.user.firstName} ${donor.user.lastName}`,
+      projects: donor.user.managedDonationProjects.map((p) => p.title),
+      cumulativeAmount:
+        typeof donor.totalDonations === 'string'
+          ? parseFloat(donor.totalDonations)
+          : donor.totalDonations || 0,
+      gender: donor.gender as 'male' | 'female' | 'others',
+      contactNumber: donor.contactNumber,
+      status: 'Active' as const, // Default status, adjust if backend provides this
+    }));
 
     console.log(
       'Transformed donors:',

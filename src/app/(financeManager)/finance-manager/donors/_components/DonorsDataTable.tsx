@@ -1,8 +1,8 @@
+import Link from 'next/link';
 import { Donor } from '@/types/DonorData';
 import DataTable, { Column } from '@/components/table/DataTable';
 import StatusBadge from '@/components/table/StatusBadge';
 import EditButton from '../../../../../components/ui/EditButton';
-import Link from 'next/link';
 
 interface DonorsDataTableProps {
   donors: Donor[];

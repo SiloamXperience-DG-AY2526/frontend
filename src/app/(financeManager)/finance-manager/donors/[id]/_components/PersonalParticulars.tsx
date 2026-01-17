@@ -16,11 +16,11 @@ export default function PersonalParticulars({
 }: PersonalParticularsProps) {
   const personalFields: PersonalField[] = [
     { label: 'Full Name', value: donor.fullName },
-    { label: 'Prefix Title', value: donor.prefixTitle },
+    { label: 'Prefix Title', value: donor.prefixTitle || '-' },
     { label: 'Birthday', value: formatDate(donor.birthday) },
-    { label: 'Gender', value: donor.gender },
-    { label: 'Occupation', value: donor.occupation },
-    { label: 'Nationality', value: donor.nationality },
+    { label: 'Gender', value: donor.gender || '-' },
+    { label: 'Occupation', value: donor.occupation || '-' },
+    { label: 'Nationality', value: donor.nationality || '-' },
     { label: 'Phone Number', value: donor.phoneNumber },
     {
       label: 'Preferred Communication Method',
