@@ -5,6 +5,7 @@ import {
   DonationProjectsResponse,
   DonationProject,
   DonationProjectWithFinance,
+  DonationProjectDetail,
 } from '@/types/DonationProjectData';
 import {
   SubmitDonationApplication,
@@ -12,6 +13,20 @@ import {
   DonationHistoryResponse,
   DonationHomepage 
 } from '@/types/DonationData';
+
+export type ProposeDonationProjectPayload = {
+  title: string;
+  initiatorName: string;
+  location: string;
+  startDate: string;
+  endDate: string;
+  targetFund: number;
+  about: string;
+  beneficiaries: string;
+  objectives: string;
+  attachments?: string | null;
+  image?: string | null;
+};
 
 // Get donation homepage data (statistics and featured projects)
 export async function getDonationHomepage(): Promise<DonationHomepage> {
@@ -172,6 +187,51 @@ export async function getFinanceManagerProjects(
   }
   const data = await res.json();
   return data;
+}
+
+// Get donation projects proposed by the current partner
+export async function getMyDonationProjectProposals(): Promise<
+  DonationProjectDetail[]
+> {
+  const res = await fetch('/api/v1/donation-projects/me');
+
+  if (!res.ok) {
+    throw new Error('Failed to fetch donation project proposals.');
+  }
+
+  return res.json();
+}
+
+// Submit a donation project proposal
+export async function proposeDonationProject(
+  payload: ProposeDonationProjectPayload
+): Promise<DonationProjectDetail> {
+  const res = await fetch('/api/v1/donation-projects', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      title: payload.title,
+      initiatorName: payload.initiatorName,
+      location: payload.location,
+      about: payload.about,
+      objectives: payload.objectives,
+      beneficiaries: payload.beneficiaries,
+      targetFund: payload.targetFund,
+      startDate: payload.startDate,
+      endDate: payload.endDate,
+      deadline: payload.endDate,
+      type: 'partnerLed',
+      attachments: payload.attachments ?? null,
+      image: payload.image ?? null,
+    }),
+  });
+
+  if (!res.ok) {
+    const error = await res.json().catch(() => ({}));
+    throw new Error(error.message || 'Failed to submit donation project.');
+  }
+
+  return res.json();
 }
 
 // Get donation project finance details (donations and donors)
