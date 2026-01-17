@@ -2,7 +2,7 @@ import { SignUpData } from '@/types/SignUpData';
 import Button from '@/components/ui/Button';
 import Input from '../ui/Input';
 import MultiSelect from '../ui/MultiSelect';
-import Textarea from '../ui/Textarea';
+import TextArea from '../ui/Textarea';
 import { useState } from 'react';
 import Toast from '../ui/Toast';
 import RadioGroup from '../ui/RadioGroup';
@@ -153,7 +153,7 @@ export default function VolunteerInterest({
             error={errors.otherInterest}
           />
         )}
-        <Textarea
+        <TextArea
           label="Do you have any health conditions we should know about?"
           value={data.healthNotes || ''}
           onChange={(v) => setData({ ...data, healthNotes: v })}
