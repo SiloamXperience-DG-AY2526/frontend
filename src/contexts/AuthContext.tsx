@@ -45,8 +45,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // Check authentication status on mount
   useEffect(() => {
-    authRefresh();
-  }, [authRefresh]);
+    const initAuth = async () => {
+      setIsLoading(true);
+      try {
+        const authUser = await getAuthUser();
+        setUser(authUser);
+      } catch (error) {
+        // Silently fail if not authenticated
+        setUser(null);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    initAuth();
+  }, []);
 
   const value = useMemo(
     () => ({ user, isLoading, authLogin, authLogout, authRefresh }),

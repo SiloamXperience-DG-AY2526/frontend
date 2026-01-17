@@ -401,16 +401,18 @@ export default function DonatePage() {
 
                     {/* Action Buttons */}
                     <div className="flex gap-4 justify-center">
-                      <Button
-                        label="Request Receipt"
+                      <button
                         onClick={() => router.push('/partner/donations')}
-                        variant="secondary"
-                      />
-                      <Button
-                        label="Home"
+                        className="px-8 py-3 bg-gray-300 hover:bg-gray-400 text-gray-900 font-semibold rounded-lg transition-colors duration-200"
+                      >
+                        Request Receipt
+                      </button>
+                      <button
                         onClick={() => router.push('/partner/donations')}
-                        variant="primary"
-                      />
+                        className="px-8 py-3 bg-gray-800 hover:bg-gray-900 text-white font-semibold rounded-lg transition-colors duration-200"
+                      >
+                        Home
+                      </button>
                     </div>
                   </>
                 ) : (
