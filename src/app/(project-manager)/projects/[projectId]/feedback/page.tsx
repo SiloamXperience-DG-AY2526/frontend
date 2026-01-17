@@ -36,11 +36,16 @@ export default function FeedbackAnalyticsPage() {
     }, [projectId]);
 
     const totalShown = feedbackData.length;
-    const totalResponse = feedbackData.filter(f => f.score !== null && f.score !== undefined).length;
+    const respondedFeedback = feedbackData.filter(
+        (f) => f.score != null && !Number.isNaN(f.score as number)
+    );
+    const totalResponse = respondedFeedback.length;
     const responseRate = totalShown > 0 ? Math.round((totalResponse / totalShown) * 100) : 0;
 
-    const averageScore = feedbackData.length > 0
-        ? Math.round((feedbackData.reduce((sum, f) => sum + f.score, 0) / feedbackData.length) * 20)
+    const averageScore = respondedFeedback.length > 0
+        ? Math.round(
+            (respondedFeedback.reduce((sum, f) => sum + (f.score as number), 0) / respondedFeedback.length) * 20
+        )
         : 0;
 
     const tagFrequency = feedbackData.reduce((acc, feedback) => {
