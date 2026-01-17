@@ -15,7 +15,11 @@ import { useAuth } from '@/contexts/AuthContext';
 const menu = [
   { name: 'Dashboard', icon: HomeIcon, href: '/finance-manager/home' },
   { name: 'Donors', icon: CurrencyDollarIcon, href: '/finance-manager/donors' },
-  { name: 'Projects', icon: ChartBarIcon, href: '/finance-manager/projects' },
+  {
+    name: 'Projects',
+    icon: ChartBarIcon,
+    href: '/finance-manager/donation-projects',
+  },
   { name: 'Reports', icon: DocumentTextIcon, href: '/finance-manager/reports' },
   { name: 'My Profile', icon: UserGroupIcon, href: '/finance-manager/profile' },
 ];

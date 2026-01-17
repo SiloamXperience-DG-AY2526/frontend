@@ -1,10 +1,21 @@
 import Sidebar from '@/components/sidebar';
+import { getUserCredentialsServer } from '@/lib/api/auth.server';
+import { UserRole } from '@/types/AuthData';
+import { redirect } from 'next/navigation';
 
-export default function DashboardLayout({
+export default async function DashboardLayout({
     children,
 }: {
     children: React.ReactNode;
 }) {
+
+    const { role } = await getUserCredentialsServer();
+
+    if (!role) redirect('/login');
+
+    if (role !== UserRole.GENERAL_MANAGER) redirect('/unauthorized');
+
+
     return (
         <div className="flex min-h-screen bg-gray-50">
             <Sidebar />

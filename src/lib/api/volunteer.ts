@@ -1,4 +1,5 @@
 import {
+  EditVolunteerProjectPayload,
   FeedbackPayload,
   FeedbackSubmitResponse,
   ProposeVolunteerProjectPayload,
@@ -8,6 +9,27 @@ import {
 } from '@/types/Volunteer';
 
 
+
+export async function getAllVolunteerProjects(
+  page: number,
+  limit: number,
+  search?: string,
+  signal?: AbortSignal
+) {
+  const qs = new URLSearchParams();
+  qs.set('page', String(page));
+  qs.set('limit', String(limit));
+  if (search?.trim()) qs.set('search', search.trim());
+
+  const res = await fetch(`/api/volunteer/all?${qs.toString()}`, {
+    signal,
+     credentials: 'include'
+  });
+
+  const json = await res.json().catch(() => null);
+  if (!res.ok) throw new Error(json?.message ?? `Request failed ${res.status}`);
+  return json;
+}
 
 export async function getAvailableVolunteerProjects(
   page: number,
@@ -29,6 +51,7 @@ export async function getAvailableVolunteerProjects(
   if (!res.ok) throw new Error(json?.message ?? `Request failed ${res.status}`);
   return json;
 }
+
 export async function submitVolunteerApplication(
   projectId: string,
   positionId: string,
@@ -130,6 +153,32 @@ export async function proposeVolunteerProject(payload: ProposeVolunteerProjectPa
 
   const json = await res.json().catch(() => null);
   if (!res.ok) throw new Error(json?.message ?? `Unable to submit proposal (${res.status})`);
+  return json;
+}
+
+export async function createVolunteerProject(payload: EditVolunteerProjectPayload) {
+  const res = await fetch('/api/volunteer/project/create', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify(payload),
+  });
+
+  const json = await res.json().catch(() => null);
+  if (!res.ok) throw new Error(json?.message ?? `Failed to create project (${res.status})`);
+  return json;
+}
+
+export async function updateVolunteerProject(projectId: string, payload: EditVolunteerProjectPayload) {
+  const res = await fetch(`/api/volunteer/project/${projectId}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify(payload),
+  });
+
+  const json = await res.json().catch(() => null);
+  if (!res.ok) throw new Error(json?.message ?? `Failed to edit project (${res.status})`);
   return json;
 }
 

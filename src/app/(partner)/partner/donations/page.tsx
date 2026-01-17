@@ -86,7 +86,8 @@ export default function DonationsPage() {
             Make a Difference Today
           </h1>
           <p className="text-center text-gray-600">
-            Support causes that matter to you. Every donation helps create positive change in our community.
+            Support causes that matter to you. Every donation helps create
+            positive change in our community.
           </p>
         </div>
 
@@ -121,13 +122,13 @@ export default function DonationsPage() {
         {/* Fund a Project Section */}
         <div className="mb-6">
           <h2 className="text-2xl font-bold mb-4">Fund a Project Today</h2>
-          
+
           {/* Search Bar */}
           <div className="mb-6 bg-gray-200 rounded-lg p-3">
             <div className="flex items-center gap-2">
               <input
                 type="text"
-                placeholder="Search through all projects to find one you'd like to support"
+                placeholder="Search volunteer projects rt"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="flex-1 bg-transparent outline-none text-gray-700 placeholder-gray-500"

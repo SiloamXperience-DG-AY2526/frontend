@@ -90,7 +90,9 @@ export default function ProjectDetailPage() {
   }
 
   // Parse objectives if it's a string
-  const objectivesList = project.objectives ? project.objectives.split('\n').filter(o => o.trim()) : [];
+  const objectivesList = project.objectives
+    ? project.objectives.split('\n').filter((o) => o.trim())
+    : [];
 
   return (
     <main className="flex-1 px-10 py-8 overflow-y-auto">
@@ -140,7 +142,9 @@ export default function ProjectDetailPage() {
             {/* About Section */}
             <div className="bg-white rounded-lg p-6">
               <h2 className="text-xl font-bold mb-3">About</h2>
-              <p className="text-gray-700 whitespace-pre-line">{project.about}</p>
+              <p className="text-gray-700 whitespace-pre-line">
+                {project.about}
+              </p>
             </div>
 
             {/* Objectives/Goals Section */}
@@ -154,7 +158,9 @@ export default function ProjectDetailPage() {
                   </div>
                 ))}
                 {objectivesList.length === 0 && (
-                  <p className="text-gray-500 italic">No objectives specified</p>
+                  <p className="text-gray-500 italic">
+                    No objectives specified
+                  </p>
                 )}
               </div>
             </div>
@@ -163,7 +169,8 @@ export default function ProjectDetailPage() {
             <div className="bg-white rounded-lg p-6">
               <h2 className="text-xl font-bold mb-3">Beneficiary Details</h2>
               <p className="text-gray-700 whitespace-pre-line">
-                {project.beneficiaries || 'Details about the beneficiaries of this project.'}
+                {project.beneficiaries ||
+                  'Details about the beneficiaries of this project.'}
               </p>
             </div>
           </div>
@@ -175,7 +182,9 @@ export default function ProjectDetailPage() {
               {project.deadline && (
                 <div className="bg-gray-400 rounded p-3 mb-4">
                   <p className="text-sm text-gray-700">deadline</p>
-                  <p className="font-semibold">{formatDate(project.deadline)}</p>
+                  <p className="font-semibold">
+                    {formatDate(project.deadline)}
+                  </p>
                 </div>
               )}
 
@@ -183,7 +192,9 @@ export default function ProjectDetailPage() {
               {project.targetFund && (
                 <div className="bg-gray-400 rounded p-3 mb-4">
                   <p className="text-sm text-gray-700">goal</p>
-                  <p className="font-semibold">{formatCurrency(project.targetFund)}</p>
+                  <p className="font-semibold">
+                    {formatCurrency(parseFloat(project.targetFund))}
+                  </p>
                 </div>
               )}
 
@@ -195,7 +206,7 @@ export default function ProjectDetailPage() {
                   </span>
                   {project.targetFund && (
                     <span className="text-gray-600">
-                      {formatCurrency(project.targetFund)}
+                      {formatCurrency(parseFloat(project.targetFund))}
                     </span>
                   )}
                 </div>

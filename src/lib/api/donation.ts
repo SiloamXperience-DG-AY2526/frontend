@@ -1,12 +1,13 @@
 // API client functions for donation features
 // Following the pattern from lib/api/auth.ts and lib/api/user.ts
 
-import { 
-  DonationProjectsResponse, 
-  DonationProject 
-} from '@/types/DonationProject';
-import { 
-  SubmitDonationApplication, 
+import {
+  DonationProjectsResponse,
+  DonationProject,
+  DonationProjectWithFinance,
+} from '@/types/DonationProjectData';
+import {
+  SubmitDonationApplication,
   DonationApplication,
   DonationHistoryResponse,
   DonationHomepage 
@@ -41,7 +42,7 @@ export async function getDonationProjects(
     params.append('type', type);
   }
 
-  const res = await fetch(`/api/v1/donation-projects?${params.toString()}`);
+  const res = await fetch(`/api/donation-projects?${params.toString()}`);
 
   if (!res.ok) {
     throw new Error('Failed to fetch donation projects.');
@@ -52,8 +53,10 @@ export async function getDonationProjects(
 }
 
 // Get a specific donation project by ID
-export async function getDonationProjectById(projectId: string): Promise<DonationProject> {
-  const res = await fetch(`/api/v1/donation-projects/${projectId}`);
+export async function getDonationProjectById(
+  projectId: string
+): Promise<DonationProject> {
+  const res = await fetch(`/api/donation-projects/${projectId}`);
 
   if (!res.ok) {
     throw new Error('Failed to fetch donation project details.');
@@ -125,4 +128,64 @@ export async function downloadDonationReceipt(donationId: string): Promise<{ rec
   }
 
   return res.json();
+}
+
+// Get all donation projects for finance manager with pagination
+export async function getFinanceManagerProjects(
+  page: number = 1,
+  limit: number = 20
+): Promise<DonationProjectsResponse> {
+  const params = new URLSearchParams({
+    page: page.toString(),
+    limit: limit.toString(),
+  });
+  const res = await fetch(`/api/donation-projects?${params.toString()}`);
+  if (!res.ok) {
+    throw new Error('Failed to fetch donation projects for finance manager.');
+  }
+  const data = await res.json();
+  return data;
+}
+
+// Get donation project finance details (donations and donors)
+export async function getDonationProjectFinance(
+  projectId: string
+): Promise<DonationProjectWithFinance> {
+  // Fetch all three endpoints in parallel
+  const [projectRes, donationsRes, donorsRes] = await Promise.all([
+    fetch(`/api/donation-projects/${projectId}`),
+    fetch(`/api/donation-projects/${projectId}/donations`),
+    fetch(`/api/donation-projects/${projectId}/donors`),
+  ]);
+
+  if (!projectRes.ok) {
+    throw new Error('Failed to fetch donation project details.');
+  }
+
+  const projectData = await projectRes.json();
+
+  // Handle donations - default to empty array if fails
+  let donations = [];
+  if (donationsRes.ok) {
+    const donationsData = await donationsRes.json();
+    donations = donationsData.donations || [];
+  } else {
+    console.warn('Failed to fetch project donations, using empty array');
+  }
+
+  // Handle donors - default to empty array if fails
+  let donors = [];
+  if (donorsRes.ok) {
+    const donorsData = await donorsRes.json();
+    donors = donorsData.donors || [];
+  } else {
+    console.warn('Failed to fetch project donors, using empty array');
+  }
+
+  return {
+    project: projectData.project,
+    totalRaised: projectData.totalRaised,
+    donations,
+    donors,
+  };
 }
