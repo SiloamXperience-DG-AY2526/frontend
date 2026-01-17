@@ -6,7 +6,7 @@ import PageHeader from '@/components/ui/PageHeader';
 import ProjectsDataTable from './_components/ProjectsDataTable';
 import Pagination from '@/components/ui/Pagination';
 import { getFinanceManagerProjects } from '@/lib/api/donation';
-import { DonationProject } from '@/types/DonationProject';
+import { DonationProject } from '@/types/DonationProjectData';
 import FilterButton from '@/components/ui/FilterButton';
 
 export default function DonationProjectsPage() {

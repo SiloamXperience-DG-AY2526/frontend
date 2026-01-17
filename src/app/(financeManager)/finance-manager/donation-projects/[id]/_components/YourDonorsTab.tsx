@@ -4,7 +4,7 @@ import Link from 'next/link';
 import DataTable, { Column } from '@/components/table/DataTable';
 import StatusBadge from '@/components/table/StatusBadge';
 import EditButton from '@/components/ui/EditButton';
-import { ProjectDonor } from '@/types/DonationProject';
+import { ProjectDonor } from '@/types/DonationProjectData';
 import FilterButton from '@/components/ui/FilterButton';
 
 interface YourDonorsTabProps {

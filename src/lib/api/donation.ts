@@ -5,7 +5,7 @@ import {
   DonationProjectsResponse,
   DonationProject,
   DonationProjectWithFinance,
-} from '@/types/DonationProject';
+} from '@/types/DonationProjectData';
 import {
   SubmitDonationApplication,
   DonationApplication,
@@ -38,7 +38,7 @@ export async function getDonationProjects(
     limit: limit.toString(),
   });
 
-  const res = await fetch(`/api/v1/donation-projects?${params.toString()}`);
+  const res = await fetch(`/api/donation-projects?${params.toString()}`);
 
   if (!res.ok) {
     throw new Error('Failed to fetch donation projects.');
@@ -52,7 +52,7 @@ export async function getDonationProjects(
 export async function getDonationProjectById(
   projectId: string
 ): Promise<DonationProject> {
-  const res = await fetch(`/api/v1/donation-projects/${projectId}`);
+  const res = await fetch(`/api/donation-projects/${projectId}`);
 
   if (!res.ok) {
     throw new Error('Failed to fetch donation project details.');
@@ -131,65 +131,26 @@ export async function downloadDonationReceipt(
   return blob;
 }
 
-//sample data: temp
-const sample = {
-  projects: [
-    {
-      id: 'dp_001',
-      title: 'Clean Water for Rural Villages',
-      location: 'Cambodia',
-      about: 'Providing access to clean and safe drinking water.',
-      objectives: 'Install filtration systems.',
-      beneficiaries: 'Rural households',
-      initiatorName: 'Hope Foundation',
-      organisingTeam: 'Water Aid Team',
-      targetFund: 50000,
-      currentFund: 18350,
-      brickSize: 50,
-      deadline: '2026-06-30T23:59:59.000Z',
-      type: 'ONGOING',
-      startDate: '2026-01-01T00:00:00.000Z',
-      endDate: '2026-12-31T23:59:59.000Z',
-      submissionStatus: 'APPROVED',
-      approvalStatus: 'APPROVED',
-      approvalNotes: null,
-      image: null,
-      attachments: null,
-      managerId: 'user_123',
-      createdAt: '2026-01-10T08:30:00.000Z',
-      updatedAt: '2026-01-15T14:45:00.000Z',
-    },
-  ],
-  pagination: {
-    page: 1,
-    limit: 10,
-    total: 1,
-    totalPages: 1,
-  },
-} as const satisfies DonationProjectsResponse;
-
 // Get all donation projects for finance manager with pagination
 export async function getFinanceManagerProjects(
-  _page: number = 1,
-  _limit: number = 20
+  page: number = 1,
+  limit: number = 20
 ): Promise<DonationProjectsResponse> {
   // TODO: Implement actual API call with pagination
-  // const params = new URLSearchParams({
-  //   page: page.toString(),
-  //   limit: limit.toString(),
-  // });
-  // const res = await fetch(
-  //   `/api/v1/finance/donation-projects?${params.toString()}`
-  // );
-  // if (!res.ok) {
-  //   throw new Error('Failed to fetch donation projects for finance manager.');
-  // }
-  // const data = await res.json();
-  // return data;
+  const params = new URLSearchParams({
+    page: page.toString(),
+    limit: limit.toString(),
+  });
+  const res = await fetch(`/api/donation-projects?${params.toString()}`);
+  if (!res.ok) {
+    throw new Error('Failed to fetch donation projects for finance manager.');
+  }
+  const data = await res.json();
+  return data;
 
   // Temporary: return sample data
-  const data = sample;
-  return data;
+  // const data = sample;
+  // return data;
 }
 
 // Get donation project finance details (donations and refunds)

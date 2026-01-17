@@ -1,7 +1,7 @@
 'use client';
 
 import DataTable, { Column } from '@/components/table/DataTable';
-import { ProjectDonation } from '@/types/DonationProject';
+import { ProjectDonation } from '@/types/DonationProjectData';
 import { formatDateDDMMYYYY } from '@/lib/formatDate';
 import FilterButton from '@/components/ui/FilterButton';
 

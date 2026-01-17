@@ -1,4 +1,4 @@
-import { DonationProject } from '@/types/DonationProject';
+import { DonationProject } from '@/types/DonationProjectData';
 import DataTable, { Column } from '@/components/table/DataTable';
 import StatusBadge from '@/components/table/StatusBadge';
 import EditButton from '@/components/ui/EditButton';
@@ -19,17 +19,54 @@ export default function ProjectsDataTable({
   onEditClick,
   onDeleteClick,
 }: ProjectsDataTableProps) {
-  const getStatusVariant = (status: string) => {
-    switch (status) {
-      case 'APPROVED':
+  const getApprovalStatusVariant = (status: string) => {
+    switch (status.toLowerCase()) {
+      case 'approved':
         return 'success';
-      case 'REJECTED':
+      case 'rejected':
         return 'error';
-      case 'PENDING':
+      case 'pending':
+        return 'neutral';
+      case 'reviewing':
         return 'warning';
       default:
         return 'neutral';
     }
+  };
+
+  const getSubmissionStatusVariant = (status: string) => {
+    switch (status.toLowerCase()) {
+      case 'submitted':
+        return 'success';
+      case 'withdrawn':
+        return 'error';
+      case 'draft':
+        return 'warning';
+      default:
+        return 'neutral';
+    }
+  };
+
+  const getOperationStatusVariant = (status: string) => {
+    switch (status.toLowerCase()) {
+      case 'notstarted':
+        return 'neutral';
+      case 'ongoing':
+        return 'success';
+      case 'paused':
+        return 'warning';
+      case 'cancelled':
+        return 'error';
+      case 'completed':
+        return 'info';
+      default:
+        return 'neutral';
+    }
+  };
+
+  const formatType = (type: string) => {
+    if (type === 'partnerLed') return 'Partner Led';
+    return type.charAt(0).toUpperCase() + type.slice(1);
   };
 
   const formatTimePeriod = (startDate: string, endDate: string) => {
@@ -62,17 +99,49 @@ export default function ProjectsDataTable({
     {
       header: 'Funds Raised',
       accessor: (project) =>
-        project.currentFund ? `$${project.currentFund} raised` : '-',
+        project.totalRaised ? `$${project.totalRaised}` : '$0',
     },
     {
-      header: 'Status',
+      header: 'Type',
+      accessor: (project) => formatType(project.type), // Display plain text for type
+    },
+    {
+      header: 'Submission',
       accessor: (project) => (
         <StatusBadge
-          label={project.approvalStatus}
-          variant={getStatusVariant(project.approvalStatus)}
+          label={
+            project.submissionStatus.charAt(0).toUpperCase() +
+            project.submissionStatus.slice(1)
+          }
+          variant={getSubmissionStatusVariant(project.submissionStatus)}
         />
       ),
     },
+    {
+      header: 'Approval',
+      accessor: (project) => (
+        <StatusBadge
+          label={
+            project.approvalStatus.charAt(0).toUpperCase() +
+            project.approvalStatus.slice(1)
+          }
+          variant={getApprovalStatusVariant(project.approvalStatus)}
+        />
+      ),
+    },
+    {
+      header: 'Operation',
+      accessor: (project) => (
+        <StatusBadge
+          label={
+            project.operationStatus.charAt(0).toUpperCase() +
+            project.operationStatus.slice(1)
+          }
+          variant={getOperationStatusVariant(project.operationStatus)}
+        />
+      ),
+    },
+
     {
       header: 'Action',
       accessor: (project) => (

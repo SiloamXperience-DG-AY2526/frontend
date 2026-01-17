@@ -5,7 +5,7 @@ import { useParams } from 'next/navigation';
 import PageHeader from '@/components/ui/PageHeader';
 import LoadingTableState from '@/components/table/LoadingTableState';
 import { getDonationProjectFinance } from '@/lib/api/donation';
-import { DonationProjectWithFinance } from '@/types/DonationProject';
+import { DonationProjectWithFinance } from '@/types/DonationProjectData';
 import TotalFundsRaisedCard from './_components/TotalFundsRaisedCard';
 import DonationsTab from './_components/DonationsTab';
 import YourDonorsTab from './_components/YourDonorsTab';
