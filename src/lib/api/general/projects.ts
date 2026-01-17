@@ -1,57 +1,73 @@
 import { ProjectApprovalStatus } from '@/types/ProjectData';
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL!;
-
 export type FeedbackType = 'supervisor' | 'peer' | 'self';
 
+// Get all volunteer projects for the current user
+export async function getVolunteerProjects() {
+  const res = await fetch('/api/v1/volunteer-projects');
 
-// changes the approval status of a proposed volunteer project
-export const changeProposedProjectStatus = async (
-    projectId: string,
-    status: ProjectApprovalStatus
-) => {
+  if (!res.ok) {
+    const error = await res.json();
+    throw new Error(error.message || 'Failed to fetch volunteer projects');
+  }
 
-    const response = await fetch(`${BACKEND_URL}/volunteer-projects/${projectId}/ApprovalStatus`, {
-        method: 'PATCH',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify({ status }),
-    });
+  return res.json();
+}
 
-    if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Failed to update project status');
-    }
+// Change the approval status of a proposed volunteer project
+export async function changeProposedProjectStatus(
+  projectId: string,
+  status: ProjectApprovalStatus
+) {
+  const res = await fetch(`/api/v1/volunteer-projects/${projectId}/status`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ status }),
+  });
 
-    return response.json();
-};
+  if (!res.ok) {
+    const error = await res.json();
+    throw new Error(error.message || 'Failed to update project status');
+  }
 
+  return res.json();
+}
 
-// submits peer feedback for a team member
-export const submitPeerFeedback = async (
-    payload: {
-        feedbackType: FeedbackType;
-        reviewer: string;
-        reviewee: string;
-        score: number;
-        strengths: string;
-        improvements: string;
-        submittedAt: string;
-        projectId: string;
-    }
-) => {
-    const response = await fetch(`${BACKEND_URL}/general/peer-feedback`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify(payload),
-    });
-    if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Failed to submit feedback');
-    }
-};
+// Submit peer feedback for a team member
+export async function submitPeerFeedback(payload: {
+  feedbackType: FeedbackType;
+  reviewer: string;
+  reviewee: string;
+  score: number;
+  strengths: string;
+  improvements: string;
+  submittedAt: string;
+  projectId: string;
+}) {
+  const res = await fetch('/api/v1/volunteer-projects/peer-feedback', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+
+  if (!res.ok) {
+    const error = await res.json();
+    throw new Error(error.message || 'Failed to submit feedback');
+  }
+
+  return res.json();
+}
+
+// get peer feedback for a specific project
+export async function getProjectPeerFeedback(projectId: string) {
+  const res = await fetch(
+    `/api/v1/volunteer-projects/peer-feedback/${projectId}`
+  );
+
+  if (!res.ok) {
+    const error = await res.json();
+    throw new Error(error.message || 'Failed to fetch peer feedback');
+  }
+
+  return res.json();
+}

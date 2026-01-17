@@ -49,21 +49,20 @@ export default function FeedbackPage() {
       await submitPeerFeedback(payload);
       alert('Feedback submitted successfully!');
 
-      setFeedbackType(null);
-      setFormData({
-        reviewer: '',
-        reviewee: '',
-        score: '',
-        strengths: '',
-        improvements: '',
-      });
-    } catch (error) {
-      console.error(error);
-      alert('Something went wrong. Please try again.');
-    } finally {
-      setLoading(false);
-    }
-  };
+            setFeedbackType(null);
+            setFormData({
+                reviewer: '',
+                reviewee: '',
+                score: '',
+                strengths: '',
+                improvements: '',
+            });
+        } catch {
+            alert('Something went wrong. Please try again.');
+        } finally {
+            setLoading(false);
+        }
+    };
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
