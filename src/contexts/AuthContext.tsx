@@ -50,7 +50,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       try {
         const authUser = await getAuthUser();
         setUser(authUser);
-      } catch (_error) {
+      } catch {
         // Silently fail if not authenticated
         setUser(null);
       } finally {
