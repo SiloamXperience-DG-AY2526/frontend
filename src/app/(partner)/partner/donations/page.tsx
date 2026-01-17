@@ -7,21 +7,32 @@ import Sidebar from '@/components/sidebar';
 import Button from '@/components/ui/Button';
 import { getDonationHomepage, getDonationProjects } from '@/lib/api/donation';
 import { DonationProject } from '@/types/DonationProject';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function DonationsPage() {
   const [projects, setProjects] = useState<DonationProject[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [statistics, setStatistics] = useState({
+    totalRaised: '0',
     totalDonations: 0,
-    totalProjects: 0,
-    totalDonors: 0,
+    activeProjects: 0,
   });
   const router = useRouter();
+  const { user, isLoading: authLoading } = useAuth();
 
   useEffect(() => {
-    loadData();
-  }, []);
+    // Redirect to login if not authenticated
+    if (!authLoading && !user) {
+      router.push('/partner/login');
+      return;
+    }
+
+    // Load data only when authenticated
+    if (user) {
+      loadData();
+    }
+  }, [user, authLoading, router]);
 
   const loadData = async () => {
     setLoading(true);
@@ -34,7 +45,7 @@ export default function DonationsPage() {
 
       // Load projects
       const response = await getDonationProjects('all');
-      setProjects(response.projects);
+      setProjects(response.projectsWithTotals);
     } catch (error) {
       console.error('Failed to load donation data:', error);
       alert('Failed to load donation data. Please try again.');
@@ -63,7 +74,7 @@ export default function DonationsPage() {
     return Math.min((current / target) * 100, 100);
   };
 
-  const filteredProjects = projects.filter((project) =>
+  const filteredProjects = (projects || []).filter((project) =>
     project.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
     project.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
     project.about.toLowerCase().includes(searchQuery.toLowerCase())
@@ -87,30 +98,27 @@ export default function DonationsPage() {
         {/* Statistics Cards */}
         <div className="grid grid-cols-3 gap-6 mb-12">
           <div className="bg-gray-200 rounded-lg p-6 text-center">
-            <div className="text-4xl mb-2">💼</div>
             <div className="text-3xl font-bold mb-1">
-              {statistics.totalProjects}
+              {statistics.activeProjects}
             </div>
             <div className="text-gray-700 font-semibold">
-              Beneficiaries Supported
+              Active Projects
             </div>
           </div>
           <div className="bg-gray-200 rounded-lg p-6 text-center">
-            <div className="text-4xl mb-2">💰</div>
             <div className="text-3xl font-bold mb-1">
-              {formatCurrency(statistics.totalDonations)}
+              {formatCurrency(parseFloat(statistics.totalRaised))}
             </div>
             <div className="text-gray-700 font-semibold">
               Total Funds Raised
             </div>
           </div>
           <div className="bg-gray-200 rounded-lg p-6 text-center">
-            <div className="text-4xl mb-2">🎁</div>
             <div className="text-3xl font-bold mb-1">
-              {statistics.totalDonors}
+              {statistics.totalDonations}
             </div>
             <div className="text-gray-700 font-semibold">
-              Active Donors
+              Total Donations
             </div>
           </div>
         </div>
@@ -122,7 +130,6 @@ export default function DonationsPage() {
           {/* Search Bar */}
           <div className="mb-6 bg-gray-200 rounded-lg p-3">
             <div className="flex items-center gap-2">
-              <span className="text-gray-600">🔍</span>
               <input
                 type="text"
                 placeholder="Search through all projects to find one you'd like to support"
@@ -148,10 +155,10 @@ export default function DonationsPage() {
               <div
                 key={project.id}
                 onClick={() => handleProjectClick(project.id)}
-                className="bg-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition cursor-pointer"
+                className="bg-white rounded-2xl overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer border border-gray-200 flex flex-col"
               >
                 {/* Project Image */}
-                <div className="h-48 bg-white flex items-center justify-center relative overflow-hidden">
+                <div className="h-56 bg-gray-100 flex items-center justify-center relative overflow-hidden">
                   {project.image ? (
                     <Image
                       src={project.image}
@@ -161,40 +168,40 @@ export default function DonationsPage() {
                       sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                     />
                   ) : (
-                    <p className="text-gray-400">Project Image</p>
+                    <p className="text-gray-400 text-lg">Project Image</p>
                   )}
                 </div>
 
                 {/* Project Details */}
-                <div className="bg-gray-300 p-4">
+                <div className="p-6 flex flex-col flex-1">
                   {/* Title */}
-                  <h3 className="text-lg font-bold text-black mb-2">
+                  <h3 className="text-xl font-bold text-gray-900 mb-3">
                     {project.title}
                   </h3>
 
                   {/* Description */}
-                  <p className="text-sm text-gray-700 mb-3 line-clamp-2">
+                  <p className="text-sm text-gray-600 mb-4 line-clamp-2 leading-relaxed">
                     {project.about}
                   </p>
 
                   {/* Raised Amount */}
-                  <div className="mb-3">
-                    <p className="text-xl font-bold">
-                      {formatCurrency(project.currentFund)}
+                  <div className="mb-4">
+                    <p className="text-2xl font-bold text-gray-900 mb-2">
+                      {formatCurrency(parseFloat(project.totalRaised || '0'))}
                       {project.targetFund && (
-                        <span className="text-sm font-normal text-gray-600">
-                          {' '}raised of {formatCurrency(project.targetFund)}
+                        <span className="text-base font-normal text-gray-600">
+                          {' '}raised of {formatCurrency(parseFloat(project.targetFund))}
                         </span>
                       )}
                     </p>
                     {project.targetFund && (
-                      <div className="w-full h-2 bg-gray-400 rounded-full overflow-hidden mt-1">
+                      <div className="w-full h-3 bg-gray-200 rounded-full overflow-hidden">
                         <div
-                          className="h-full bg-black"
+                          className="h-full bg-gray-800 rounded-full transition-all duration-500"
                           style={{
                             width: `${calculateProgress(
-                              project.currentFund,
-                              project.targetFund
+                              parseFloat(project.totalRaised || '0'),
+                              parseFloat(project.targetFund)
                             )}%`,
                           }}
                         />
@@ -203,15 +210,19 @@ export default function DonationsPage() {
                   </div>
 
                   {/* Donor Count */}
-                  <p className="text-sm text-gray-700 mb-4">234 donors</p>
+                  <p className="text-sm text-gray-600 mb-5">234 donors</p>
 
                   {/* Donate Button */}
-                  <div className="w-full">
-                    <Button
-                      label="Donate Now!"
-                      onClick={() => handleDonate(project.id)}
-                      variant="primary"
-                    />
+                  <div className="mt-auto flex justify-end">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDonate(project.id);
+                      }}
+                      className="px-6 py-2 bg-gray-300 hover:bg-gray-400 text-gray-900 font-semibold rounded-lg transition-colors duration-200"
+                    >
+                      Donate Now!
+                    </button>
                   </div>
                 </div>
               </div>

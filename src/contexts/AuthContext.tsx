@@ -2,7 +2,7 @@
 
 import { getAuthUser, login, logout } from '@/lib/api/auth';
 import { AuthUser, AuthPayload, AuthContextValue } from '@/types/AuthData';
-import { createContext, useCallback, useContext, useMemo, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
@@ -42,6 +42,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     setIsLoading(false);
   }, []);
+
+  // Check authentication status on mount
+  useEffect(() => {
+    authRefresh();
+  }, [authRefresh]);
 
   const value = useMemo(
     () => ({ user, isLoading, authLogin, authLogout, authRefresh }),

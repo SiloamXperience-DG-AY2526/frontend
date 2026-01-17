@@ -7,17 +7,25 @@ import Sidebar from '@/components/sidebar';
 import Button from '@/components/ui/Button';
 import { getDonationProjectById } from '@/lib/api/donation';
 import { DonationProject } from '@/types/DonationProject';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function ProjectDetailPage() {
   const router = useRouter();
   const params = useParams();
   const projectId = params?.projectId as string;
+  const { user, isLoading: authLoading } = useAuth();
 
   const [project, setProject] = useState<DonationProject | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!projectId) return;
+    // Redirect to login if not authenticated
+    if (!authLoading && !user) {
+      router.push('/partner/login');
+      return;
+    }
+
+    if (!projectId || !user) return;
     
     const loadProject = async () => {
       setLoading(true);
@@ -32,23 +40,27 @@ export default function ProjectDetailPage() {
         setLoading(false);
       }
     };
-    
+
     loadProject();
-  }, [projectId, router]);
+  }, [projectId, router, user, authLoading]);
   const handleDonate = () => {
     router.push(`/partner/donations/${projectId}/donate`);
   };
 
-  const formatCurrency = (amount: number) => {
+  const formatCurrency = (amount: string | number | null) => {
+    const numAmount = typeof amount === 'string' ? parseFloat(amount) : amount || 0;
     return new Intl.NumberFormat('en-SG', {
       style: 'currency',
       currency: 'SGD',
-    }).format(amount);
+    }).format(numAmount);
   };
 
-  const calculateProgress = (current: number, target: number | null) => {
-    if (!target || target === 0) return 0;
-    return Math.min((current / target) * 100, 100);
+  const calculateProgress = (current: string | null, target: string | null) => {
+    if (!target || !current) return 0;
+    const currentNum = parseFloat(current);
+    const targetNum = parseFloat(target);
+    if (targetNum === 0) return 0;
+    return Math.min((currentNum / targetNum) * 100, 100);
   };
 
   const formatDate = (dateString: string) => {
@@ -190,7 +202,7 @@ export default function ProjectDetailPage() {
               <div className="bg-white rounded p-4 mb-4">
                 <div className="flex justify-between mb-2">
                   <span className="font-bold">
-                    {formatCurrency(project.currentFund)}
+                    {formatCurrency(project.totalRaised || '0')}
                   </span>
                   {project.targetFund && (
                     <span className="text-gray-600">
@@ -203,7 +215,7 @@ export default function ProjectDetailPage() {
                     <div
                       className="h-full bg-black"
                       style={{
-                        width: `${calculateProgress(project.currentFund, project.targetFund)}%`,
+                        width: `${calculateProgress(project.totalRaised || '0', project.targetFund)}%`,
                       }}
                     />
                   </div>

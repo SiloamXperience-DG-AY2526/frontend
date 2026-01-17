@@ -12,7 +12,7 @@ import { DonationType } from '@/types/DonationData';
 const PRESET_AMOUNTS = [50, 100, 200, 500, 1000, 2000];
 
 export default function DonatePage() {
-  const { user } = useAuth();
+  const { user, isLoading: authLoading } = useAuth();
   const router = useRouter();
   const params = useParams();
   const projectId = params?.projectId as string;
@@ -47,7 +47,13 @@ export default function DonatePage() {
   ];
 
   useEffect(() => {
-    if (!projectId) return;
+    // Redirect to login if not authenticated
+    if (!authLoading && !user) {
+      router.push('/partner/login');
+      return;
+    }
+
+    if (!projectId || !user) return;
     
     const loadProjectDetails = async () => {
       setLoading(true);
@@ -64,7 +70,7 @@ export default function DonatePage() {
     };
     
     loadProjectDetails();
-  }, [projectId, router]);
+  }, [projectId, router, user, authLoading]);
 
   const getDonationAmount = () => {
     if (selectedAmount) return selectedAmount;

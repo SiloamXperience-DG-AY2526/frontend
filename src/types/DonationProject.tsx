@@ -1,10 +1,10 @@
-// Donation Project Types (based on OpenAPI schema)
+// Donation Project Types (based on actual backend response)
 
-export type DonationProjectType = 'ONGOING' | 'SPECIFIC';
+export type DonationProjectType = 'brick' | 'sponsor' | 'partnerLed';
 
-export type DonationProjectSubmissionStatus = 'DRAFT' | 'SUBMITTED' | 'APPROVED' | 'REJECTED';
+export type DonationProjectSubmissionStatus = 'draft' | 'submitted' | 'withdrawn';
 
-export type DonationProjectApprovalStatus = 'PENDING' | 'APPROVED' | 'REJECTED';
+export type DonationProjectApprovalStatus = 'pending' | 'approved' | 'rejected';
 
 export type DonationProject = {
   id: string;
@@ -12,13 +12,12 @@ export type DonationProject = {
   location: string;
   about: string;
   objectives: string;
-  beneficiaries: string | null;
+  beneficiaries: string;
   initiatorName: string | null;
   organisingTeam: string | null;
-  targetFund: number | null;
-  currentFund: number;
-  brickSize: number | null;
-  deadline: string;
+  targetFund: string | null; // Backend returns as string
+  brickSize: string | null; // Backend returns as string
+  deadline: string | null;
   type: DonationProjectType;
   startDate: string;
   endDate: string;
@@ -27,17 +26,24 @@ export type DonationProject = {
   approvalNotes: string | null;
   image: string | null;
   attachments: string | null;
-  managerId: string;
+  managedBy: string;
   createdAt: string;
   updatedAt: string;
+  project_manager: {
+    id: string;
+    firstName: string;
+    lastName: string;
+  };
+  totalRaised?: string; // Backend returns as string
+  objectivesList?: string[];
 };
 
 export type DonationProjectsResponse = {
-  projects: DonationProject[];
+  projectsWithTotals: DonationProject[];
   pagination: {
     page: number;
     limit: number;
-    total: number;
+    totalCount: number;
     totalPages: number;
   };
 };
