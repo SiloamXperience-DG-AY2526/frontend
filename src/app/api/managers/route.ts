@@ -46,7 +46,7 @@ export async function GET() {
         projects: manager.managedProjects || [],
         role: manager.role,
         email: manager.email,
-        status: manager.isActive
+        status: manager.isActive ? 'Active' : 'Inactive'
       })
     );
 
