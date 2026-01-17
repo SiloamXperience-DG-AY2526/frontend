@@ -3,6 +3,7 @@ import React, { useMemo, useState } from 'react';
 
 import VolunteeringTab from '@/components/contribution/VolunteeringTab';
 import ApplicationTab from '@/components/contribution/ApplicationTab';
+import DonationsTab from '@/components/contribution/DonationsTab';
 import Link from 'next/link';
 
 type TabKey = 'volunteering' | 'donations' | 'applications';
@@ -84,11 +85,7 @@ export default function MyContributions() {
 
         {activeTab === 'applications' && <ApplicationTab  />}
 
-        {activeTab === 'donations' && (
-          <div className="text-sm text-gray-500 mt-6">
-            No donation records yet.
-          </div>
-        )}
+        {activeTab === 'donations' && <DonationsTab />}
       </main>
     </div>
   );

@@ -24,6 +24,7 @@ export default function DonatePage() {
   const [selectedAmount, setSelectedAmount] = useState<number | null>(null);
   const [customAmount, setCustomAmount] = useState('');
   const [paymentMethod, setPaymentMethod] = useState('');
+  const [paymentDetails, setPaymentDetails] = useState('');
   const [donationType] = useState<DonationType>('individual');
   const [countryOfResidence] = useState('Singapore');
 
@@ -35,13 +36,22 @@ export default function DonatePage() {
     projectTitle?: string;
   } | null>(null);
 
-  // Dummy payment methods (saved cards)
-  const savedCards = [
-    { id: '1', type: 'visa', last4: '1234' },
-    { id: '2', type: 'visa', last4: '5678' },
-    { id: '3', type: 'visa', last4: '9012' },
-    { id: '4', type: 'visa', last4: '3456' },
-    { id: '5', type: 'visa', last4: '7890' },
+  const paymentOptions = [
+    {
+      id: 'card',
+      label: 'Card',
+      hint: 'Visa, Mastercard, AMEX',
+    },
+    {
+      id: 'bank',
+      label: 'Bank Transfer',
+      hint: 'Local transfer',
+    },
+    {
+      id: 'qr',
+      label: 'Online QR Code',
+      hint: 'PayNow/QR',
+    },
   ];
 
   useEffect(() => {
@@ -117,7 +127,9 @@ export default function DonatePage() {
         projectId: projectId,
         type: donationType,
         countryOfResidence: countryOfResidence,
-        paymentMode: paymentMethod,
+        paymentMode: paymentDetails
+          ? `${paymentMethod} - ${paymentDetails}`
+          : paymentMethod,
         amount: getDonationAmount(),
       };
 
@@ -334,25 +346,47 @@ export default function DonatePage() {
                 </h2>
 
                 {/* Payment Method List */}
-                <div className="space-y-4 mb-8">
-                  {savedCards.map((card) => (
+                <div className="space-y-4 mb-6">
+                  {paymentOptions.map((option) => (
                     <button
-                      key={card.id}
-                      onClick={() =>
-                        setPaymentMethod(`${card.type} ****${card.last4}`)
-                      }
+                      key={option.id}
+                      onClick={() => setPaymentMethod(option.label)}
                       className={`w-full rounded-xl border p-4 text-left flex items-center gap-3 transition ${
-                        paymentMethod === `${card.type} ****${card.last4}`
+                        paymentMethod === option.label
                           ? 'border-teal-600 bg-[#E3F0EC]'
                           : 'border-gray-200 hover:bg-gray-50'
                       }`}
                     >
-                      <span className="text-2xl">💳</span>
-                      <span className="font-semibold text-gray-800">
-                        {card.type} •••• {card.last4}
+                      <span className="text-2xl">
+                        {option.id === 'card'
+                          ? '💳'
+                          : option.id === 'bank'
+                            ? '🏦'
+                            : '🔳'}
                       </span>
+                      <div>
+                        <div className="font-semibold text-gray-800">
+                          {option.label}
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          {option.hint}
+                        </div>
+                      </div>
                     </button>
                   ))}
+                </div>
+
+                <div className="mb-8">
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Additional details (optional)
+                  </label>
+                  <input
+                    type="text"
+                    value={paymentDetails}
+                    onChange={(e) => setPaymentDetails(e.target.value)}
+                    placeholder="e.g., Bank name or card type"
+                    className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm text-gray-800 outline-none focus:border-teal-600 transition"
+                  />
                 </div>
 
                 {/* Continue Button */}
@@ -395,7 +429,11 @@ export default function DonatePage() {
                     <p className="font-semibold mb-2">Payment method</p>
                     <p className="text-gray-700 flex items-center gap-2">
                       <span>💳</span>
-                      <span>•••• {paymentMethod.slice(-4)}</span>
+                      <span>
+                        {paymentDetails
+                          ? `${paymentMethod} - ${paymentDetails}`
+                          : paymentMethod}
+                      </span>
                     </p>
                   </div>
                 </div>
@@ -422,33 +460,15 @@ export default function DonatePage() {
                       Donation Successful
                     </h2>
                     <p className="text-gray-600 mb-2">
-                      Thank you for your generous donation of{' '}
-                      {formatCurrency(donationResult.amount || 0)} to{' '}
-                      {donationResult.projectTitle}
+                      Thank you for your interest in supporting{' '}
+                      {donationResult.projectTitle}.
                     </p>
                     <p className="text-gray-700 font-semibold mb-6">
-                      Receipt ID: #{donationResult.receiptId}
+                      We will reach out with more details.
                     </p>
-
-                    {/* Subscribe Checkbox */}
-                    <div className="mb-8">
-                      <label className="flex items-center justify-center gap-2">
-                        <input type="checkbox" className="w-4 h-4" />
-                        <span className="text-sm text-gray-600">
-                          Subscribe for email reminder emails for recurring
-                          donations?
-                        </span>
-                      </label>
-                    </div>
 
                     {/* Action Buttons */}
                     <div className="flex flex-wrap gap-3 justify-center">
-                      <button
-                        onClick={() => router.push('/partner/donations')}
-                        className="px-6 py-3 bg-gray-200 hover:bg-gray-300 text-gray-900 text-sm font-semibold rounded-lg transition-colors duration-200"
-                      >
-                        Request Receipt
-                      </button>
                       <button
                         onClick={() => router.push('/partner/donations')}
                         className="px-6 py-3 bg-teal-600 hover:bg-teal-700 text-white text-sm font-semibold rounded-lg transition-colors duration-200"
