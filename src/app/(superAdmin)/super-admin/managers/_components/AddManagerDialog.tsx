@@ -71,8 +71,10 @@ export default function AddManagerDialog({
       onSuccess();
       resetForm();
       onClose();
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+      setError(errorMessage);
+      console.error(err);
     } finally {
       setLoading(false);
     }

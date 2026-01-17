@@ -18,8 +18,10 @@ export function useManagers() {
       const data = await res.json();
       setManagers(data);
       setError(null);
-    } catch (e) {
-      setError('Failed to load managers');
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+      setError(errorMessage);
+      console.error(err);
     } finally {
       setLoading(false);
     }
