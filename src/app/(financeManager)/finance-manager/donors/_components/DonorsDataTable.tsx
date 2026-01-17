@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { Donor } from '@/types/DonorData';
 import DataTable, { Column } from '@/components/table/DataTable';
 import StatusBadge from '@/components/table/StatusBadge';
@@ -17,7 +18,15 @@ export default function DonorsDataTable({
   const columns: Column<Donor>[] = [
     {
       header: 'Partner Name',
-      accessor: (donor) => `${donor.partnerName}`,
+      accessor: (donor) => (
+        <Link
+          href={`/finance-manager/donors/${donor.donorId}`}
+          className="hover:underline"
+          style={{ color: '#2C89A5' }}
+        >
+          {donor.partnerName}
+        </Link>
+      ),
     },
     {
       header: 'Projects',
