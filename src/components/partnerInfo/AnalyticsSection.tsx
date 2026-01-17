@@ -13,9 +13,6 @@ function LineChart({
   data: number[];
   height?: number;
 }) {
-  const width = CHART_WIDTH;
-  const padding = CHART_PADDING;
-
   const { points, minY, maxY } = useMemo(() => {
     const min = Math.min(...data);
     const max = Math.max(...data);
@@ -24,13 +21,14 @@ function LineChart({
     const range = safeMax - safeMin || 1;
 
     const xStep =
-      (width - padding.left - padding.right) / Math.max(1, data.length - 1);
-    const yScale = (height - padding.top - padding.bottom) / range;
+      (CHART_WIDTH - CHART_PADDING.left - CHART_PADDING.right) /
+      Math.max(1, data.length - 1);
+    const yScale = (height - CHART_PADDING.top - CHART_PADDING.bottom) / range;
 
     const pts = data
       .map((y, i) => {
-        const x = padding.left + i * xStep;
-        const yy = padding.top + (safeMax - y) * yScale;
+        const x = CHART_PADDING.left + i * xStep;
+        const yy = CHART_PADDING.top + (safeMax - y) * yScale;
         return `${x.toFixed(2)},${yy.toFixed(2)}`;
       })
       .join(' ');
@@ -45,7 +43,8 @@ function LineChart({
       const t = i / (ticks - 1);
       const value = minY + (1 - t) * range;
       const y =
-        padding.top + ((height - padding.top - padding.bottom) * i) / (ticks - 1);
+        CHART_PADDING.top +
+        ((height - CHART_PADDING.top - CHART_PADDING.bottom) * i) / (ticks - 1);
       return { value, y };
     });
   }, [height, maxY, minY]);
@@ -53,27 +52,34 @@ function LineChart({
   const xTicks = useMemo(() => {
     const maxTick = 12;
     const ticks = maxTick + 1;
-    const xStep = (width - padding.left - padding.right) / Math.max(1, ticks - 1);
+    const xStep =
+      (CHART_WIDTH - CHART_PADDING.left - CHART_PADDING.right) /
+      Math.max(1, ticks - 1);
     return Array.from({ length: ticks }, (_, i) => ({
       label: String(i),
-      x: padding.left + i * xStep,
+      x: CHART_PADDING.left + i * xStep,
     }));
   }, []);
 
   return (
-    <svg viewBox={`0 0 ${width} ${height}`} className="w-full" role="img" aria-label="Line chart">
+    <svg
+      viewBox={`0 0 ${CHART_WIDTH} ${height}`}
+      className="w-full"
+      role="img"
+      aria-label="Line chart"
+    >
       {yTicks.map((t) => (
         <g key={t.y}>
           <line
-            x1={padding.left}
-            x2={width - padding.right}
+            x1={CHART_PADDING.left}
+            x2={CHART_WIDTH - CHART_PADDING.right}
             y1={t.y}
             y2={t.y}
             stroke="#E5E7EB"
             strokeWidth="1"
           />
           <text
-            x={padding.left - 8}
+            x={CHART_PADDING.left - 8}
             y={t.y + 4}
             textAnchor="end"
             fontSize="10"
@@ -85,18 +91,18 @@ function LineChart({
       ))}
 
       <line
-        x1={padding.left}
-        x2={padding.left}
-        y1={padding.top}
-        y2={height - padding.bottom}
+        x1={CHART_PADDING.left}
+        x2={CHART_PADDING.left}
+        y1={CHART_PADDING.top}
+        y2={height - CHART_PADDING.bottom}
         stroke="#111827"
         strokeWidth="1"
       />
       <line
-        x1={padding.left}
-        x2={width - padding.right}
-        y1={height - padding.bottom}
-        y2={height - padding.bottom}
+        x1={CHART_PADDING.left}
+        x2={CHART_WIDTH - CHART_PADDING.right}
+        y1={height - CHART_PADDING.bottom}
+        y2={height - CHART_PADDING.bottom}
         stroke="#111827"
         strokeWidth="1"
       />
@@ -106,8 +112,8 @@ function LineChart({
           <line
             x1={t.x}
             x2={t.x}
-            y1={height - padding.bottom}
-            y2={height - padding.bottom + 4}
+            y1={height - CHART_PADDING.bottom}
+            y2={height - CHART_PADDING.bottom + 4}
             stroke="#111827"
             strokeWidth="1"
           />
@@ -160,9 +166,7 @@ export function AnalyticsSection({ partnerInfo }: { partnerInfo: PartnerInfoResp
     return Math.round((totalHoursCompleted / partnerInfo.projects.length) * 100) / 100;
   }, [partnerInfo.projects.length, totalHoursCompleted]);
 
-  const averageScore = useMemo(() => {
-    return 69.69; // TODO: What is "average score" based on in the Figma mockup??
-  }, [partnerInfo.performance]);
+  const averageScore = 69.69; // TODO: What is "average score" based on in the Figma mockup??
 
   return (
     <div className="grid grid-cols-1 gap-4 lg:grid-cols-[1.7fr_1fr]">
