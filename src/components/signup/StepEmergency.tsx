@@ -22,7 +22,7 @@ export default function StepEmergency({
   next,
 }: SignUpFormProps) {
   const [countryCodes, setCountryCodes] = useState<string[]>([]);
-  const [emergencyCode, setEmergencyCode] = useState<string>(''); // UI-only
+
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [toast, setToast] = useState<{
     open: boolean;
@@ -40,10 +40,7 @@ export default function StepEmergency({
   const validate = () => {
     const e: Record<string, string> = {};
 
-    if (!data.emergencyContactName?.trim()) e.emergencyContactName = 'Required';
-
-    // Code is UI-only but required for this step
-    if (!emergencyCode) e.emergencyCode = 'Required';
+    
 
     const num = (data.emergencyContactNumber || '').trim();
     if (!num) {
@@ -96,31 +93,17 @@ export default function StepEmergency({
       </h2>
 
       <div className="space-y-6">
-        <Input
-          label="Emergency Contact Name"
-          value={data.emergencyContactName || ''}
-          onChange={(v) => {
-            setData({ ...data, emergencyContactName: v });
-            if (errors.emergencyContactName)
-              setErrors((p) => ({ ...p, emergencyContactName: '' }));
-          }}
-          required
-          error={errors.emergencyContactName}
-        />
-
         <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
           <div className="md:col-span-4">
             <Select
               label="Code"
-              value={emergencyCode}
+              value={data.emergencyCountryCode || ''}
               options={countryCodes}
               onChange={(v) => {
-                setEmergencyCode(v);
+                setData({ ...data, emergencyCountryCode: v });
                 if (errors.emergencyCode)
                   setErrors((p) => ({ ...p, emergencyCode: '' }));
               }}
-              required
-              error={errors.emergencyCode}
             />
           </div>
 

@@ -3,8 +3,6 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Image from 'next/image';
-import Sidebar from '@/components/sidebar';
-import Button from '@/components/ui/Button';
 import { getDonationProjectById } from '@/lib/api/donation';
 import { DonationProject } from '@/types/DonationProject';
 import { useAuth } from '@/contexts/AuthContext';
@@ -73,27 +71,21 @@ export default function ProjectDetailPage() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen bg-gray-50">
-        <Sidebar />
-        <main className="flex-1 px-10 py-8">
-          <div className="text-center py-12">
-            <p className="text-gray-500">Loading project details...</p>
-          </div>
-        </main>
-      </div>
+      <main className="flex-1 px-10 py-8 overflow-y-auto">
+        <div className="text-center py-12">
+          <p className="text-gray-500">Loading project details...</p>
+        </div>
+      </main>
     );
   }
 
   if (!project) {
     return (
-      <div className="flex min-h-screen bg-gray-50">
-        <Sidebar />
-        <main className="flex-1 px-10 py-8">
-          <div className="text-center py-12">
-            <p className="text-gray-500">Project not found</p>
-          </div>
-        </main>
-      </div>
+      <main className="flex-1 px-10 py-8 overflow-y-auto">
+        <div className="text-center py-12">
+          <p className="text-gray-500">Project not found</p>
+        </div>
+      </main>
     );
   }
 
@@ -101,10 +93,7 @@ export default function ProjectDetailPage() {
   const objectivesList = project.objectives ? project.objectives.split('\n').filter(o => o.trim()) : [];
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
-      <Sidebar />
-
-      <main className="flex-1 px-10 py-8">
+    <main className="flex-1 px-10 py-8 overflow-y-auto">
         {/* Back Button */}
         <button
           onClick={() => router.back()}
@@ -223,15 +212,15 @@ export default function ProjectDetailPage() {
               </div>
 
               {/* Donate Button */}
-              <Button
-                label="I want to donate"
+              <button
                 onClick={handleDonate}
-                variant="primary"
-              />
+                className="w-full px-6 py-3 bg-gray-800 hover:bg-gray-900 text-white font-semibold rounded-lg transition-colors duration-200"
+              >
+                I want to donate
+              </button>
             </div>
           </div>
         </div>
       </main>
-    </div>
   );
 }

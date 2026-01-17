@@ -3,8 +3,6 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import Sidebar from '@/components/sidebar';
-import Button from '@/components/ui/Button';
 import { getDonationHomepage, getDonationProjects } from '@/lib/api/donation';
 import { DonationProject } from '@/types/DonationProject';
 import { useAuth } from '@/contexts/AuthContext';
@@ -81,13 +79,10 @@ export default function DonationsPage() {
   );
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
-      <Sidebar />
-
-      <main className="flex-1 px-10 py-8">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-center mb-2">
+    <main className="flex-1 px-10 py-8 overflow-y-auto">
+      {/* Header */}
+      <div className="mb-8">
+        <h1 className="text-4xl font-bold text-center mb-2">
             Make a Difference Today
           </h1>
           <p className="text-center text-gray-600">
@@ -242,6 +237,5 @@ export default function DonationsPage() {
           </div>
         )}
       </main>
-    </div>
   );
 }

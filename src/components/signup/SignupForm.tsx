@@ -10,7 +10,6 @@ import StepCommunication from './StepCommunication';
 
 const initialData: SignUpData = {
   // Page 1 - Personal Details
-  salutation: '',
   firstName: '',
   lastName: '', 
   email: '',
@@ -38,7 +37,7 @@ const initialData: SignUpData = {
   healthNotes: '',
 
   // Page 4 - Emergency Contact
-  emergencyContactName: '',
+
   emergencyContactNumber: '',
   skills: '',
   volunteeredBefore: 'No',

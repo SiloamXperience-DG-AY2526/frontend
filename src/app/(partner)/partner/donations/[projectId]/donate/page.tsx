@@ -3,8 +3,6 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
-import Sidebar from '@/components/sidebar';
-import Button from '@/components/ui/Button';
 import { getDonationProjectById, submitDonation } from '@/lib/api/donation';
 import { DonationProject } from '@/types/DonationProject';
 import { DonationType } from '@/types/DonationData';
@@ -26,7 +24,7 @@ export default function DonatePage() {
   const [selectedAmount, setSelectedAmount] = useState<number | null>(null);
   const [customAmount, setCustomAmount] = useState('');
   const [paymentMethod, setPaymentMethod] = useState('');
-  const [donationType] = useState<DonationType>('INDIVIDUAL');
+  const [donationType] = useState<DonationType>('individual');
   const [countryOfResidence] = useState('Singapore');
   
   // Success/Failure state
@@ -157,35 +155,26 @@ export default function DonatePage() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen bg-gray-50">
-        <Sidebar />
-        <main className="flex-1 px-10 py-8">
-          <div className="text-center py-12">
-            <p className="text-gray-500">Loading project details...</p>
-          </div>
-        </main>
-      </div>
+      <main className="flex-1 px-10 py-8 overflow-y-auto">
+        <div className="text-center py-12">
+          <p className="text-gray-500">Loading project details...</p>
+        </div>
+      </main>
     );
   }
 
   if (!project) {
     return (
-      <div className="flex min-h-screen bg-gray-50">
-        <Sidebar />
-        <main className="flex-1 px-10 py-8">
-          <div className="text-center py-12">
-            <p className="text-gray-500">Project not found</p>
-          </div>
-        </main>
-      </div>
+      <main className="flex-1 px-10 py-8 overflow-y-auto">
+        <div className="text-center py-12">
+          <p className="text-gray-500">Project not found</p>
+        </div>
+      </main>
     );
   }
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
-      <Sidebar />
-
-      <main className="flex-1 px-10 py-8">
+    <main className="flex-1 px-10 py-8 overflow-y-auto">
         {/* Back Button */}
         {step < 4 && (
           <button
@@ -296,11 +285,12 @@ export default function DonatePage() {
 
                 {/* Continue Button */}
                 <div className="flex justify-end">
-                  <Button
-                    label="Continue"
+                  <button
                     onClick={handleContinueFromAmount}
-                    variant="primary"
-                  />
+                    className="px-8 py-3 bg-gray-800 hover:bg-gray-900 text-white font-semibold rounded-lg transition-colors duration-200"
+                  >
+                    Continue
+                  </button>
                 </div>
               </div>
             )}
@@ -332,11 +322,12 @@ export default function DonatePage() {
 
                 {/* Continue Button */}
                 <div className="flex justify-end">
-                  <Button
-                    label="Continue"
+                  <button
                     onClick={handleContinueFromPayment}
-                    variant="primary"
-                  />
+                    className="px-8 py-3 bg-gray-800 hover:bg-gray-900 text-white font-semibold rounded-lg transition-colors duration-200"
+                  >
+                    Continue
+                  </button>
                 </div>
               </div>
             )}
@@ -369,12 +360,13 @@ export default function DonatePage() {
                 </div>
 
                 {/* Confirm Button */}
-                <Button
-                  label={submitting ? 'Processing...' : 'Confirm donation'}
+                <button
                   onClick={handleConfirmDonation}
                   disabled={submitting}
-                  variant="primary"
-                />
+                  className="w-full px-8 py-3 bg-gray-800 hover:bg-gray-900 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold rounded-lg transition-colors duration-200"
+                >
+                  {submitting ? 'Processing...' : 'Confirm donation'}
+                </button>
               </div>
             )}
 
@@ -438,6 +430,5 @@ export default function DonatePage() {
           </div>
         </div>
       </main>
-    </div>
   );
 }

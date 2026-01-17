@@ -1,9 +1,16 @@
+export enum UserRole {
+  SUPER_ADMIN = 'superAdmin',
+  GENERAL_MANAGER = 'generalManager',
+  FINANCE_MANAGER = 'financeManager',
+  PARTNER = 'partner'
+}
+
 export type AuthUser = {
   userId: string,
   firstName: string,
   lastName: string,
   title?: string, 
-  role: 'superAdmin' | 'generalManager' | 'financeManager' | 'partner',
+  role: UserRole,
   email: string
 }; 
 
@@ -22,13 +29,13 @@ export type AuthPayload = {
 
 export type JwtPayload = {
   userId: string;
-  role: 'superAdmin' | 'generalManager' | 'financeManager' | 'partner';
+  role: UserRole;
   exp?: number;
 };
 
 export type UserCredentials = {
   userId: string;
-  role: 'superAdmin' | 'generalManager' | 'financeManager' | 'partner';
+  role: UserRole;
 };
 
 export type LoginInputData = {
