@@ -250,8 +250,10 @@ export type ProposeVolunteerProjectPayload = {
   dayOfWeek?: string | null;
 
   positions: Array<{
+    id?: string;
     role: string;
     description: string;
+    totalSlots: number;
     skills: string[];
   }>;
 
@@ -282,8 +284,10 @@ export type EditVolunteerProjectPayload = {
   dayOfWeek?: string | null;
 
   positions: Array<{
+    id?: string;
     role: string;
     description: string;
+    totalSlots: number;
     skills: string[];
   }>;
 
@@ -303,6 +307,7 @@ export type MyProposedProject = {
   location: string;
   initiatorName: string;
   approvalStatus: ProjectApprovalStatus;
+  submissionStatus?: string;
   totalCapacity: number;
   acceptedCount: number;
 };

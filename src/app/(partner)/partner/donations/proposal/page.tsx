@@ -1,15 +1,16 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import Input from '@/components/ui/Input';
 import TextArea from '@/components/ui/Textarea';
 import UploadBox from '@/components/ui/UploadBox';
 import SectionTitle from '@/components/ui/FormSectionTitle';
 import Toast from '@/components/ui/Toast';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import {
   ProposeDonationProjectPayload,
   proposeDonationProject,
+  updateDonationProject,
 } from '@/lib/api/donation';
 
 // TEMP placeholders (until S3 ready)
@@ -19,6 +20,8 @@ const TEMP_IMAGE_URL =
 
 export default function DonationProjectProposalPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const draftId = searchParams.get('projectId');
 
   const [title, setTitle] = useState('');
   const [initiatorName, setInitiatorName] = useState('');
@@ -43,6 +46,51 @@ export default function DonationProjectProposalPage() {
   }>({ open: false, type: 'error', title: '' });
 
   const [submitting, setSubmitting] = useState(false);
+  const [savingDraft, setSavingDraft] = useState(false);
+
+  useEffect(() => {
+    let mounted = true;
+
+    async function loadDraft() {
+      if (!draftId) return;
+      try {
+        const res = await fetch(`/api/v1/donation-projects/me/${draftId}`);
+        const data = await res.json();
+        if (!res.ok || !data) return;
+        const draft = data.project ?? data;
+        if (!mounted) return;
+        setTitle(draft.title ?? '');
+        setInitiatorName(draft.initiatorName ?? '');
+        setLocation(draft.location ?? '');
+        setAboutDesc(draft.about ?? '');
+        setBeneficiaries(draft.beneficiaries ?? '');
+        setObjectives(
+          draft.objectives
+            ? draft.objectives
+                .split('\n')
+                .map((o: string) => o.replace(/^-\s*/, '').trim())
+                .filter(Boolean)
+            : ['']
+        );
+        if (draft.startDate) {
+          setStartDate(draft.startDate.slice(0, 10));
+        }
+        if (draft.endDate) {
+          setEndDate(draft.endDate.slice(0, 10));
+        }
+        if (draft.targetFund != null) {
+          setTargetFund(String(draft.targetFund));
+        }
+      } catch {
+        // ignore draft load errors
+      }
+    }
+
+    loadDraft();
+    return () => {
+      mounted = false;
+    };
+  }, [draftId]);
 
   const pad2 = (n: number) => String(n).padStart(2, '0');
   const toYYYYMMDD = (d: Date) => {
@@ -104,6 +152,55 @@ export default function DonationProjectProposalPage() {
   const removeObjective = (idx: number) =>
     setObjectives((prev) => prev.filter((_, i) => i !== idx));
 
+  const buildPayload = (): ProposeDonationProjectPayload => ({
+    title: title.trim(),
+    initiatorName: initiatorName.trim(),
+    location: location.trim(),
+    startDate: new Date(startDate).toISOString(),
+    endDate: new Date(endDate).toISOString(),
+    targetFund: Number(targetFund),
+    about: aboutDesc.trim(),
+    beneficiaries: beneficiaries.trim(),
+    objectives: objectives
+      .map((o) => o.trim())
+      .filter(Boolean)
+      .map((o) => `- ${o}`)
+      .join('\n'),
+    attachments: TEMP_PDF_URL,
+    image: TEMP_IMAGE_URL,
+  });
+
+  const onSaveDraft = async () => {
+    try {
+      setSavingDraft(true);
+      const payload = buildPayload();
+      if (draftId) {
+        await updateDonationProject(draftId, payload);
+      } else {
+        const res = await proposeDonationProject(payload);
+        const newId = res?.id;
+        if (newId) {
+          router.replace(`/partner/donations/proposal?projectId=${newId}`);
+        }
+      }
+      setToast({
+        open: true,
+        type: 'success',
+        title: 'Draft saved',
+        message: 'You can continue editing this draft anytime.',
+      });
+    } catch (err: unknown) {
+      setToast({
+        open: true,
+        type: 'error',
+        title: 'Save failed',
+        message: `Failed to save draft: ${String(err)}`,
+      });
+    } finally {
+      setSavingDraft(false);
+    }
+  };
+
   const onSubmit = async () => {
     const e = validate();
 
@@ -124,26 +221,24 @@ export default function DonationProjectProposalPage() {
 
     try {
       setSubmitting(true);
+      const payload = buildPayload();
 
-      const payload: ProposeDonationProjectPayload = {
-        title: title.trim(),
-        initiatorName: initiatorName.trim(),
-        location: location.trim(),
-        startDate: new Date(startDate).toISOString(),
-        endDate: new Date(endDate).toISOString(),
-        targetFund: Number(targetFund),
-        about: aboutDesc.trim(),
-        beneficiaries: beneficiaries.trim(),
-        objectives: objectives
-          .map((o) => o.trim())
-          .filter(Boolean)
-          .map((o) => `- ${o}`)
-          .join('\n'),
-        attachments: TEMP_PDF_URL,
-        image: TEMP_IMAGE_URL,
-      };
-
-      await proposeDonationProject(payload);
+      if (draftId) {
+        await updateDonationProject(draftId, {
+          ...payload,
+          submissionStatus: 'submitted',
+          approvalStatus: 'pending',
+        });
+      } else {
+        const res = await proposeDonationProject(payload);
+        const newId = res?.id;
+        if (newId) {
+          await updateDonationProject(newId, {
+            submissionStatus: 'submitted',
+            approvalStatus: 'pending',
+          });
+        }
+      }
 
       setToast({
         open: true,
@@ -415,7 +510,20 @@ export default function DonationProjectProposalPage() {
         </div>
 
         {/* Submit */}
-        <div className="mt-10 flex items-center justify-end">
+        <div className="mt-10 flex items-center justify-end gap-3">
+          <button
+            type="button"
+            disabled={savingDraft}
+            onClick={onSaveDraft}
+            className={[
+              'rounded-xl px-10 py-4 font-bold',
+              'border border-gray-300 bg-white text-gray-700',
+              'hover:bg-gray-50 transition',
+              savingDraft ? 'opacity-50 cursor-not-allowed' : '',
+            ].join(' ')}
+          >
+            {savingDraft ? 'Saving...' : 'Save Draft'}
+          </button>
           <button
             type="button"
             disabled={submitting}

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import Link from 'next/link';
 import { getMyProposedProjects } from '@/lib/api/project';
 import { ProjectApprovalStatus } from '@/types/ProjectData';
 import { MyProposedProject } from '@/types/Volunteer';
@@ -39,6 +40,8 @@ export default function Projects() {
 
   const getStatusColor = (status?: string | null) => {
     switch (status) {
+      case 'draft':
+        return 'text-slate-500';
       case 'approved':
         return 'text-emerald-700';
       case 'rejected':
@@ -109,6 +112,9 @@ export default function Projects() {
                     <th className="px-7 py-4 text-left text-white font-semibold text-sm">
                       Status
                     </th>
+                    <th className="px-7 py-4 text-left text-white font-semibold text-sm">
+                      Action
+                    </th>
                   </tr>
                 </thead>
 
@@ -116,7 +122,12 @@ export default function Projects() {
                   {rows.map((project) => {
                     const start = formatDate(project.startDate);
                     const end = formatDate(project.endDate);
-                    const status = project.approvalStatus ?? 'pending';
+                    const submissionStatus =
+                      project.submissionStatus ?? 'submitted';
+                    const status =
+                      submissionStatus === 'draft'
+                        ? 'draft'
+                        : project.approvalStatus ?? 'pending';
 
                     return (
                       <tr
@@ -148,6 +159,18 @@ export default function Projects() {
                           <span className={getStatusColor(status)}>
                             {status}
                           </span>
+                        </td>
+                        <td className="px-7 py-5 align-top">
+                          {submissionStatus === 'draft' ? (
+                            <Link
+                              href={`/partner/volunteers/projects/proposal?projectId=${project.id}`}
+                              className="text-sm font-semibold text-[#1F7A67] hover:text-[#195D4B]"
+                            >
+                              Edit draft
+                            </Link>
+                          ) : (
+                            <span className="text-sm text-slate-400">—</span>
+                          )}
                         </td>
                       </tr>
                     );

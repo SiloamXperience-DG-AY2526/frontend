@@ -185,6 +185,26 @@ export async function proposeVolunteerProject(payload: ProposeVolunteerProjectPa
   return json;
 }
 
+export async function updateVolunteerProposal(
+  projectId: string,
+  payload: Partial<ProposeVolunteerProjectPayload> & {
+    submissionStatus?: 'draft' | 'submitted' | 'withdrawn';
+  }
+) {
+  const res = await fetch(`/api/volunteer/project/proposal/${projectId}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify(payload),
+  });
+
+  const json = await res.json().catch(() => null);
+  if (!res.ok) {
+    throw new Error(json?.message ?? `Unable to update proposal (${res.status})`);
+  }
+  return json;
+}
+
 export async function createVolunteerProject(payload: EditVolunteerProjectPayload) {
   const res = await fetch('/api/volunteer/project/create', {
     method: 'POST',

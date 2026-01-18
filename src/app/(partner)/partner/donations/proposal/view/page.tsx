@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import Link from 'next/link';
 import { getMyDonationProjectProposals } from '@/lib/api/donation';
 import { DonationProjectDetail } from '@/types/DonationProjectData';
 
@@ -53,6 +54,8 @@ export default function DonationProjectProposalsView() {
 
   const getStatusColor = (status?: string | null) => {
     switch (status) {
+      case 'draft':
+        return 'text-slate-500';
       case 'approved':
         return 'text-emerald-700';
       case 'rejected':
@@ -113,6 +116,9 @@ export default function DonationProjectProposalsView() {
                     <th className="px-7 py-4 text-left text-white font-semibold text-sm">
                       Status
                     </th>
+                    <th className="px-7 py-4 text-left text-white font-semibold text-sm">
+                      Action
+                    </th>
                   </tr>
                 </thead>
 
@@ -120,7 +126,12 @@ export default function DonationProjectProposalsView() {
                   {rows.map((project) => {
                     const start = formatDate(project.startDate);
                     const end = formatDate(project.endDate);
-                    const status = project.approvalStatus ?? 'pending';
+                    const submissionStatus =
+                      project.submissionStatus ?? 'submitted';
+                    const status =
+                      submissionStatus === 'draft'
+                        ? 'draft'
+                        : project.approvalStatus ?? 'pending';
 
                     return (
                       <tr
@@ -145,6 +156,18 @@ export default function DonationProjectProposalsView() {
                           <span className={getStatusColor(status)}>
                             {status}
                           </span>
+                        </td>
+                        <td className="px-7 py-5 text-sm font-semibold">
+                          {submissionStatus === 'draft' ? (
+                            <Link
+                              href={`/partner/donations/proposal?projectId=${project.id}`}
+                              className="text-sm font-semibold text-[#1F7A67] hover:text-[#195D4B]"
+                            >
+                              Edit draft
+                            </Link>
+                          ) : (
+                            <span className="text-sm text-slate-400">—</span>
+                          )}
                         </td>
                       </tr>
                     );
