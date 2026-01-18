@@ -5,6 +5,7 @@ export enum ProjectApprovalStatus {
     rejected = 'rejected',
 }
 export enum ProjectOperationStatus {
+    notStarted = 'notStarted',
     ongoing = 'ongoing',
     paused = 'paused',
     cancelled = 'cancelled',

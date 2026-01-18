@@ -180,6 +180,7 @@ export type VolunteerProjectDetail = {
 
   approvalStatus: ProjectApprovalStatus;
   operationStatus: ProjectOperationStatus;
+  submissionStatus?: 'draft' | 'submitted' | 'withdrawn';
 };
 
 export type VolunteerProjectDetailResponse = {
@@ -297,6 +298,7 @@ export type EditVolunteerProjectPayload = {
 
   approvalStatus: ProjectApprovalStatus;
   operationStatus: ProjectOperationStatus;
+  submissionStatus?: 'draft' | 'submitted' | 'withdrawn';
 };
 
 export type MyProposedProject = {

@@ -6,8 +6,7 @@ import {
   EnvelopeIcon,
   UserIcon,
   HomeIcon,
-  CubeIcon,
-  StarIcon,
+  CubeIcon
 } from '@heroicons/react/24/outline';
 import { ArrowLeftStartOnRectangleIcon } from '@heroicons/react/24/solid';
 import { useRouter } from 'next/navigation';
@@ -18,7 +17,7 @@ const menu = [
   { name: 'Projects', icon: CubeIcon, href: '/general-manager/projects' },
   { name: 'Partners', icon: UserGroupIcon, href: '/general-manager/partners' },
   { name: 'Mass Send Emails', icon: EnvelopeIcon, href: '/general-manager/emails' },
-  { name: 'Feedback', icon: StarIcon, href: '/general-manager/feedback' },
+  // { name: 'Feedback', icon: StarIcon, href: '/general-manager/feedback' },
   { name: 'My Profile', icon: UserIcon, href: '/general-manager/profile' },
 ];
 
