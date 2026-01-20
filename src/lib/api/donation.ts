@@ -255,6 +255,65 @@ export async function updateDonationProject(
   return res.json();
 }
 
+export async function updateDonationProjectById(
+  projectId: string,
+  payload: Partial<ProposeDonationProjectPayload> & {
+    submissionStatus?: 'draft' | 'submitted' | 'withdrawn';
+    approvalStatus?: 'pending' | 'reviewing' | 'approved' | 'rejected';
+  }
+): Promise<DonationProjectDetail> {
+  const res = await fetch(`/api/v1/donation-projects/${projectId}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+
+  if (!res.ok) {
+    const error = await res.json().catch(() => ({}));
+    throw new Error(error.message || 'Failed to update donation project.');
+  }
+
+  return res.json();
+}
+
+export async function createDonationProjectAdmin(
+  payload: ProposeDonationProjectPayload & {
+    type: 'brick' | 'sponsor' | 'partnerLed';
+    brickSize?: number | null;
+    deadline?: string | null;
+    organisingTeam?: string | null;
+  }
+): Promise<DonationProjectDetail> {
+  const res = await fetch('/api/v1/donation-projects', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      title: payload.title,
+      initiatorName: payload.initiatorName,
+      organisingTeam: payload.organisingTeam ?? null,
+      location: payload.location,
+      about: payload.about,
+      objectives: payload.objectives,
+      beneficiaries: payload.beneficiaries,
+      targetFund: payload.targetFund,
+      startDate: payload.startDate,
+      endDate: payload.endDate,
+      deadline: payload.deadline ?? payload.endDate,
+      type: payload.type,
+      brickSize: payload.brickSize ?? null,
+      attachments: payload.attachments ?? null,
+      image: payload.image ?? null,
+    }),
+  });
+
+  if (!res.ok) {
+    const error = await res.json().catch(() => ({}));
+    throw new Error(error.message || 'Failed to create donation project.');
+  }
+
+  return res.json();
+}
+
 // Get donation project finance details (donations and donors)
 export async function getDonationProjectFinance(
   projectId: string

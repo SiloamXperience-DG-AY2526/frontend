@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import PageHeader from '@/components/ui/PageHeader';
 import LoadingTableState from '@/components/table/LoadingTableState';
@@ -69,7 +70,13 @@ export default function DonationProjectDetail() {
       {/* Page Header with Funds Card */}
       <div className="flex items-start justify-between gap-6 mb-6">
         <PageHeader title={projectData.project.title} />
-        <div className="w-full max-w-md">
+        <div className="flex w-full max-w-md flex-col items-end gap-3">
+          <Link
+            href={`/finance-manager/donation-projects/${projectId}/edit`}
+            className="rounded-full border border-[#0E5A4A] px-6 py-2 text-sm font-semibold text-[#0E5A4A] hover:bg-[#E6F5F1]"
+          >
+            Edit project
+          </Link>
           <TotalFundsRaisedCard
             currentFund={parseFloat(projectData.totalRaised)}
             targetFund={
