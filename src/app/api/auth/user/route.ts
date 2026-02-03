@@ -9,7 +9,7 @@ export async function GET() {
 
   if (!token) { 
     return NextResponse.json(
-      { user: null, role: null, errMsg: 'Missing access token.' }, 
+      { userId: null, role: null, hasOnboarded: false, errMsg: 'Missing access token.' }, 
       { status: 401 },
     );
   }
@@ -19,13 +19,13 @@ export async function GET() {
   // check token expiry
   if (payload.exp && payload.exp * 1000 < Date.now()) {
     return NextResponse.json(
-      { userId: null, role: null, errMsg: 'User session expired.' }, 
+      { userId: null, role: null, hasOnboarded: false, errMsg: 'User session expired.' }, 
       { status: 401 }
     );
   }
 
   return NextResponse.json(
-    { userId: payload.userId, role: payload.role },
+    { userId: payload.userId, role: payload.role, hasOnboarded: payload.hasOnboarded ?? false },
     { status: 200 }
   );
 }

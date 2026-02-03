@@ -5,10 +5,10 @@ const BACKEND_URL = process.env.BACKEND_URL!;
 
 export async function GET(
   request: Request,
-  { params }: { params: Promise<{ projectId: string }> }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { projectId } = await params;
+    const { id } = await params;
     const cookieStore = await cookies();
     const token = cookieStore.get('access_token')?.value;
 
@@ -20,7 +20,7 @@ export async function GET(
       headers['Authorization'] = `Bearer ${token}`;
     }
 
-    const res = await fetch(`${BACKEND_URL}/donation-projects/${projectId}`, {
+    const res = await fetch(`${BACKEND_URL}/donation-projects/${id}`, {
       headers,
     });
 
@@ -45,10 +45,10 @@ export async function GET(
 
 export async function PATCH(
   request: Request,
-  { params }: { params: Promise<{ projectId: string }> }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { projectId } = await params;
+    const { id } = await params;
     const body = await request.json();
     const cookieStore = await cookies();
     const token = cookieStore.get('access_token')?.value;
@@ -57,7 +57,7 @@ export async function PATCH(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const res = await fetch(`${BACKEND_URL}/donation-projects/${projectId}`, {
+    const res = await fetch(`${BACKEND_URL}/donation-projects/${id}`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',

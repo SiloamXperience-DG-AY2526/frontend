@@ -329,6 +329,23 @@ export async function createDonationProjectAdmin(
   return res.json();
 }
 
+// Update donation receipt status (finance manager only)
+export async function updateDonationReceiptStatus(
+  donationId: string,
+  receiptStatus: 'pending' | 'received' | 'cancelled'
+): Promise<void> {
+  const res = await fetch(`/api/v1/donations/${donationId}/receiptStatus`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ receiptStatus }),
+  });
+
+  if (!res.ok) {
+    const error = await res.json().catch(() => ({}));
+    throw new Error(error.message || 'Failed to update donation receipt status.');
+  }
+}
+
 // Get donation project finance details (donations and donors)
 export async function getDonationProjectFinance(
   projectId: string

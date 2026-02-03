@@ -12,6 +12,7 @@ import {
   DonationProject,
   DonationProjectType,
   DonationProjectApprovalStatus,
+  DonationProjectOperationStatus,
   DonationProjectSubmissionStatus,
 } from '@/types/DonationProjectData';
 import {
@@ -41,6 +42,27 @@ const PROJECT_TYPES: { value: DonationProjectType; label: string }[] = [
   { value: 'brick', label: 'Brick' },
   { value: 'sponsor', label: 'Sponsor' },
   { value: 'partnerLed', label: 'Partner-led' },
+];
+
+const APPROVAL_STATUS_OPTIONS: {
+  value: DonationProjectApprovalStatus;
+  label: string;
+}[] = [
+  { value: 'pending', label: 'Pending' },
+  { value: 'reviewing', label: 'Reviewing' },
+  { value: 'approved', label: 'Approved' },
+  { value: 'rejected', label: 'Rejected' },
+];
+
+const OPERATION_STATUS_OPTIONS: {
+  value: DonationProjectOperationStatus;
+  label: string;
+}[] = [
+  { value: 'notStarted', label: 'Not Started' },
+  { value: 'ongoing', label: 'Ongoing' },
+  { value: 'paused', label: 'Paused' },
+  { value: 'cancelled', label: 'Cancelled' },
+  { value: 'completed', label: 'Completed' },
 ];
 
 export default function EditDonationProjectPage() {
@@ -74,6 +96,8 @@ export default function EditDonationProjectPage() {
     useState<DonationProjectSubmissionStatus>('draft');
   const [approvalStatus, setApprovalStatus] =
     useState<DonationProjectApprovalStatus>('pending');
+  const [operationStatus, setOperationStatus] =
+    useState<DonationProjectOperationStatus>('notStarted');
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [toast, setToast] = useState<{
@@ -111,6 +135,7 @@ export default function EditDonationProjectPage() {
         setAttachmentsUrl(data.attachments ?? '');
         setSubmissionStatus(data.submissionStatus ?? 'draft');
         setApprovalStatus(data.approvalStatus ?? 'pending');
+        setOperationStatus(data.operationStatus ?? 'notStarted');
       } catch (error) {
         console.error('Failed to load donation project:', error);
       } finally {
@@ -193,6 +218,7 @@ export default function EditDonationProjectPage() {
       image: imageUrl.trim() || null,
       attachments: attachmentsUrl.trim() || null,
       approvalStatus,
+      operationStatus,
     };
 
     // Only include submissionStatus when actually changing it (draft → submitted).
@@ -204,6 +230,7 @@ export default function EditDonationProjectPage() {
         ...(status === 'submitted' && {
           approvalStatus:
             approvalStatus === 'approved' ? 'approved' : 'pending',
+          operationStatus: 'notStarted',
         }),
       };
     }
@@ -507,6 +534,53 @@ export default function EditDonationProjectPage() {
               onChange={setAttachmentsUrl}
               placeholder="https://..."
             />
+          </div>
+        </div>
+
+        <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+          <SectionTitle>Project status</SectionTitle>
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+            <div>
+              <label className="block text-black text-md mb-2 font-semibold">
+                Approval status
+              </label>
+              <select
+                value={approvalStatus}
+                onChange={(e) =>
+                  setApprovalStatus(
+                    e.target.value as DonationProjectApprovalStatus
+                  )
+                }
+                className="w-full rounded-md border border-green-700 bg-white px-3 py-2 text-sm outline-none transition focus:border-green-800 focus:ring-1 focus:ring-green-800"
+              >
+                {APPROVAL_STATUS_OPTIONS.map((opt) => (
+                  <option key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-black text-md mb-2 font-semibold">
+                Operation status
+              </label>
+              <select
+                value={operationStatus}
+                onChange={(e) =>
+                  setOperationStatus(
+                    e.target.value as DonationProjectOperationStatus
+                  )
+                }
+                className="w-full rounded-md border border-green-700 bg-white px-3 py-2 text-sm outline-none transition focus:border-green-800 focus:ring-1 focus:ring-green-800"
+              >
+                {OPERATION_STATUS_OPTIONS.map((opt) => (
+                  <option key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
         </div>
       </div>

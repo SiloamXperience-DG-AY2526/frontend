@@ -9,6 +9,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { ROLE_HOME } from '@/lib/homeRoutes';
+import { UserRole } from '@/types/AuthData';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -31,8 +32,10 @@ export default function LoginPage() {
 
       const role = authUser.role;
 
-      // redirect based on role
-      const home = ROLE_HOME[role] || '/login-error'; 
+      const home =
+        role === UserRole.PARTNER && !authUser.hasOnboarded
+          ? '/onboarding'
+          : ROLE_HOME[role] || '/login-error';
 
       router.replace(home); 
 

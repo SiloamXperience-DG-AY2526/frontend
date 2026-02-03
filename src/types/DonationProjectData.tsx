@@ -152,6 +152,9 @@ export type DonationProjectSubmissionStatus = z.infer<
 export type DonationProjectApprovalStatus = z.infer<
   typeof DonationProjectApprovalStatusSchema
 >;
+export type DonationProjectOperationStatus = z.infer<
+  typeof DonationProjectOperationStatusSchema
+>;
 export type DonationProject = z.infer<typeof DonationProjectSchema>;
 export type DonationProjectsResponse = z.infer<
   typeof DonationProjectsResponseSchema
@@ -168,6 +171,7 @@ export {
   DonationProjectTypeSchema,
   DonationProjectSubmissionStatusSchema,
   DonationProjectApprovalStatusSchema,
+  DonationProjectOperationStatusSchema,
   DonationProjectSchema,
   DonationProjectsResponseSchema,
   ProjectDonationSchema,

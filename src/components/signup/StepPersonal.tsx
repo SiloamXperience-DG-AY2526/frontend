@@ -1,13 +1,12 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { SignUpData } from '@/types/SignUpData';
 import Button from '@/components/ui/Button';
 import Input from '../ui/Input';
-import Select from '../ui/Select';
 import Toast from '@/components/ui/Toast';
-import { fetchCountryCodes } from '@/lib/countries';
 
 interface Props {
   data: SignUpData;
@@ -15,9 +14,9 @@ interface Props {
   next: () => void;
 }
 
-export default function PersonalDetails({ data, setData, next }: Props) {
-  const [countryCodes, setCountryCodes] = useState<string[]>([]);
+export default function PersonalDetails({ data, setData }: Props) {
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [loading, setLoading] = useState(false);
   const [toast, setToast] = useState<{
     open: boolean;
     type: 'success' | 'error';
@@ -25,9 +24,8 @@ export default function PersonalDetails({ data, setData, next }: Props) {
     message?: string;
   }>({ open: false, type: 'error', title: '' });
 
-  useEffect(() => {
-    fetchCountryCodes().then(setCountryCodes);
-  }, []);
+  const router = useRouter();
+
   const isValidEmail = (email: string) => {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   };
@@ -42,13 +40,6 @@ export default function PersonalDetails({ data, setData, next }: Props) {
       e.email = 'Required';
     } else if (!isValidEmail(data.email)) {
       e.email = 'Invalid email format';
-    }
-
-    if (!data.countryCode) e.countryCode = 'Required';
-    if (!data.contact?.trim()) {
-      e.contact = 'Required';
-    } else if (!/^\d+$/.test(data.contact)) {
-      e.contact = 'Contact number must contain only numbers';
     }
 
     if (!data.password) {
@@ -74,7 +65,7 @@ export default function PersonalDetails({ data, setData, next }: Props) {
     return e;
   };
 
-  const handleNext = () => {
+  const handleSignup = async () => {
     const validationErrors = validate();
 
     if (Object.keys(validationErrors).length > 0) {
@@ -89,20 +80,14 @@ export default function PersonalDetails({ data, setData, next }: Props) {
       ) {
         title = 'Password mismatch';
         message = 'Password and Confirm Password must be the same.';
-      } else if (
-        validationErrors.contact &&
-        validationErrors.contact !== 'Required'
-      ) {
-        title = 'Invalid contact number';
-        message = 'Contact number must contain only numbers.';
       } else if (validationErrors.password) {
         title = 'Weak password';
         message =
           validationErrors.password === 'Min 8 characters'
             ? 'Password must be at least 8 characters.'
             : validationErrors.password === 'Must include 1 uppercase letter'
-            ? 'Password must include at least one uppercase letter (A–Z).'
-            : 'Password must include at least one number (0–9).';
+            ? 'Password must include at least one uppercase letter (A-Z).'
+            : 'Password must include at least one number (0-9).';
       }
 
       setToast({
@@ -114,7 +99,49 @@ export default function PersonalDetails({ data, setData, next }: Props) {
       return;
     }
 
-    next();
+    setLoading(true);
+
+    try {
+      const payload = {
+        firstName: data.firstName,
+        lastName: data.lastName,
+        email: data.email,
+        password: data.password,
+      };
+
+      const res = await fetch('/api/auth/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      const json = await res.json();
+
+      if (!res.ok) {
+        throw new Error(json?.message ?? 'Signup failed');
+      }
+
+      setToast({
+        open: true,
+        type: 'success',
+        title: 'Account created!',
+        message: 'Please complete your profile.',
+      });
+
+      // Redirect to onboarding
+      setTimeout(() => {
+        router.push('/onboarding');
+      }, 1500);
+    } catch (err: unknown) {
+      setToast({
+        open: true,
+        type: 'error',
+        title: 'Signup failed',
+        message: `${err}`,
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -141,7 +168,6 @@ export default function PersonalDetails({ data, setData, next }: Props) {
       </div>
 
       <div className="space-y-4">
-        {/* Responsive grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Input
             label="First Name"
@@ -178,37 +204,6 @@ export default function PersonalDetails({ data, setData, next }: Props) {
           error={errors.email}
         />
 
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
-          <div className="md:col-span-4">
-            <Select
-              label="Code"
-              value={data.countryCode}
-              options={countryCodes}
-              onChange={(v) => {
-                setData({ ...data, countryCode: v });
-                if (errors.countryCode)
-                  setErrors((p) => ({ ...p, countryCode: '' }));
-              }}
-              required
-              error={errors.countryCode}
-            />
-          </div>
-
-          <div className="md:col-span-8">
-            <Input
-              label="Contact Number"
-              type="tel"
-              value={data.contact}
-              onChange={(v) => {
-                setData({ ...data, contact: v });
-                if (errors.contact) setErrors((p) => ({ ...p, contact: '' }));
-              }}
-              required
-              error={errors.contact}
-            />
-          </div>
-        </div>
-
         <Input
           label="Password"
           type="password"
@@ -236,7 +231,11 @@ export default function PersonalDetails({ data, setData, next }: Props) {
       </div>
 
       <div className="mt-6 flex justify-center">
-        <Button label="NEXT →" onClick={handleNext} />
+        <Button
+          label={loading ? 'Creating account...' : 'CREATE ACCOUNT'}
+          onClick={handleSignup}
+          disabled={loading}
+        />
       </div>
     </div>
   );

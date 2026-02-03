@@ -29,21 +29,25 @@ export default function DonationProjectDetail() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<TabKey>('donations');
 
-  useEffect(() => {
-    const fetchProjectData = async () => {
-      try {
-        setLoading(true);
-        const data = await getDonationProjectFinance(projectId);
-        setProjectData(data);
-      } catch (error) {
-        console.error('Error fetching project finance data:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchProjectData = async () => {
+    try {
+      setLoading(true);
+      const data = await getDonationProjectFinance(projectId);
+      setProjectData(data);
+    } catch (error) {
+      console.error('Error fetching project finance data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchProjectData();
   }, [projectId]);
+
+  const handleRefresh = () => {
+    fetchProjectData();
+  };
 
   if (loading) {
     return (
@@ -116,7 +120,7 @@ export default function DonationProjectDetail() {
       {/* Tab Content */}
       <div className="mt-6">
         {activeTab === 'donations' && (
-          <DonationsTab donations={projectData.donations} />
+          <DonationsTab donations={projectData.donations} onRefresh={handleRefresh} />
         )}
         {activeTab === 'donors' && (
           <YourDonorsTab donors={projectData.donors} />

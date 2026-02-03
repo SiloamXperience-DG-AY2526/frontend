@@ -6,16 +6,16 @@ export async function getUserCredentialsServer() {
   const cookieStore = await cookies();
   const token = cookieStore.get('access_token')?.value;
 
-  if (!token) { 
-    return { userId: null, role: null };
+  if (!token) {
+    return { userId: null, role: null, hasOnboarded: false };
   }
 
   const payload = jwtDecode<JwtPayload>(token);
 
   // check token expiry
   if (payload.exp && payload.exp * 1000 < Date.now()) {
-    return { userId: null, role: null };
+    return { userId: null, role: null, hasOnboarded: false };
   }
 
-  return { userId: payload.userId, role: payload.role };
+  return { userId: payload.userId, role: payload.role, hasOnboarded: payload.hasOnboarded ?? false };
 }

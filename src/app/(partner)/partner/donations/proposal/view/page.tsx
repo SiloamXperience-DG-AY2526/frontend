@@ -165,6 +165,13 @@ export default function DonationProjectProposalsView() {
                             >
                               Edit draft
                             </Link>
+                          ) : project.approvalStatus === 'approved' ? (
+                            <Link
+                              href={`/partner/donations/${project.id}/manage`}
+                              className="text-sm font-semibold text-[#1F7A67] hover:text-[#195D4B]"
+                            >
+                              Manage
+                            </Link>
                           ) : (
                             <span className="text-sm text-slate-400">—</span>
                           )}
