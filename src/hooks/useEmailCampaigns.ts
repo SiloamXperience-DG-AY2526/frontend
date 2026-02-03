@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
 import { EmailCampaignListResponse } from '@/types/EmailCampaign';
-import { listEmailCampaigns } from '@/lib/api/emailCampaign';
 
 export function useEmailCampaigns() {
   const [data, setData] = useState<EmailCampaignListResponse | null>(null);
