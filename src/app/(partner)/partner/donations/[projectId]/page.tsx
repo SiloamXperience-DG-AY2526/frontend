@@ -14,6 +14,7 @@ import {
   CurrencyDollarIcon,
   MapPinIcon,
 } from '@heroicons/react/24/outline';
+import Toast from '@/components/ui/Toast';
 
 export default function ProjectDetailPage() {
   const router = useRouter();
@@ -23,6 +24,7 @@ export default function ProjectDetailPage() {
 
   const [project, setProject] = useState<DonationProject | null>(null);
   const [loading, setLoading] = useState(true);
+  const [toast, setToast] = useState<{ open: boolean; type: 'success' | 'error'; title: string }>({ open: false, type: 'error', title: '' });
 
   useEffect(() => {
     // Redirect to login if not authenticated
@@ -40,8 +42,8 @@ export default function ProjectDetailPage() {
         setProject(data);
       } catch (error) {
         console.error('Failed to load project:', error);
-        alert('Failed to load project details.');
-        router.push('/partner/donations');
+        setToast({ open: true, type: 'error', title: 'Failed to load project details.' });
+        setTimeout(() => router.push('/partner/donations'), 1500);
       } finally {
         setLoading(false);
       }
@@ -103,6 +105,7 @@ export default function ProjectDetailPage() {
 
   return (
     <div className="flex h-screen overflow-y-auto bg-gray-50">
+      <Toast open={toast.open} type={toast.type} title={toast.title} onClose={() => setToast((t) => ({ ...t, open: false }))} />
       <main className="w-full px-6 py-6 md:px-10">
         <button
           type="button"

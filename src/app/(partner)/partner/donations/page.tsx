@@ -10,6 +10,7 @@ import StatCard from '@/components/volunteer/StatCard';
 import HumanStatIcon from '@/components/icons/HumanIcon';
 import ClockIcon from '@/components/icons/ClockIcon';
 import HeartIcon from '@/components/icons/HeartIcon';
+import Toast from '@/components/ui/Toast';
 
 export default function DonationsPage() {
   const [projects, setProjects] = useState<DonationProject[]>([]);
@@ -22,6 +23,7 @@ export default function DonationsPage() {
   });
   const router = useRouter();
   const { user, isLoading: authLoading } = useAuth();
+  const [toast, setToast] = useState<{ open: boolean; type: 'success' | 'error'; title: string; message?: string }>({ open: false, type: 'error', title: '' });
 
   useEffect(() => {
     // Redirect to login if not authenticated
@@ -50,7 +52,7 @@ export default function DonationsPage() {
       setProjects(response.projects);
     } catch (error) {
       console.error('Failed to load donation data:', error);
-      alert('Failed to load donation data. Please try again.');
+      setToast({ open: true, type: 'error', title: 'Failed to load donation data', message: 'Please try again.' });
     } finally {
       setLoading(false);
     }
@@ -84,6 +86,7 @@ export default function DonationsPage() {
 
   return (
     <div className="flex h-screen overflow-y-auto bg-gray-50">
+      <Toast open={toast.open} type={toast.type} title={toast.title} message={toast.message} onClose={() => setToast((t) => ({ ...t, open: false }))} />
       <main className="w-full px-6 py-6 md:px-10">
         {/* Header */}
         <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">

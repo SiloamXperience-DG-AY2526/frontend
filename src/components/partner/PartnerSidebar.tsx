@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import {
   HomeIcon,
@@ -11,6 +12,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
+import Toast from '@/components/ui/Toast';
 
 const menu = [
   { name: 'Home', icon: HomeIcon, href: '/partner/home' },
@@ -21,18 +23,19 @@ const menu = [
 ];
 
 export default function PartnerSidebar() {
-
   const router = useRouter();
   const { authLogout } = useAuth();
+  const [toast, setToast] = useState<{ open: boolean; title: string }>({ open: false, title: '' });
 
   const handleLogout = async () => {
     await authLogout();
-    router.push('/login');
-    alert('Logged out successfully');
+    setToast({ open: true, title: 'Logged out successfully' });
+    setTimeout(() => router.push('/login'), 800);
   };
 
   return (
     <aside className="hidden md:flex w-64 bg-[#195D4B] text-white flex-col py-5">
+      <Toast open={toast.open} type="success" title={toast.title} onClose={() => setToast({ open: false, title: '' })} />
       <div className="px-6 py-5 text-lg font-semibold">PARTNER</div>
 
       <nav className="flex-1 space-y-1 px-3">

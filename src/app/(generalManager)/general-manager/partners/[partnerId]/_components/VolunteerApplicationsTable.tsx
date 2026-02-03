@@ -1,7 +1,10 @@
+'use client';
+
 import Link from 'next/link';
 import DataTable, { Column } from '@/components/table/DataTable';
 import StatusBadge from '@/components/table/StatusBadge';
 import { PartnerVolunteerApplication } from '@/types/Partner';
+import { useManagerBasePath } from '@/lib/utils/managerBasePath';
 
 interface VolunteerApplicationsTableProps {
   applications: PartnerVolunteerApplication[];
@@ -31,13 +34,15 @@ export default function VolunteerApplicationsTable({
   loading,
   emptyMessage = 'No volunteer applications found',
 }: VolunteerApplicationsTableProps) {
+  const basePath = useManagerBasePath('general');
+
   const columns: Column<PartnerVolunteerApplication>[] = [
     {
       header: 'Project',
       accessor: (app) =>
         app.position.projectId ? (
           <Link
-            href={`/general-manager/projects/${app.position.projectId}`}
+            href={`${basePath}/projects/${app.position.projectId}`}
             className="hover:underline"
             style={{ color: '#2C89A5' }}
           >

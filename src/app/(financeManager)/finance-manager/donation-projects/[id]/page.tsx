@@ -10,6 +10,7 @@ import { DonationProjectWithFinance } from '@/types/DonationProjectData';
 import TotalFundsRaisedCard from './_components/TotalFundsRaisedCard';
 import DonationsTab from './_components/DonationsTab';
 import YourDonorsTab from './_components/YourDonorsTab';
+import { useManagerBasePath } from '@/lib/utils/managerBasePath';
 
 type TabKey = 'donations' | 'donors';
 
@@ -21,6 +22,7 @@ const tabs: { key: TabKey; label: string }[] = [
 export default function DonationProjectDetail() {
   const params = useParams<{ id: string }>();
   const projectId = params.id;
+  const basePath = useManagerBasePath('finance');
 
   const [projectData, setProjectData] =
     useState<DonationProjectWithFinance | null>(null);
@@ -72,7 +74,7 @@ export default function DonationProjectDetail() {
         <PageHeader title={projectData.project.title} />
         <div className="flex w-full max-w-md flex-col items-end gap-3">
           <Link
-            href={`/finance-manager/donation-projects/${projectId}/edit`}
+            href={`${basePath}/donation-projects/${projectId}/edit`}
             className="rounded-full border border-[#0E5A4A] px-6 py-2 text-sm font-semibold text-[#0E5A4A] hover:bg-[#E6F5F1]"
           >
             Edit project

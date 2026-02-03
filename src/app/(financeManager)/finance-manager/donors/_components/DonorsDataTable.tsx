@@ -1,8 +1,11 @@
+'use client';
+
 import Link from 'next/link';
 import { Donor } from '@/types/DonorData';
 import DataTable, { Column } from '@/components/table/DataTable';
 import StatusBadge from '@/components/table/StatusBadge';
 import EditButton from '../../../../../components/ui/EditButton';
+import { useManagerBasePath } from '@/lib/utils/managerBasePath';
 
 interface DonorsDataTableProps {
   donors: Donor[];
@@ -15,12 +18,14 @@ export default function DonorsDataTable({
   loading,
   onEditClick,
 }: DonorsDataTableProps) {
+  const basePath = useManagerBasePath('finance');
+
   const columns: Column<Donor>[] = [
     {
       header: 'Partner Name',
       accessor: (donor) => (
         <Link
-          href={`/finance-manager/donors/${donor.donorId}`}
+          href={`${basePath}/donors/${donor.donorId}`}
           className="hover:underline"
           style={{ color: '#2C89A5' }}
         >

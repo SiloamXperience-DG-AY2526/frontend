@@ -15,7 +15,8 @@ import {
   updateDelivery,
 } from '@/lib/api/emailCampaign';
 import { getAllVolunteerProjects } from '@/lib/api/volunteer';
-import { EmailCampaignDetail } from '@/types/EmailCampaign';
+import { EmailCampaignDetail, EmailCampaignStatus } from '@/types/EmailCampaign';
+import { useManagerBasePath } from '@/lib/utils/managerBasePath';
 
 type Step = 1 | 2 | 3 | 4;
 
@@ -69,6 +70,7 @@ export default function EmailCampaignWizard({
   initialCampaignId?: string;
 }) {
   const router = useRouter();
+  const basePath = useManagerBasePath('general');
   const [step, setStep] = useState<Step>(1);
   const [campaignId, setCampaignId] = useState<string | undefined>(
     initialCampaignId
@@ -76,6 +78,7 @@ export default function EmailCampaignWizard({
   const [loading, setLoading] = useState(Boolean(initialCampaignId));
   const [saving, setSaving] = useState(false);
   const [publishing, setPublishing] = useState(false);
+  const [campaignStatus, setCampaignStatus] = useState<EmailCampaignStatus>('draft');
 
   const [campaignName, setCampaignName] = useState('');
   const [senderAddress, setSenderAddress] = useState('');
@@ -143,6 +146,7 @@ export default function EmailCampaignWizard({
         if (!mounted || !data) return;
         const campaign = data as EmailCampaignDetail;
         setCampaignId(campaign.id);
+        setCampaignStatus(campaign.status);
         setCampaignName(campaign.name ?? '');
         setSenderAddress(campaign.senderAddress ?? '');
         setSubject(campaign.subject ?? '');
@@ -484,7 +488,7 @@ export default function EmailCampaignWizard({
         title: 'Campaign scheduled',
       });
       setTimeout(() => {
-        router.push('/general-manager/emails');
+        router.push(`${basePath}/emails`);
       }, 1200);
     } catch (err) {
       setToast({
@@ -522,6 +526,7 @@ export default function EmailCampaignWizard({
 
   const isPublishDisabled =
     !campaignId || !subject.trim() || !body.trim() || publishing;
+  const readOnly = campaignStatus === 'sent';
 
   if (loading) {
     return (
@@ -554,33 +559,39 @@ export default function EmailCampaignWizard({
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-3">
-          <button
-            type="button"
-            onClick={handleSaveDraft}
-            disabled={saving}
-            className={[
-              'rounded-md px-5 py-2 text-sm font-semibold',
-              'border border-[#1F6B59] text-[#1F6B59]',
-              'hover:bg-[#E6F5F1] transition',
-              saving ? 'opacity-50 cursor-not-allowed' : '',
-            ].join(' ')}
-          >
-            Save as Draft
-          </button>
-          <button
-            type="button"
-            disabled={isPublishDisabled}
-            onClick={handlePublish}
-            className={[
-              'rounded-md px-5 py-2 text-sm font-semibold text-white',
-              'bg-[#1F6B59] hover:bg-[#195746] transition',
-              isPublishDisabled ? 'opacity-50 cursor-not-allowed' : '',
-            ].join(' ')}
-          >
-            {publishing ? 'Publishing...' : 'Review and Publish'}
-          </button>
-        </div>
+        {readOnly ? (
+          <div className="rounded-md bg-gray-100 border border-gray-300 px-4 py-2 text-sm text-gray-600">
+            This campaign has been sent and cannot be edited.
+          </div>
+        ) : (
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={handleSaveDraft}
+              disabled={saving}
+              className={[
+                'rounded-md px-5 py-2 text-sm font-semibold',
+                'border border-[#1F6B59] text-[#1F6B59]',
+                'hover:bg-[#E6F5F1] transition',
+                saving ? 'opacity-50 cursor-not-allowed' : '',
+              ].join(' ')}
+            >
+              Save as Draft
+            </button>
+            <button
+              type="button"
+              disabled={isPublishDisabled}
+              onClick={handlePublish}
+              className={[
+                'rounded-md px-5 py-2 text-sm font-semibold text-white',
+                'bg-[#1F6B59] hover:bg-[#195746] transition',
+                isPublishDisabled ? 'opacity-50 cursor-not-allowed' : '',
+              ].join(' ')}
+            >
+              {publishing ? 'Publishing...' : 'Review and Publish'}
+            </button>
+          </div>
+        )}
       </div>
 
       <div className="overflow-hidden rounded-lg border border-slate-200 bg-[#E6EFEA]">
@@ -619,7 +630,7 @@ export default function EmailCampaignWizard({
       </div>
 
       {step === 1 && (
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_320px]">
+        <fieldset disabled={readOnly} className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_320px]">
           <div className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
             <div className="space-y-5">
               <div>
@@ -857,11 +868,11 @@ export default function EmailCampaignWizard({
               </p>
             )}
           </div>
-        </div>
+        </fieldset>
       )}
 
       {step === 2 && (
-        <div className="rounded-lg border border-slate-200 bg-white p-8 shadow-sm">
+        <fieldset disabled={readOnly} className="rounded-lg border border-slate-200 bg-white p-8 shadow-sm">
           <div className="max-w-xl space-y-6">
             <p className={sectionTitle}>Delivery</p>
             <div>
@@ -913,11 +924,11 @@ export default function EmailCampaignWizard({
               </button>
             </div>
           </div>
-        </div>
+        </fieldset>
       )}
 
       {step === 3 && (
-        <div className="rounded-lg border border-slate-200 bg-white p-8 shadow-sm">
+        <fieldset disabled={readOnly} className="rounded-lg border border-slate-200 bg-white p-8 shadow-sm">
           <div className="flex gap-3">
             <button
               type="button"
@@ -978,11 +989,11 @@ export default function EmailCampaignWizard({
               {saving ? 'Saving...' : 'Done'}
             </button>
           </div>
-        </div>
+        </fieldset>
       )}
 
       {step === 4 && (
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_380px]">
+        <fieldset disabled={readOnly} className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_380px]">
           <div className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
             <div className="flex gap-3">
               <button
@@ -1045,7 +1056,7 @@ export default function EmailCampaignWizard({
               {body || 'Email body preview will appear here.'}
             </div>
           </div>
-        </div>
+        </fieldset>
       )}
     </div>
   );

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { submitPeerFeedback } from '@/lib/api/general/projects';
 import { useParams } from 'next/navigation';
+import Toast from '@/components/ui/Toast';
 
 type FeedbackType = 'supervisor' | 'peer' | 'self';
 
@@ -17,10 +18,11 @@ export default function FeedbackPage() {
   const [strengths, setStrengths] = useState('');
   const [improvements, setImprovements] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const [toast, setToast] = useState<{ open: boolean; type: 'success' | 'error'; title: string }>({ open: false, type: 'success', title: '' });
 
   const onSubmit = async () => {
     if (!feedbackType) {
-      alert('Please select a feedback type.');
+      setToast({ open: true, type: 'error', title: 'Please select a feedback type.' });
       return;
     }
     if (!reviewer.trim() || !reviewee.trim() || !strengths.trim() || !improvements.trim()) {
@@ -45,7 +47,7 @@ export default function FeedbackPage() {
     };
 
     await submitPeerFeedback(payload);
-    alert('Feedback submitted successfully!');
+    setToast({ open: true, type: 'success', title: 'Feedback submitted successfully!' });
     setFeedbackType(null);
     setReviewer('');
     setReviewee('');
@@ -56,6 +58,7 @@ export default function FeedbackPage() {
 
   return (
     <div className="p-6">
+      <Toast open={toast.open} type={toast.type} title={toast.title} onClose={() => setToast((t) => ({ ...t, open: false }))} />
       <h1 className="text-2xl font-bold mb-6">Feedback Form</h1>
 
       <div className="space-y-4">

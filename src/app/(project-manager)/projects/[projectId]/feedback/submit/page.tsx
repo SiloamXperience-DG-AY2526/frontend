@@ -1,6 +1,7 @@
 'use client';
 
 import TextArea from '@/components/ui/Textarea';
+import Toast from '@/components/ui/Toast';
 import { submitPeerFeedback } from '@/lib/api/general/projects';
 import { useParams } from 'next/navigation';
 import { useState } from 'react';
@@ -11,6 +12,7 @@ export default function FeedbackPage() {
   const { projectId } = useParams();
   const [loading, setLoading] = useState(false);
   const [feedbackType, setFeedbackType] = useState<FeedbackType | null>(null);
+  const [toast, setToast] = useState<{ open: boolean; type: 'success' | 'error'; title: string; message?: string }>({ open: false, type: 'success', title: '' });
   const [formData, setFormData] = useState({
     reviewer: '',
     reviewee: '',
@@ -23,12 +25,12 @@ export default function FeedbackPage() {
     e.preventDefault();
 
     if (!feedbackType) {
-      alert('Please select a feedback type.');
+      setToast({ open: true, type: 'error', title: 'Please select a feedback type.' });
       return;
     }
 
     if (!formData.reviewer || !formData.reviewee || !formData.score) {
-      alert('Please fill in all required fields.');
+      setToast({ open: true, type: 'error', title: 'Please fill in all required fields.' });
       return;
     }
 
@@ -47,7 +49,7 @@ export default function FeedbackPage() {
 
     try {
       await submitPeerFeedback(payload);
-      alert('Feedback submitted successfully!');
+      setToast({ open: true, type: 'success', title: 'Feedback submitted successfully!' });
 
             setFeedbackType(null);
             setFormData({
@@ -58,7 +60,7 @@ export default function FeedbackPage() {
                 improvements: '',
             });
         } catch {
-            alert('Something went wrong. Please try again.');
+            setToast({ open: true, type: 'error', title: 'Something went wrong', message: 'Please try again.' });
         } finally {
             setLoading(false);
         }
@@ -75,6 +77,7 @@ export default function FeedbackPage() {
 
   return (
     <>
+      <Toast open={toast.open} type={toast.type} title={toast.title} message={toast.message} onClose={() => setToast((t) => ({ ...t, open: false }))} />
       {/* Header */}
       <div className="flex items-center gap-3 sm:gap-5 mb-6 sm:mb-10">
         <div className="w-[5px] h-[30px] sm:h-[39px] bg-[#56E0C2]" />

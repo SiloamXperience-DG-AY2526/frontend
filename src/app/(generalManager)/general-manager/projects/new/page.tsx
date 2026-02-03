@@ -17,6 +17,7 @@ import {
   ProjectApprovalStatus,
   ProjectOperationStatus,
 } from '@/types/ProjectData';
+import { useManagerBasePath } from '@/lib/utils/managerBasePath';
 type TimePeriod = 'one-time' | 'ongoing';
 type FrequencyUI = 'weekly' | 'monthly' | 'ad-hoc';
 
@@ -47,6 +48,7 @@ const TEMP_IMAGE_URL =
 
 export default function VolunteerProjectProposalPage() {
   const router = useRouter();
+  const basePath = useManagerBasePath('general');
 
   // Project details
   const [title, setTitle] = useState('');
@@ -203,8 +205,8 @@ export default function VolunteerProjectProposalPage() {
       skills: p.skills.map((s) => s.trim()).filter(Boolean),
     })),
 
-    approvalStatus,
-    operationStatus,
+    approvalStatus: submissionStatus === 'submitted' ? ProjectApprovalStatus.pending : approvalStatus,
+    operationStatus: submissionStatus === 'submitted' ? ProjectOperationStatus.notStarted : operationStatus,
     submissionStatus,
   });
 
@@ -219,7 +221,7 @@ export default function VolunteerProjectProposalPage() {
       setToastMsg('You can continue editing this draft anytime.');
       setToastOpen(true);
       setTimeout(() => {
-        router.push('/general-manager/projects');
+        router.push(`${basePath}/projects`);
       }, 2000);
     } catch (e: unknown) {
       setToastType('error');
@@ -241,7 +243,7 @@ export default function VolunteerProjectProposalPage() {
       setToastTitle('Project Submitted');
       setToastOpen(true);
       setTimeout(() => {
-        router.push('/general-manager/projects');
+        router.push(`${basePath}/projects`);
       }, 2000);
     } catch (e: unknown) {
       setToastType('error');
@@ -254,7 +256,7 @@ export default function VolunteerProjectProposalPage() {
   };
 
   const onCancel = () => {
-    router.push('/general-manager/projects');
+    router.push(`${basePath}/projects`);
   };
 
   return (

@@ -1,3 +1,5 @@
+'use client';
+
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import DataTable, { Column } from '@/components/table/DataTable';
@@ -5,6 +7,7 @@ import StatusBadge from '@/components/table/StatusBadge';
 import DeleteButton from '@/components/ui/DeleteButton';
 import EditButton from '@/components/ui/EditButton';
 import { EmailCampaignSummary } from '@/types/EmailCampaign';
+import { useManagerBasePath } from '@/lib/utils/managerBasePath';
 
 interface EmailCampaignTableProps {
   campaigns: EmailCampaignSummary[];
@@ -20,13 +23,15 @@ const formatDate = (value?: string | null) => {
 };
 
 const statusVariant = (status: string) => {
-  if (status === 'scheduled') return 'success';
+  if (status === 'sent') return 'success';
+  if (status === 'scheduled') return 'info';
   if (status === 'cancelled') return 'error';
   return 'neutral';
 };
 
 const statusLabel = (status: string) => {
-  if (status === 'scheduled') return 'Active';
+  if (status === 'sent') return 'Sent';
+  if (status === 'scheduled') return 'Scheduled';
   if (status === 'cancelled') return 'Cancelled';
   return 'Draft';
 };
@@ -37,12 +42,13 @@ export default function EmailCampaignTable({
   onDelete,
 }: EmailCampaignTableProps) {
   const router = useRouter();
+  const basePath = useManagerBasePath('general');
   const columns: Column<EmailCampaignSummary>[] = [
     {
       header: 'Email',
       accessor: (campaign) => (
         <Link
-          href={`/general-manager/emails/${campaign.id}`}
+          href={`${basePath}/emails/${campaign.id}`}
           className="hover:underline"
           style={{ color: '#2C89A5' }}
         >
@@ -68,18 +74,28 @@ export default function EmailCampaignTable({
     },
     {
       header: 'Action',
-      accessor: (campaign) => (
-        <div className="flex items-center gap-3">
-          <EditButton
-            onClick={() => router.push(`/general-manager/emails/${campaign.id}`)}
-            ariaLabel="Edit campaign"
-          />
-          <DeleteButton
-            onClick={() => onDelete(campaign.id)}
-            ariaLabel="Delete campaign"
-          />
-        </div>
-      ),
+      accessor: (campaign) => {
+        const isSent = campaign.status === 'sent';
+        return (
+          <div className="flex items-center gap-3">
+            {!isSent && (
+              <EditButton
+                onClick={() => router.push(`${basePath}/emails/${campaign.id}`)}
+                ariaLabel="Edit campaign"
+              />
+            )}
+            {!isSent && (
+              <DeleteButton
+                onClick={() => onDelete(campaign.id)}
+                ariaLabel="Delete campaign"
+              />
+            )}
+            {isSent && (
+              <span className="text-xs text-gray-400">—</span>
+            )}
+          </div>
+        );
+      },
     },
   ];
 

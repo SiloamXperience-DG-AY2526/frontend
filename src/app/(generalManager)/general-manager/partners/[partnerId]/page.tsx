@@ -12,10 +12,12 @@ import PartnerProfileDetailsCard from './_components/PartnerProfileDetailsCard';
 import VolunteerApplicationsTable from './_components/VolunteerApplicationsTable';
 import ProposedProjectsTable from './_components/ProposedProjectsTable';
 import { PartnershipInterestsCard } from '@/components/partnerInfo/PartnershipInterestsCard';
+import { useManagerBasePath } from '@/lib/utils/managerBasePath';
 
 export default function PartnerDetailPage() {
   const params = useParams<{ partnerId: string }>();
   const partnerId = params?.partnerId ?? '';
+  const basePath = useManagerBasePath('general');
 
   const [partnerInfo, setPartnerInfo] = useState<PartnerInfoResponse | null>(
     null
@@ -157,7 +159,7 @@ export default function PartnerDetailPage() {
   return (
     <div className="flex min-h-screen bg-gray-50">
       <main className="flex-1 px-10 py-8">
-        <BackButton label="Back to Partners" href="/general-manager/partners" />
+        <BackButton label="Back to Partners" href={`${basePath}/partners`} />
         <PageHeader title={partnerName} />
 
         <div className="mt-6 space-y-6">

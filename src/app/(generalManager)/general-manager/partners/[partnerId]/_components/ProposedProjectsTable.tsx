@@ -1,7 +1,10 @@
+'use client';
+
 import Link from 'next/link';
 import DataTable, { Column } from '@/components/table/DataTable';
 import StatusBadge from '@/components/table/StatusBadge';
 import { MyProposedProject } from '@/types/Volunteer';
+import { useManagerBasePath } from '@/lib/utils/managerBasePath';
 
 interface ProposedProjectsTableProps {
   projects: MyProposedProject[];
@@ -28,12 +31,14 @@ export default function ProposedProjectsTable({
   loading,
   emptyMessage = 'No proposed projects found',
 }: ProposedProjectsTableProps) {
+  const basePath = useManagerBasePath('general');
+
   const columns: Column<MyProposedProject>[] = [
     {
       header: 'Project',
       accessor: (project) => (
         <Link
-          href={`/general-manager/projects/${project.id}`}
+          href={`${basePath}/projects/${project.id}`}
           className="hover:underline"
           style={{ color: '#2C89A5' }}
         >

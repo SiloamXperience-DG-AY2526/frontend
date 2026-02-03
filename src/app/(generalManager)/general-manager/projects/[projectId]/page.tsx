@@ -21,6 +21,8 @@ import Section from '@/components/volunteer/project/Section';
 import ObjectiveList from '@/components/volunteer/project/ObjectiveList';
 import InfoRow from '@/components/volunteer/project/InfoRow';
 import { useRouter } from 'next/navigation';
+import { useManagerBasePath } from '@/lib/utils/managerBasePath';
+import Toast from '@/components/ui/Toast';
 
 export default function VolunteerProjectDetailPage({
   params,
@@ -53,8 +55,10 @@ export default function VolunteerProjectDetailPage({
   const [applicationsLoading, setApplicationsLoading] = useState(true);
   const [applicationsError, setApplicationsError] = useState<string | null>(null);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
+  const [toast, setToast] = useState<{ open: boolean; type: 'success' | 'error'; title: string; message?: string }>({ open: false, type: 'error', title: '' });
 
   const router = useRouter();
+  const basePath = useManagerBasePath('general');
 
   useEffect(() => {
     let mounted = true;
@@ -122,7 +126,7 @@ export default function VolunteerProjectDetailPage({
   }, [data]);
 
   const handleEditProject = () => {
-    router.push(`/general-manager/projects/${data?.id}/edit`);
+    router.push(`${basePath}/projects/${data?.id}/edit`);
   };
 
   const handleStatusUpdate = async (
@@ -138,11 +142,12 @@ export default function VolunteerProjectDetailPage({
         )
       );
     } catch (e) {
-      alert(
-        e instanceof Error
-          ? e.message
-          : 'Failed to update application status'
-      );
+      setToast({
+        open: true,
+        type: 'error',
+        title: 'Failed to update application status',
+        message: e instanceof Error ? e.message : undefined,
+      });
     } finally {
       setUpdatingId(null);
     }
@@ -176,6 +181,7 @@ export default function VolunteerProjectDetailPage({
 
   return (
     <div className="flex min-h-screen bg-gray-50">
+      <Toast open={toast.open} type={toast.type} title={toast.title} message={toast.message} onClose={() => setToast((t) => ({ ...t, open: false }))} />
       <main className="w-full px-6 py-6 md:px-10 pb-12">
         <div className="flex flex-col gap-6 lg:flex-row">
           <div className="flex-1">
@@ -240,13 +246,13 @@ export default function VolunteerProjectDetailPage({
                     Edit Project
                   </button>
                   <Link
-                    href={`/general-manager/projects/${data.id}/feedback`}
+                    href={`${basePath}/projects/${data.id}/feedback`}
                     className="w-full inline-flex items-center justify-center rounded-lg border border-teal-600 px-4 py-2.5 text-sm font-semibold text-teal-700 hover:bg-teal-50"
                   >
                     View Feedback
                   </Link>
                   <Link
-                    href={`/general-manager/projects/${data.id}/feedback/submit`}
+                    href={`${basePath}/projects/${data.id}/feedback/submit`}
                     className="w-full inline-flex items-center justify-center rounded-lg border border-gray-200 px-4 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50"
                   >
                     Submit Feedback

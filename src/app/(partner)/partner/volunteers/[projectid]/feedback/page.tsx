@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 
 import PageHeader from '@/components/ui/PageHeader';
 import StarRating from '@/components/ui/StarRating';
-import TextArea from '@/components/ui/TextArea';
+import TextArea from '@/components/ui/Textarea';
 import Button from '@/components/ui/Button';
 import { useParams } from 'next/navigation';
 import { FeedbackPayload } from '@/types/Volunteer';
@@ -39,7 +39,9 @@ export default function FeedbackPage() {
 
   const handleSubmit = async () => {
     if (!projectId) {
-      alert('Missing projectId in URL.');
+      setToastType('error');
+      setToastTitle('Missing projectId in URL.');
+      setToastOpen(true);
       return;
     }
 
@@ -50,13 +52,17 @@ export default function FeedbackPage() {
       !ratings.planning ||
       !ratings.facilities
     ) {
-      alert('Please rate all categories before submitting.');
+      setToastType('error');
+      setToastTitle('Please rate all categories before submitting.');
+      setToastOpen(true);
       return;
     }
 
     //  validation for text fields
     if (!feedback.experience.trim() || !feedback.improvement.trim()) {
-      alert('Please fill in the experience and improvement fields.');
+      setToastType('error');
+      setToastTitle('Please fill in the experience and improvement fields.');
+      setToastOpen(true);
       return;
     }
 
@@ -83,8 +89,8 @@ export default function FeedbackPage() {
       });
 
       setToastType('success');
-      setToastTitle('Application submitted');
-      setToastMsg('We’ll contact you soon with the next steps.');
+      setToastTitle('Feedback submitted');
+      setToastMsg('Thank you for your valuable feedback!');
       setToastOpen(true);
 
       // reset form

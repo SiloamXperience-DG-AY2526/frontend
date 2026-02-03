@@ -10,6 +10,7 @@ import { VolunteerProjectRow } from '@/types/Volunteer';
 import Link from 'next/link';
 import Toast from '@/components/ui/Toast';
 import VolunteerProjectsTable from '@/components/general-manager/VolunteerProjectsTable';
+import { useManagerBasePath } from '@/lib/utils/managerBasePath';
 
 function useDebouncedValue<T>(value: T, delayMs = 450) {
   const [debounced, setDebounced] = useState(value);
@@ -23,6 +24,7 @@ function useDebouncedValue<T>(value: T, delayMs = 450) {
 export default function VolunteerProjectsPage() {
   const [search, setSearch] = useState('');
   const debouncedSearch = useDebouncedValue(search, 450);
+  const basePath = useManagerBasePath('general');
 
   const [page, setPage] = useState(1);
   const limit = 6;
@@ -90,7 +92,7 @@ export default function VolunteerProjectsPage() {
           </div>
 
           <Link
-            href="/general-manager/projects/new"
+            href={`${basePath}/projects/new`}
             className="inline-flex items-center justify-center
         rounded-xl px-6 py-2.5 text-sm font-bold text-white
         bg-gradient-to-r from-[#1F7A67] to-[#2AAE92]

@@ -1,7 +1,10 @@
+'use client';
+
 import Link from 'next/link';
 import DataTable, { Column } from '@/components/table/DataTable';
 import StatusBadge from '@/components/table/StatusBadge';
 import { PartnerSummary } from '@/types/Partner';
+import { useManagerBasePath } from '@/lib/utils/managerBasePath';
 
 interface PartnersDataTableProps {
   partners: PartnerSummary[];
@@ -12,12 +15,14 @@ export default function PartnersDataTable({
   partners,
   loading,
 }: PartnersDataTableProps) {
+  const basePath = useManagerBasePath('general');
+
   const columns: Column<PartnerSummary>[] = [
     {
       header: 'Partner Name',
       accessor: (partner) => (
         <Link
-          href={`/general-manager/partners/${partner.partnerId}`}
+          href={`${basePath}/partners/${partner.partnerId}`}
           className="hover:underline"
           style={{ color: '#2C89A5' }}
         >

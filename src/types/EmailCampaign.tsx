@@ -1,4 +1,4 @@
-export type EmailCampaignStatus = 'draft' | 'scheduled' | 'cancelled';
+export type EmailCampaignStatus = 'draft' | 'scheduled' | 'sent' | 'cancelled';
 
 export type EmailCampaignSummary = {
   id: string;

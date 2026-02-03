@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { ProjectApprovalStatus } from '@/types/ProjectData';
 import { changeProposedProjectStatus, getVolunteerProjects } from '@/lib/api/general/projects';
 import Link from 'next/link';
+import Toast from '@/components/ui/Toast';
 
 interface Project {
     id: string;
@@ -22,6 +23,7 @@ export default function Projects() {
     const [loading, setLoading] = useState<string | null>(null);
     const [isInitialLoading, setIsInitialLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [toast, setToast] = useState<{ open: boolean; type: 'success' | 'error'; title: string; message?: string }>({ open: false, type: 'success', title: '' });
 
     useEffect(() => {
         const fetchProjects = async () => {
@@ -59,10 +61,10 @@ export default function Projects() {
                 [projectId]: newStatus,
             }));
 
-            alert('Project status updated successfully!');
+            setToast({ open: true, type: 'success', title: 'Project status updated successfully!' });
         } catch (error) {
             console.error('Error updating project status:', error);
-            alert('Failed to update project status. Please try again.');
+            setToast({ open: true, type: 'error', title: 'Failed to update project status', message: 'Please try again.' });
 
             setProjectStatuses(prev => ({
                 ...prev,
@@ -131,6 +133,7 @@ export default function Projects() {
 
     return (
         <>
+            <Toast open={toast.open} type={toast.type} title={toast.title} message={toast.message} onClose={() => setToast((t) => ({ ...t, open: false }))} />
             {/* Header */}
             <div className="flex items-center gap-3 sm:gap-5 mb-6 sm:mb-10">
                 <div className="w-[5px] h-[30px] sm:h-[39px] bg-[#56E0C2]" />

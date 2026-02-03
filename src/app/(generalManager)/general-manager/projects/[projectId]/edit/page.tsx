@@ -17,6 +17,7 @@ import UploadBox from '@/components/ui/UploadBox';
 import { useRouter } from 'next/navigation';
 import Toast from '@/components/ui/Toast';
 import TextArea from '@/components/ui/Textarea';
+import { useManagerBasePath } from '@/lib/utils/managerBasePath';
 type TimePeriod = 'one-time' | 'ongoing';
 type FrequencyUI = 'weekly' | 'monthly' | 'ad-hoc';
 
@@ -83,6 +84,7 @@ export default function EditVolunteerProjectPage({
 }) {
   const { projectId } = use(params);
   const router = useRouter();
+  const basePath = useManagerBasePath('general');
 
   // Project details
   const [title, setTitle] = useState('');
@@ -281,42 +283,58 @@ export default function EditVolunteerProjectPage({
       ),
     );
 
-  const buildPayload = (status: 'draft' | 'submitted') => ({
-    title: title.trim(),
-    initiatorName: initiatorName.trim() || undefined,
-    location: location.trim(),
+  const buildPayload = (status?: 'draft' | 'submitted') => {
+    const base = {
+      title: title.trim(),
+      initiatorName: initiatorName.trim() || undefined,
+      location: location.trim(),
 
-    aboutDesc: aboutDesc.trim(),
-    beneficiaries: beneficiaries.trim(),
-    proposedPlan: proposedPlan.trim() || undefined,
+      aboutDesc: aboutDesc.trim(),
+      beneficiaries: beneficiaries.trim(),
+      proposedPlan: proposedPlan.trim() || undefined,
 
-    objectives: objectives
-      .map((o) => o.trim())
-      .filter(Boolean)
-      .map((o) => `- ${o}`)
-      .join('\n'),
+      objectives: objectives
+        .map((o) => o.trim())
+        .filter(Boolean)
+        .map((o) => `- ${o}`)
+        .join('\n'),
 
-    startDate: toISODateOnly(startDate),
-    endDate: toISODateOnly(endDate),
-    startTime: toISODateTime(startDate, startTime),
-    endTime: toISODateTime(startDate, endTime),
+      startDate: toISODateOnly(startDate),
+      endDate: toISODateOnly(endDate),
+      startTime: toISODateTime(startDate, startTime),
+      endTime: toISODateTime(startDate, endTime),
 
-    frequency,
-    dayOfWeek: frequencyNotes.trim() || undefined,
-    attachments: TEMP_PDF_URL,
-    image: TEMP_IMAGE_URL, //replace with s3 link
-    positions: positions.map((p) => ({
-      role: p.role.trim(),
-      description: p.description.trim(),
+      frequency,
+      dayOfWeek: frequencyNotes.trim() || undefined,
+      attachments: TEMP_PDF_URL,
+      image: TEMP_IMAGE_URL, //replace with s3 link
+      positions: positions.map((p) => ({
+        role: p.role.trim(),
+        description: p.description.trim(),
 
-      totalSlots: Math.max(1, Number(p.totalSlots) || 1),
-      skills: p.skills.map((s) => s.trim()).filter(Boolean),
-    })),
+        totalSlots: Math.max(1, Number(p.totalSlots) || 1),
+        skills: p.skills.map((s) => s.trim()).filter(Boolean),
+      })),
 
-    approvalStatus,
-    operationStatus,
-    submissionStatus: status,
-  });
+      approvalStatus,
+      operationStatus,
+    };
+
+    // Only include submissionStatus when actually changing it (draft → submitted).
+    // Sending 'submitted' on an already-submitted project causes the backend
+    // to reset approvalStatus to 'pending'.
+    if (status) {
+      return {
+        ...base,
+        submissionStatus: status,
+        ...(status === 'submitted' && {
+          approvalStatus: ProjectApprovalStatus.pending,
+          operationStatus: ProjectOperationStatus.notStarted,
+        }),
+      };
+    }
+    return base;
+  };
 
   const onSaveDraft = async () => {
     try {
@@ -338,22 +356,24 @@ export default function EditVolunteerProjectPage({
     }
   };
 
+  const isUpdate = submissionStatus !== 'draft';
+
   const onSubmit = async () => {
     try {
       setSubmitting(true);
-      const payload: EditVolunteerProjectPayload = buildPayload('submitted');
-      await updateVolunteerProject(projectId, payload);
+      const payload = buildPayload(isUpdate ? undefined : 'submitted');
+      await updateVolunteerProject(projectId, payload as EditVolunteerProjectPayload);
 
       setToastType('success');
-      setToastTitle('Project Submitted');
+      setToastTitle(isUpdate ? 'Project Updated' : 'Project Submitted');
       setToastOpen(true);
       setTimeout(() => {
-        router.push('/general-manager/projects');
+        router.push(`${basePath}/projects`);
       }, 2000);
     } catch (e: unknown) {
       setToastType('error');
-      setToastTitle('Submission failed');
-      setToastMsg(`Failed to submit project: ${e} `);
+      setToastTitle(isUpdate ? 'Update failed' : 'Submission failed');
+      setToastMsg(`Failed to ${isUpdate ? 'update' : 'submit'} project: ${e} `);
       setToastOpen(true);
     } finally {
       setSubmitting(false);
@@ -361,7 +381,7 @@ export default function EditVolunteerProjectPage({
   };
 
   const onCancel = () => {
-    router.push('/general-manager/projects');
+    router.push(`${basePath}/projects`);
   };
 
   return (
@@ -810,7 +830,9 @@ export default function EditVolunteerProjectPage({
                 : '',
             ].join(' ')}
           >
-            {submitting ? 'Submitting...' : 'Submit for Review'}
+            {submitting
+              ? isUpdate ? 'Updating...' : 'Submitting...'
+              : isUpdate ? 'Update' : 'Submit for Review'}
           </button>
         </div>
       </main>

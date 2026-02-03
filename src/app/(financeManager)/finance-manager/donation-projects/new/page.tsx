@@ -15,6 +15,7 @@ import {
   createDonationProjectAdmin,
   updateDonationProjectById,
 } from '@/lib/api/donation';
+import { useManagerBasePath } from '@/lib/utils/managerBasePath';
 
 const PROJECT_TYPES: { value: DonationProjectType; label: string }[] = [
   { value: 'brick', label: 'Brick' },
@@ -24,6 +25,7 @@ const PROJECT_TYPES: { value: DonationProjectType; label: string }[] = [
 
 export default function CreateDonationProjectPage() {
   const router = useRouter();
+  const basePath = useManagerBasePath('finance');
 
   const [submitting, setSubmitting] = useState(false);
   const [savingDraft, setSavingDraft] = useState(false);
@@ -137,7 +139,7 @@ export default function CreateDonationProjectPage() {
         message: 'You can continue editing this draft anytime.',
       });
       if (created?.id) {
-        router.push(`/finance-manager/donation-projects/${created.id}/edit`);
+        router.push(`${basePath}/donation-projects/${created.id}/edit`);
       }
     } catch (error) {
       setToast({
@@ -173,6 +175,7 @@ export default function CreateDonationProjectPage() {
         await updateDonationProjectById(created.id, {
           submissionStatus: 'submitted',
           approvalStatus: 'pending' as DonationProjectApprovalStatus,
+          operationStatus: 'notStarted',
         });
       }
 
@@ -183,7 +186,7 @@ export default function CreateDonationProjectPage() {
         message: 'Donation project has been sent for review.',
       });
       setTimeout(() => {
-        router.push('/finance-manager/donation-projects');
+        router.push(`${basePath}/donation-projects`);
       }, 1000);
     } catch (error) {
       setToast({
@@ -425,7 +428,7 @@ export default function CreateDonationProjectPage() {
       <div className="mt-10 flex items-center justify-end gap-3">
         <button
           type="button"
-          onClick={() => router.push('/finance-manager/donation-projects')}
+          onClick={() => router.push(`${basePath}/donation-projects`)}
           disabled={submitting || savingDraft}
           className={[
             'rounded-xl px-8 py-3 font-bold',

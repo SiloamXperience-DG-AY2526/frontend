@@ -6,6 +6,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { getDonationProjectById, submitDonation } from '@/lib/api/donation';
 import { DonationProject } from '@/types/DonationProjectData';
 import { DonationType } from '@/types/DonationData';
+import Toast from '@/components/ui/Toast';
 
 const PRESET_AMOUNTS = [50, 100, 200, 500, 1000, 2000];
 
@@ -27,6 +28,7 @@ export default function DonatePage() {
   const [paymentDetails, setPaymentDetails] = useState('');
   const [donationType] = useState<DonationType>('individual');
   const [countryOfResidence] = useState('Singapore');
+  const [toast, setToast] = useState<{ open: boolean; type: 'success' | 'error'; title: string }>({ open: false, type: 'error', title: '' });
 
   // Success/Failure state
   const [donationResult, setDonationResult] = useState<{
@@ -70,8 +72,8 @@ export default function DonatePage() {
         setProject(data);
       } catch (error) {
         console.error('Failed to load project:', error);
-        alert('Failed to load project details.');
-        router.push('/partner/donations');
+        setToast({ open: true, type: 'error', title: 'Failed to load project details.' });
+        setTimeout(() => router.push('/partner/donations'), 1500);
       } finally {
         setLoading(false);
       }
@@ -99,7 +101,7 @@ export default function DonatePage() {
   const handleContinueFromAmount = () => {
     const amount = getDonationAmount();
     if (!amount || amount <= 0) {
-      alert('Please select or enter a donation amount');
+      setToast({ open: true, type: 'error', title: 'Please select or enter a donation amount' });
       return;
     }
     setStep(2);
@@ -107,7 +109,7 @@ export default function DonatePage() {
 
   const handleContinueFromPayment = () => {
     if (!paymentMethod) {
-      alert('Please select a payment method');
+      setToast({ open: true, type: 'error', title: 'Please select a payment method' });
       return;
     }
     setStep(3);
@@ -115,8 +117,8 @@ export default function DonatePage() {
 
   const handleConfirmDonation = async () => {
     if (!user) {
-      alert('You must be logged in to make a donation');
-      router.push('/login');
+      setToast({ open: true, type: 'error', title: 'You must be logged in to make a donation' });
+      setTimeout(() => router.push('/login'), 1500);
       return;
     }
 
@@ -193,6 +195,7 @@ export default function DonatePage() {
 
   return (
     <div className="flex h-screen overflow-y-auto bg-gray-50">
+      <Toast open={toast.open} type={toast.type} title={toast.title} onClose={() => setToast((t) => ({ ...t, open: false }))} />
       <main className="w-full px-6 py-6 md:px-10">
         {/* Back Button */}
         {step < 4 && (

@@ -2,6 +2,7 @@ import { Manager } from '@/types/Managers';
 import DataTable, { Column } from '@/components/table/DataTable';
 import StatusBadge from '@/components/table/StatusBadge';
 import EditButton from '@/components/ui/EditButton';
+import Toast from '@/components/ui/Toast';
 import { useState } from 'react';
 import ManagerStatusDialog from './ManagerStatusDialog';
 
@@ -20,6 +21,7 @@ export default function ManagersDataTable({
   const [selected, setSelected] = useState<Manager | null>(null);
   const [updating, setUpdating] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [toast, setToast] = useState<{ open: boolean; type: 'success' | 'error'; title: string; message?: string }>({ open: false, type: 'error', title: '' });
 
   const handleStatusChange = async (manager: Manager, activate: boolean) => {
     if (!manager.id) return;
@@ -43,7 +45,7 @@ export default function ManagersDataTable({
       setTimeout(() => setSuccessMessage(null), 3000);
     } catch (err) {
       console.error('Failed to update manager status:', err);
-      alert('Failed to update manager status. Please try again.');
+      setToast({ open: true, type: 'error', title: 'Failed to update manager status', message: 'Please try again.' });
     } finally {
       setUpdating(false);
     }
@@ -88,6 +90,7 @@ export default function ManagersDataTable({
 
   return (
     <>
+      <Toast open={toast.open} type={toast.type} title={toast.title} message={toast.message} onClose={() => setToast((t) => ({ ...t, open: false }))} />
       {successMessage && (
         <div className="mb-4 rounded-md bg-green-50 px-4 py-2 text-sm text-green-800 border border-green-200">
           {successMessage}

@@ -28,6 +28,27 @@ export type ProposeDonationProjectPayload = {
   image?: string | null;
 };
 
+export type UpdateDonationProjectPayload = {
+  title?: string;
+  initiatorName?: string | null;
+  organisingTeam?: string | null;
+  location?: string;
+  type?: 'brick' | 'sponsor' | 'partnerLed';
+  targetFund?: number | null;
+  brickSize?: number | null;
+  startDate?: string;
+  endDate?: string;
+  deadline?: string;
+  about?: string;
+  beneficiaries?: string | null;
+  objectives?: string;
+  attachments?: string | null;
+  image?: string | null;
+  submissionStatus?: 'draft' | 'submitted' | 'withdrawn';
+  approvalStatus?: 'pending' | 'reviewing' | 'approved' | 'rejected';
+  operationStatus?: 'notStarted' | 'ongoing' | 'paused' | 'cancelled' | 'completed';
+};
+
 // Get donation homepage data (statistics and featured projects)
 export async function getDonationHomepage(): Promise<DonationHomepage> {
   const res = await fetch('/api/v1/donations/home');
@@ -236,10 +257,7 @@ export async function proposeDonationProject(
 
 export async function updateDonationProject(
   projectId: string,
-  payload: Partial<ProposeDonationProjectPayload> & {
-    submissionStatus?: 'draft' | 'submitted' | 'withdrawn';
-    approvalStatus?: 'pending' | 'reviewing' | 'approved' | 'rejected';
-  }
+  payload: UpdateDonationProjectPayload
 ): Promise<DonationProjectDetail> {
   const res = await fetch(`/api/v1/donation-projects/me/${projectId}`, {
     method: 'PATCH',
@@ -257,10 +275,7 @@ export async function updateDonationProject(
 
 export async function updateDonationProjectById(
   projectId: string,
-  payload: Partial<ProposeDonationProjectPayload> & {
-    submissionStatus?: 'draft' | 'submitted' | 'withdrawn';
-    approvalStatus?: 'pending' | 'reviewing' | 'approved' | 'rejected';
-  }
+  payload: UpdateDonationProjectPayload
 ): Promise<DonationProjectDetail> {
   const res = await fetch(`/api/v1/donation-projects/${projectId}`, {
     method: 'PATCH',

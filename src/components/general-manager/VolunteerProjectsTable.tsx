@@ -1,9 +1,13 @@
-import React from 'react';
+'use client';
+
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { VolunteerProjectRow } from '@/types/Volunteer';
 import { formatShortDate } from '@/lib/utils/date';
 import { PencilSquareIcon, TrashIcon } from '@heroicons/react/24/outline';
 import { useRouter } from 'next/navigation';
+import { useManagerBasePath } from '@/lib/utils/managerBasePath';
+import Toast from '@/components/ui/Toast';
 
 type Tone = 'success' | 'warning' | 'danger' | 'muted' | 'info';
 
@@ -58,8 +62,9 @@ export default function VolunteerProjectTable({
   loading: boolean;
   projects: VolunteerProjectRow[];
 }) {
-
+  const basePath = useManagerBasePath('general');
   const router = useRouter();
+  const [toast, setToast] = useState<{ open: boolean; type: 'success' | 'error'; title: string }>({ open: false, type: 'success', title: '' });
 
   if (loading) {
     return (
@@ -79,12 +84,13 @@ export default function VolunteerProjectTable({
 
   const onDelete = (projectId: string) => {
     // await deleteVolunteerProject(projectId);
-    alert(`Deleted project ${projectId}`);
+    setToast({ open: true, type: 'success', title: `Deleted project ${projectId}` });
     router.refresh();
   };
 
   return (
     <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+      <Toast open={toast.open} type={toast.type} title={toast.title} onClose={() => setToast((t) => ({ ...t, open: false }))} />
       <div className="w-full overflow-x-auto">
         <table className="w-full min-w-[1080px] border-collapse">
           <thead>
@@ -119,7 +125,7 @@ export default function VolunteerProjectTable({
                 >
                   <td className="px-5 py-4">
                     <Link
-                      href={`/general-manager/projects/${p.id}`}
+                      href={`${basePath}/projects/${p.id}`}
                       className="font-semibold text-[#0F5E5E] hover:underline"
                     >
                       {p.title}
@@ -152,7 +158,7 @@ export default function VolunteerProjectTable({
                   <td className="px-5 py-4">
                     <div className="flex items-center justify-center gap-3">
                       <Link
-                        href={`/general-manager/projects/${p.id}/edit`}
+                        href={`${basePath}/projects/${p.id}/edit`}
                         className="rounded-md p-2 hover:bg-gray-100"
                         aria-label="Edit project"
                         title="Edit"

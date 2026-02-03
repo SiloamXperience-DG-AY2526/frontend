@@ -7,6 +7,7 @@ import UnauthorizedAccessCard from '@/components/UnauthorizedAccessCard';
 import { useDonor } from '@/hooks/useDonors';
 import PersonalParticulars from './_components/PersonalParticulars';
 import DonationsTable from './_components/DonationsTable';
+import { useManagerBasePath } from '@/lib/utils/managerBasePath';
 
 export default function DonorDetailPage({
   params,
@@ -15,6 +16,7 @@ export default function DonorDetailPage({
 }) {
   const { id } = use(params);
   const { donor, loading, error, statusCode } = useDonor(id);
+  const basePath = useManagerBasePath('finance');
 
   if (loading) {
     return (
@@ -45,7 +47,7 @@ export default function DonorDetailPage({
   return (
     <>
       <main className="flex-1 px-10 py-8">
-        <BackButton label="Back to Donors" href="/finance-manager/donors" />
+        <BackButton label="Back to Donors" href={`${basePath}/donors`} />
 
         <PageHeader title={donor.fullName} />
 

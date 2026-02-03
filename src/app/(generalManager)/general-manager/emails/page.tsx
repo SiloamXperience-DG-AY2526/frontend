@@ -8,8 +8,10 @@ import { useEmailCampaigns } from '@/hooks/useEmailCampaigns';
 import EmailCampaignTable from './_components/EmailCampaignTable';
 import { deleteCampaign } from '@/lib/api/emailCampaign';
 import Link from 'next/link';
+import { useManagerBasePath } from '@/lib/utils/managerBasePath';
 
 export default function EmailCampaignsPage() {
+  const basePath = useManagerBasePath('general');
   const { data, loading, error, statusCode, refetch } = useEmailCampaigns();
   const [toast, setToast] = useState<{
     open: boolean;
@@ -17,13 +19,18 @@ export default function EmailCampaignsPage() {
     title: string;
     message?: string;
   }>({ open: false, type: 'success', title: '' });
+  const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
-  const handleDelete = async (campaignId: string) => {
-    const ok = window.confirm('Delete this email campaign?');
-    if (!ok) return;
+  const handleDeleteRequest = (campaignId: string) => {
+    setPendingDeleteId(campaignId);
+  };
 
+  const handleDeleteConfirm = async () => {
+    if (!pendingDeleteId) return;
     try {
-      await deleteCampaign(campaignId);
+      setDeleting(true);
+      await deleteCampaign(pendingDeleteId);
       setToast({
         open: true,
         type: 'success',
@@ -37,6 +44,9 @@ export default function EmailCampaignsPage() {
         title: 'Delete failed',
         message: err instanceof Error ? err.message : String(err),
       });
+    } finally {
+      setDeleting(false);
+      setPendingDeleteId(null);
     }
   };
 
@@ -75,7 +85,7 @@ export default function EmailCampaignsPage() {
         <div className="flex items-start justify-between gap-4">
           <PageHeader title="Email" />
           <Link
-            href="/general-manager/emails/create"
+            href={`${basePath}/emails/create`}
             className="inline-flex items-center justify-center rounded-xl px-6 py-2.5 text-sm font-semibold text-white bg-[#2F6E62] hover:bg-[#275D53] transition"
           >
             Create an email
@@ -86,10 +96,43 @@ export default function EmailCampaignsPage() {
           <EmailCampaignTable
             campaigns={campaigns}
             loading={loading}
-            onDelete={handleDelete}
+            onDelete={handleDeleteRequest}
           />
         </div>
       </main>
+
+      {pendingDeleteId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
+          <div className="w-[340px] rounded-md bg-white p-5 shadow-md">
+            <h3 className="text-sm font-semibold text-gray-900 mb-2">
+              Delete campaign
+            </h3>
+            <p className="text-sm text-gray-600 mb-4">
+              Are you sure you want to delete this email campaign? This action
+              cannot be undone.
+            </p>
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setPendingDeleteId(null)}
+                disabled={deleting}
+                className="rounded-md border border-gray-300 px-4 py-2 text-sm text-gray-800 hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDeleteConfirm}
+                disabled={deleting}
+                className={[
+                  'rounded-md px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 transition',
+                  deleting ? 'opacity-50 cursor-not-allowed' : '',
+                ].join(' ')}
+              >
+                {deleting ? 'Deleting...' : 'Delete'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -18,6 +18,7 @@ import {
   getDonationProjectById,
   updateDonationProjectById,
 } from '@/lib/api/donation';
+import { useManagerBasePath } from '@/lib/utils/managerBasePath';
 
 const toDateInput = (d?: string | null) => {
   if (!d) return '';
@@ -46,6 +47,7 @@ export default function EditDonationProjectPage() {
   const params = useParams<{ id: string }>();
   const projectId = params.id;
   const router = useRouter();
+  const basePath = useManagerBasePath('finance');
 
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -168,35 +170,45 @@ export default function EditDonationProjectPage() {
     return nextErrors;
   };
 
-  const buildPayload = (status: DonationProjectSubmissionStatus) => ({
-    title: title.trim(),
-    initiatorName: initiatorName.trim() || null,
-    organisingTeam: organisingTeam.trim() || null,
-    location: location.trim(),
-    type,
-    targetFund: targetFund.trim() ? Number(targetFund) : null,
-    brickSize:
-      type === 'brick' && brickSize.trim() ? Number(brickSize) : null,
-    startDate: startDate ? new Date(startDate).toISOString() : undefined,
-    endDate: endDate ? new Date(endDate).toISOString() : undefined,
-    deadline: deadline ? new Date(deadline).toISOString() : undefined,
-    about: aboutDesc.trim(),
-    beneficiaries: beneficiaries.trim() || null,
-    objectives: objectives
-      .map((o) => o.trim())
-      .filter(Boolean)
-      .map((o) => `- ${o}`)
-      .join('\n'),
-    image: imageUrl.trim() || null,
-    attachments: attachmentsUrl.trim() || null,
-    submissionStatus: status,
-    approvalStatus:
-      status === 'submitted'
-        ? approvalStatus === 'approved'
-          ? 'approved'
-          : 'pending'
-        : approvalStatus,
-  });
+  const buildPayload = (status?: DonationProjectSubmissionStatus) => {
+    const base = {
+      title: title.trim(),
+      initiatorName: initiatorName.trim() || null,
+      organisingTeam: organisingTeam.trim() || null,
+      location: location.trim(),
+      type,
+      targetFund: targetFund.trim() ? Number(targetFund) : null,
+      brickSize:
+        type === 'brick' && brickSize.trim() ? Number(brickSize) : null,
+      startDate: startDate ? new Date(startDate).toISOString() : undefined,
+      endDate: endDate ? new Date(endDate).toISOString() : undefined,
+      deadline: deadline ? new Date(deadline).toISOString() : undefined,
+      about: aboutDesc.trim(),
+      beneficiaries: beneficiaries.trim() || null,
+      objectives: objectives
+        .map((o) => o.trim())
+        .filter(Boolean)
+        .map((o) => `- ${o}`)
+        .join('\n'),
+      image: imageUrl.trim() || null,
+      attachments: attachmentsUrl.trim() || null,
+      approvalStatus,
+    };
+
+    // Only include submissionStatus when actually changing it (draft → submitted).
+    // Sending 'submitted' on an already-submitted project resets approvalStatus.
+    if (status) {
+      return {
+        ...base,
+        submissionStatus: status,
+        ...(status === 'submitted' && {
+          approvalStatus:
+            approvalStatus === 'approved' ? 'approved' : 'pending',
+        }),
+      };
+    }
+    return base;
+  };
 
   const onSaveDraft = async () => {
     try {
@@ -221,6 +233,8 @@ export default function EditDonationProjectPage() {
     }
   };
 
+  const isUpdate = submissionStatus !== 'draft';
+
   const onSubmit = async () => {
     const nextErrors = validate();
     if (Object.keys(nextErrors).length > 0) {
@@ -234,22 +248,25 @@ export default function EditDonationProjectPage() {
 
     try {
       setSubmitting(true);
-      await updateDonationProjectById(projectId, buildPayload('submitted'));
-      setSubmissionStatus('submitted');
+      await updateDonationProjectById(
+        projectId,
+        buildPayload(isUpdate ? undefined : 'submitted'),
+      );
+      if (!isUpdate) setSubmissionStatus('submitted');
       setToast({
         open: true,
         type: 'success',
-        title: 'Project updated',
+        title: isUpdate ? 'Project updated' : 'Project submitted',
         message: 'Donation project details have been saved.',
       });
       setTimeout(() => {
-        router.push(`/finance-manager/donation-projects/${projectId}`);
+        router.push(`${basePath}/donation-projects/${projectId}`);
       }, 800);
     } catch (error) {
       setToast({
         open: true,
         type: 'error',
-        title: 'Update failed',
+        title: isUpdate ? 'Update failed' : 'Submission failed',
         message: String(error),
       });
     } finally {
@@ -498,7 +515,7 @@ export default function EditDonationProjectPage() {
         <button
           type="button"
           onClick={() =>
-            router.push(`/finance-manager/donation-projects/${projectId}`)
+            router.push(`${basePath}/donation-projects/${projectId}`)
           }
           disabled={submitting || savingDraft}
           className={[
@@ -537,7 +554,9 @@ export default function EditDonationProjectPage() {
               : '',
           ].join(' ')}
         >
-          {submitting ? 'Submitting...' : 'Submit for Review'}
+          {submitting
+            ? isUpdate ? 'Updating...' : 'Submitting...'
+            : isUpdate ? 'Update' : 'Submit for Review'}
         </button>
       </div>
 
