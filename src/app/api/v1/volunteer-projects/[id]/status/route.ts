@@ -1,7 +1,7 @@
-import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
+import { NextResponse } from 'next/server';
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3000/api/v1';
+const BACKEND_URL = process.env.BACKEND_URL!;
 
 export async function PATCH(
   req: Request,
@@ -9,7 +9,6 @@ export async function PATCH(
 ) {
   try {
     const { id } = await params;
-    const body = await req.json();
     const cookieStore = await cookies();
     const token = cookieStore.get('access_token')?.value;
 
@@ -20,28 +19,36 @@ export async function PATCH(
       );
     }
 
-    const response = await fetch(
-      `${BACKEND_URL}/volunteer-projects/${id}/ApprovalStatus`,
+    const body = await req.json().catch(() => null);
+    if (!body) {
+      return NextResponse.json(
+        { error: 'Invalid JSON body' },
+        { status: 400 }
+      );
+    }
+
+    const res = await fetch(
+      `${BACKEND_URL}/volunteer-projects/${id}/proposal/status`,
       {
         method: 'PATCH',
         headers: {
-          Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(body),
       }
     );
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
+    const data = await res.json().catch(() => null);
+
+    if (!res.ok) {
       return NextResponse.json(
-        { error: errorData.message || 'Failed to update project status' },
-        { status: response.status }
+        { error: data?.message || 'Failed to update project status' },
+        { status: res.status }
       );
     }
 
-    const data = await response.json();
-    return NextResponse.json(data, { status: 200 });
+    return NextResponse.json(data, { status: res.status });
   } catch (error) {
     console.error('Error updating project status:', error);
     return NextResponse.json(
