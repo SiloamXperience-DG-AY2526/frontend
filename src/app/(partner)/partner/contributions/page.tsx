@@ -35,7 +35,12 @@ export default function MyContributions() {
 
         <div className="mb-6 flex items-start gap-3">
           <div className="w-[5px] h-[39px] bg-[#56E0C2] mt-1" />
-          <h1 className="text-2xl mt-2 font-bold">My Contributions</h1>
+          <div>
+            <h1 className="text-2xl mt-2 font-bold">My Contributions</h1>
+            <p className="mt-1 text-sm text-gray-600">
+              Track your volunteer activities, donations, and applications
+            </p>
+          </div>
         </div>
         <div className="flex flex-wrap gap-3">
           <Link

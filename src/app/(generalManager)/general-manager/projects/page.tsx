@@ -86,9 +86,12 @@ export default function VolunteerProjectsPage() {
       <main className="w-full px-6 py-6 md:px-10">
         {/* Header */}
         <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">All Projects</h1>
-            <p className="mt-1 text-gray-600">Manage all Volunteer Projects</p>
+          <div className="flex items-start gap-3">
+            <div className="w-[5px] h-[39px] bg-[#56E0C2] mt-1" />
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900">All Projects</h1>
+              <p className="mt-1 text-gray-600">Manage all Volunteer Projects</p>
+            </div>
           </div>
 
           <Link

@@ -84,14 +84,14 @@ export default function FinanceManagerHomePage() {
 
   return (
     <div className="min-h-full bg-gray-50 px-6 py-8 lg:px-10">
-      <header className="mb-6">
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-gray-500">
-          Finance dashboard
-        </p>
-        <h1 className="mt-2 text-2xl font-semibold text-gray-900">Overview</h1>
-        <p className="mt-1 text-sm text-gray-500">
-          Live snapshot of donation performance and project funding.
-        </p>
+      <header className="mb-8 flex items-start gap-3">
+        <div className="w-[5px] h-[39px] bg-[#56E0C2] mt-1" />
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
+          <p className="mt-1 text-sm text-gray-500">
+            Live snapshot of donation performance and project funding.
+          </p>
+        </div>
       </header>
 
       {errorMessage ? (
@@ -101,25 +101,25 @@ export default function FinanceManagerHomePage() {
       ) : null}
 
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <div className="rounded-lg border border-gray-200 bg-white p-4">
+        <div className="rounded-lg border border-gray-200 bg-white p-4 border-l-4 border-l-[#56E0C2]">
           <p className="text-xs uppercase tracking-[0.18em] text-gray-400">Total raised</p>
           <p className="mt-2 text-2xl font-semibold text-gray-900">
             {isLoading ? 'Loading...' : totalRaised}
           </p>
         </div>
-        <div className="rounded-lg border border-gray-200 bg-white p-4">
+        <div className="rounded-lg border border-gray-200 bg-white p-4 border-l-4 border-l-[#56E0C2]">
           <p className="text-xs uppercase tracking-[0.18em] text-gray-400">Total donations</p>
           <p className="mt-2 text-2xl font-semibold text-gray-900">
             {isLoading ? 'Loading...' : totalDonations}
           </p>
         </div>
-        <div className="rounded-lg border border-gray-200 bg-white p-4">
+        <div className="rounded-lg border border-gray-200 bg-white p-4 border-l-4 border-l-[#56E0C2]">
           <p className="text-xs uppercase tracking-[0.18em] text-gray-400">Active projects</p>
           <p className="mt-2 text-2xl font-semibold text-gray-900">
             {isLoading ? 'Loading...' : activeProjects}
           </p>
         </div>
-        <div className="rounded-lg border border-gray-200 bg-white p-4">
+        <div className="rounded-lg border border-gray-200 bg-white p-4 border-l-4 border-l-[#56E0C2]">
           <p className="text-xs uppercase tracking-[0.18em] text-gray-400">Projects tracked</p>
           <p className="mt-2 text-2xl font-semibold text-gray-900">
             {isLoading ? 'Loading...' : trackedProjects}
@@ -127,23 +127,21 @@ export default function FinanceManagerHomePage() {
         </div>
       </section>
 
-      <section className="mt-8 rounded-lg border border-gray-200 bg-white p-5">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <h2 className="text-lg font-semibold text-gray-900">Top funded projects</h2>
-            <p className="text-sm text-gray-500">Sorted by total raised.</p>
-          </div>
+      <section className="mt-8 rounded-xl border border-[#195D4B] bg-white overflow-hidden">
+        <div className="px-5 pt-5 pb-3">
+          <h2 className="text-lg font-semibold text-gray-900">Top funded projects</h2>
+          <p className="text-sm text-gray-500">Sorted by total raised.</p>
         </div>
 
-        <div className="mt-4 overflow-x-auto">
+        <div className="overflow-x-auto">
           <table className="min-w-full text-left text-sm">
-            <thead className="border-b border-gray-200 text-xs uppercase tracking-[0.16em] text-gray-400">
+            <thead className="bg-[#206378] text-white text-xs uppercase tracking-[0.16em]">
               <tr>
-                <th className="px-2 py-3">Project</th>
-                <th className="px-2 py-3">Type</th>
-                <th className="px-2 py-3">Raised</th>
-                <th className="px-2 py-3">Target</th>
-                <th className="px-2 py-3">Status</th>
+                <th className="px-4 py-3 font-bold text-left">Project</th>
+                <th className="px-4 py-3 font-bold text-left">Type</th>
+                <th className="px-4 py-3 font-bold text-left">Raised</th>
+                <th className="px-4 py-3 font-bold text-left">Target</th>
+                <th className="px-4 py-3 font-bold text-left">Status</th>
               </tr>
             </thead>
             <tbody>
@@ -156,17 +154,17 @@ export default function FinanceManagerHomePage() {
               ) : topProjects.length ? (
                 topProjects.map((project: DonationProject) => (
                   <tr key={project.id} className="border-b border-gray-100 last:border-b-0">
-                    <td className="px-2 py-3 font-medium text-gray-900">{project.title}</td>
-                    <td className="px-2 py-3 capitalize text-gray-600">{project.type}</td>
-                    <td className="px-2 py-3 text-gray-700">
+                    <td className="px-4 py-3 font-medium text-gray-900">{project.title}</td>
+                    <td className="px-4 py-3 capitalize text-gray-600">{project.type}</td>
+                    <td className="px-4 py-3 text-gray-700">
                       {currencyFormatter.format(parseAmount(project.totalRaised))}
                     </td>
-                    <td className="px-2 py-3 text-gray-700">
+                    <td className="px-4 py-3 text-gray-700">
                       {project.targetFund
                         ? currencyFormatter.format(parseAmount(project.targetFund))
                         : '--'}
                     </td>
-                    <td className="px-2 py-3 text-gray-600">
+                    <td className="px-4 py-3 text-gray-600">
                       {project.operationStatus ?? project.approvalStatus ?? '—'}
                     </td>
                   </tr>

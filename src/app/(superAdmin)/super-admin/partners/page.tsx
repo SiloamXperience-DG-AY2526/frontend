@@ -65,8 +65,8 @@ export default function SuperAdminPartnersPage() {
             onClick={() => setActiveTab('volunteers')}
             className={`rounded-full px-4 py-2 text-sm font-semibold ${
               activeTab === 'volunteers'
-                ? 'bg-[#1F6B7C] text-white'
-                : 'border border-gray-200 bg-white text-gray-700'
+                ? 'bg-[#0E5A4A] text-white border-[#0E5A4A]'
+                : 'border border-gray-300 bg-white text-gray-700 hover:bg-gray-50'
             }`}
           >
             Volunteers
@@ -76,8 +76,8 @@ export default function SuperAdminPartnersPage() {
             onClick={() => setActiveTab('donors')}
             className={`rounded-full px-4 py-2 text-sm font-semibold ${
               activeTab === 'donors'
-                ? 'bg-[#1F6B7C] text-white'
-                : 'border border-gray-200 bg-white text-gray-700'
+                ? 'bg-[#0E5A4A] text-white border-[#0E5A4A]'
+                : 'border border-gray-300 bg-white text-gray-700 hover:bg-gray-50'
             }`}
           >
             Donors

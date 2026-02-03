@@ -47,7 +47,7 @@ export default function FinanceManagerSidebar() {
           <Link
             key={item.name}
             href={item.href}
-            className="flex items-center gap-3 rounded-md px-3 py-2 text-sm hover:bg-emerald-800 transition"
+            className="flex items-center gap-3 rounded-md px-3 py-2 text-sm uppercase tracking-wide hover:bg-emerald-800 transition"
           >
             <item.icon className="h-5 w-5" />
             {item.name}

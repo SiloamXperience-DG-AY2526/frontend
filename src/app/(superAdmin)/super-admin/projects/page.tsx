@@ -129,8 +129,8 @@ export default function SuperAdminProjectsPage() {
             onClick={() => setActiveTab('volunteer')}
             className={`rounded-full px-4 py-2 text-sm font-semibold ${
               activeTab === 'volunteer'
-                ? 'bg-[#1F6B7C] text-white'
-                : 'border border-gray-200 bg-white text-gray-700'
+                ? 'bg-[#0E5A4A] text-white border-[#0E5A4A]'
+                : 'border border-gray-300 bg-white text-gray-700 hover:bg-gray-50'
             }`}
           >
             Volunteer Projects
@@ -140,8 +140,8 @@ export default function SuperAdminProjectsPage() {
             onClick={() => setActiveTab('donation')}
             className={`rounded-full px-4 py-2 text-sm font-semibold ${
               activeTab === 'donation'
-                ? 'bg-[#1F6B7C] text-white'
-                : 'border border-gray-200 bg-white text-gray-700'
+                ? 'bg-[#0E5A4A] text-white border-[#0E5A4A]'
+                : 'border border-gray-300 bg-white text-gray-700 hover:bg-gray-50'
             }`}
           >
             Donation Projects

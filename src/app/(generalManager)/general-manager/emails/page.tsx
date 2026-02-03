@@ -86,7 +86,7 @@ export default function EmailCampaignsPage() {
           <PageHeader title="Email" />
           <Link
             href={`${basePath}/emails/create`}
-            className="inline-flex items-center justify-center rounded-xl px-6 py-2.5 text-sm font-semibold text-white bg-[#2F6E62] hover:bg-[#275D53] transition"
+            className="inline-flex items-center justify-center rounded-xl px-6 py-2.5 text-sm font-bold text-white bg-gradient-to-r from-[#1F7A67] to-[#2AAE92] hover:from-[#1A6A59] hover:to-[#22997F] shadow-sm transition"
           >
             Create an email
           </Link>

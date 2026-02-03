@@ -106,14 +106,14 @@ export default function SuperAdminHomePage() {
 
   return (
     <div className="min-h-full bg-gray-50 px-6 py-8 lg:px-10">
-      <header className="mb-6">
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-gray-500">
-          Super admin dashboard
-        </p>
-        <h1 className="mt-2 text-2xl font-semibold text-gray-900">Overview</h1>
-        <p className="mt-1 text-sm text-gray-500">
-          Operations and finance snapshots across the organization.
-        </p>
+      <header className="mb-8 flex items-start gap-3">
+        <div className="w-[5px] h-[39px] bg-[#56E0C2] mt-1" />
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
+          <p className="mt-1 text-sm text-gray-500">
+            Operations and finance snapshots across the organization.
+          </p>
+        </div>
       </header>
 
       {errorMessage ? (
@@ -127,25 +127,25 @@ export default function SuperAdminHomePage() {
           Volunteer operations
         </h2>
         <div className="mt-3 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          <div className="rounded-lg border border-gray-200 bg-white p-4">
+          <div className="rounded-lg border border-gray-200 bg-white p-4 border-l-4 border-l-[#56E0C2]">
             <p className="text-xs uppercase tracking-[0.18em] text-gray-400">Total partners</p>
             <p className="mt-2 text-2xl font-semibold text-gray-900">
               {isLoading ? 'Loading...' : partners.length}
             </p>
           </div>
-          <div className="rounded-lg border border-gray-200 bg-white p-4">
+          <div className="rounded-lg border border-gray-200 bg-white p-4 border-l-4 border-l-[#56E0C2]">
             <p className="text-xs uppercase tracking-[0.18em] text-gray-400">Active partners</p>
             <p className="mt-2 text-2xl font-semibold text-gray-900">
               {isLoading ? 'Loading...' : activePartners}
             </p>
           </div>
-          <div className="rounded-lg border border-gray-200 bg-white p-4">
+          <div className="rounded-lg border border-gray-200 bg-white p-4 border-l-4 border-l-[#56E0C2]">
             <p className="text-xs uppercase tracking-[0.18em] text-gray-400">Applications</p>
             <p className="mt-2 text-2xl font-semibold text-gray-900">
               {isLoading ? 'Loading...' : applications.length}
             </p>
           </div>
-          <div className="rounded-lg border border-gray-200 bg-white p-4">
+          <div className="rounded-lg border border-gray-200 bg-white p-4 border-l-4 border-l-[#56E0C2]">
             <p className="text-xs uppercase tracking-[0.18em] text-gray-400">
               Pending review
             </p>
@@ -161,19 +161,19 @@ export default function SuperAdminHomePage() {
           Donation performance
         </h2>
         <div className="mt-3 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          <div className="rounded-lg border border-gray-200 bg-white p-4">
+          <div className="rounded-lg border border-gray-200 bg-white p-4 border-l-4 border-l-[#56E0C2]">
             <p className="text-xs uppercase tracking-[0.18em] text-gray-400">Total raised</p>
             <p className="mt-2 text-2xl font-semibold text-gray-900">
               {isLoading ? 'Loading...' : totalRaised}
             </p>
           </div>
-          <div className="rounded-lg border border-gray-200 bg-white p-4">
+          <div className="rounded-lg border border-gray-200 bg-white p-4 border-l-4 border-l-[#56E0C2]">
             <p className="text-xs uppercase tracking-[0.18em] text-gray-400">Total donations</p>
             <p className="mt-2 text-2xl font-semibold text-gray-900">
               {isLoading ? 'Loading...' : totalDonations}
             </p>
           </div>
-          <div className="rounded-lg border border-gray-200 bg-white p-4">
+          <div className="rounded-lg border border-gray-200 bg-white p-4 border-l-4 border-l-[#56E0C2]">
             <p className="text-xs uppercase tracking-[0.18em] text-gray-400">
               Active donation projects
             </p>
@@ -181,7 +181,7 @@ export default function SuperAdminHomePage() {
               {isLoading ? 'Loading...' : activeProjects}
             </p>
           </div>
-          <div className="rounded-lg border border-gray-200 bg-white p-4">
+          <div className="rounded-lg border border-gray-200 bg-white p-4 border-l-4 border-l-[#56E0C2]">
             <p className="text-xs uppercase tracking-[0.18em] text-gray-400">
               Projects tracked
             </p>
