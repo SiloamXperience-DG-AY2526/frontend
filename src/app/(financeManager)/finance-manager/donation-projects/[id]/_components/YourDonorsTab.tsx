@@ -6,12 +6,15 @@ import EditButton from '@/components/ui/EditButton';
 import { ProjectDonor } from '@/types/DonationProjectData';
 import FilterButton from '@/components/ui/FilterButton';
 import { formatDateDDMMYYYY } from '@/lib/formatDate';
+import { useManagerBasePath } from '@/lib/utils/managerBasePath';
 
 interface YourDonorsTabProps {
   donors: ProjectDonor[];
 }
 
 export default function YourDonorsTab({ donors }: YourDonorsTabProps) {
+  const basePath = useManagerBasePath('finance');
+
   const handleFilterClick = () => {
     // Placeholder for filter functionality
     console.log('Filter button clicked - filters to be implemented');
@@ -31,7 +34,7 @@ export default function YourDonorsTab({ donors }: YourDonorsTabProps) {
       header: 'Donor Name',
       accessor: (donor: ProjectDonor) => (
         <Link
-          href={`/finance-manager/donors/${donor.id}`}
+          href={`${basePath}/donors/${donor.id}`}
           className="hover:underline"
           style={{ color: '#2C89A5' }}
         >

@@ -11,7 +11,8 @@ export type AuthUser = {
   lastName: string,
   title?: string, 
   role: UserRole,
-  email: string
+  email: string,
+  hasOnboarded: boolean
 }; 
 
 export type AuthContextValue = {
@@ -30,12 +31,14 @@ export type AuthPayload = {
 export type JwtPayload = {
   userId: string;
   role: UserRole;
+  hasOnboarded: boolean;
   exp?: number;
 };
 
 export type UserCredentials = {
   userId: string;
   role: UserRole;
+  hasOnboarded: boolean;
 };
 
 export type LoginInputData = {

@@ -1,3 +1,5 @@
+'use client';
+
 import { DonationProject } from '@/types/DonationProjectData';
 import DataTable, { Column } from '@/components/table/DataTable';
 import StatusBadge from '@/components/table/StatusBadge';
@@ -5,6 +7,7 @@ import EditButton from '@/components/ui/EditButton';
 import DeleteButton from '@/components/ui/DeleteButton';
 import { formatDateDDMMYYYY } from '@/lib/formatDate';
 import Link from 'next/link';
+import { useManagerBasePath } from '@/lib/utils/managerBasePath';
 
 interface ProjectsDataTableProps {
   projects: DonationProject[];
@@ -19,7 +22,10 @@ export default function ProjectsDataTable({
   onEditClick,
   onDeleteClick,
 }: ProjectsDataTableProps) {
-  const getApprovalStatusVariant = (status: string) => {
+  const basePath = useManagerBasePath('finance');
+
+  const getApprovalStatusVariant = (status?: string) => {
+    if (!status) return 'neutral';
     switch (status.toLowerCase()) {
       case 'approved':
         return 'success';
@@ -34,7 +40,8 @@ export default function ProjectsDataTable({
     }
   };
 
-  const getSubmissionStatusVariant = (status: string) => {
+  const getSubmissionStatusVariant = (status?: string) => {
+    if (!status) return 'neutral';
     switch (status.toLowerCase()) {
       case 'submitted':
         return 'success';
@@ -47,7 +54,8 @@ export default function ProjectsDataTable({
     }
   };
 
-  const getOperationStatusVariant = (status: string) => {
+  const getOperationStatusVariant = (status?: string) => {
+    if (!status) return 'neutral';
     switch (status.toLowerCase()) {
       case 'notstarted':
         return 'neutral';
@@ -78,7 +86,7 @@ export default function ProjectsDataTable({
       header: 'Projects',
       accessor: (project) => (
         <Link
-          href={`/finance-manager/donation-projects/${project.id}`}
+          href={`${basePath}/donation-projects/${project.id}`}
           className="hover:underline"
           style={{ color: '#2C89A5' }}
         >
@@ -107,15 +115,18 @@ export default function ProjectsDataTable({
     },
     {
       header: 'Submission',
-      accessor: (project) => (
-        <StatusBadge
-          label={
-            project.submissionStatus.charAt(0).toUpperCase() +
-            project.submissionStatus.slice(1)
-          }
-          variant={getSubmissionStatusVariant(project.submissionStatus)}
-        />
-      ),
+      accessor: (project) => {
+        const submissionStatus = project.submissionStatus;
+        const label = submissionStatus
+          ? submissionStatus.charAt(0).toUpperCase() + submissionStatus.slice(1)
+          : 'Unknown';
+        return (
+          <StatusBadge
+            label={label}
+            variant={getSubmissionStatusVariant(submissionStatus)}
+          />
+        );
+      },
     },
     {
       header: 'Approval',

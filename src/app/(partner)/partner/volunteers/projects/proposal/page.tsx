@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import Input from '@/components/ui/Input';
-import TextArea from '@/components/ui/TextArea';    
-import { proposeVolunteerProject } from '@/lib/api/volunteer';
+import TextArea from '@/components/ui/Textarea';    
+import { proposeVolunteerProject, updateVolunteerProposal } from '@/lib/api/volunteer';
 import {
   ProjectFrequency,
   ProposeVolunteerProjectPayload,
@@ -11,17 +11,27 @@ import {
 import RadioGroup from '@/components/ui/RadioGroup';
 import SectionTitle from '@/components/ui/FormSectionTitle';
 import UploadBox from '@/components/ui/UploadBox';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Toast from '@/components/ui/Toast';
 
 type TimePeriod = 'one-time' | 'ongoing';
 type FrequencyUI = 'weekly' | 'monthly' | 'ad-hoc';
 
 type PositionForm = {
+  id?: string;
   role: string;
   description: string;
   totalSlots: string;
   skills: string[];
+};
+
+type DraftSkill = string | { skill?: string | null };
+type DraftPosition = {
+  id?: string;
+  role?: string | null;
+  description?: string | null;
+  totalSlots?: number | string | null;
+  skills?: DraftSkill[] | null;
 };
 
 // TEMP placeholders (until S3 ready)
@@ -31,6 +41,8 @@ const TEMP_IMAGE_URL =
 
 export default function VolunteerProjectProposalPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const draftId = searchParams.get('projectId');
 
   // Project details
   const [title, setTitle] = useState('');
@@ -74,6 +86,77 @@ export default function VolunteerProjectProposalPage() {
 
   // submit state
   const [submitting, setSubmitting] = useState(false);
+  const [savingDraft, setSavingDraft] = useState(false);
+
+  useEffect(() => {
+    let mounted = true;
+
+    async function loadDraft() {
+      if (!draftId) return;
+      try {
+        const res = await fetch(`/api/v1/volunteer-projects/${draftId}`);
+        const data = await res.json();
+        if (!res.ok || !data) return;
+        const draft = data.project ?? data;
+        if (!mounted) return;
+        setTitle(draft.title ?? '');
+        setInitiatorName(draft.initiatorName ?? '');
+        setLocation(draft.location ?? '');
+        setAboutDesc(draft.aboutDesc ?? '');
+        setBeneficiaries(draft.beneficiaries ?? '');
+        setProposedPlan(draft.proposedPlan ?? '');
+        setObjectives(
+          draft.objectives
+            ? draft.objectives
+                .split('\n')
+                .map((o: string) => o.replace(/^-\s*/, '').trim())
+                .filter(Boolean)
+            : ['']
+        );
+        if (draft.startDate) {
+          setStartDate(draft.startDate.slice(0, 10));
+        }
+        if (draft.endDate) {
+          setEndDate(draft.endDate.slice(0, 10));
+        }
+        if (draft.startTime) {
+          setStartTime(draft.startTime.slice(11, 16));
+        }
+        if (draft.endTime) {
+          setEndTime(draft.endTime.slice(11, 16));
+        }
+        if (Array.isArray(draft.positions) && draft.positions.length > 0) {
+          const positionsData = draft.positions as DraftPosition[];
+          setPositions(
+            positionsData.map((pos) => {
+              const skills =
+                Array.isArray(pos.skills) && pos.skills.length > 0
+                  ? pos.skills
+                      .map((skill) =>
+                        typeof skill === 'string' ? skill : skill?.skill ?? ''
+                      )
+                      .filter((skill): skill is string => Boolean(skill))
+                  : [''];
+              return {
+                id: pos.id,
+                role: pos.role ?? '',
+                description: pos.description ?? '',
+                totalSlots: String(pos.totalSlots ?? 1),
+                skills,
+              };
+            })
+          );
+        }
+      } catch {
+        // ignore draft load errors
+      }
+    }
+
+    loadDraft();
+    return () => {
+      mounted = false;
+    };
+  }, [draftId]);
 
   const frequency: ProjectFrequency = useMemo(() => {
     if (timePeriod === 'one-time') return 'once';
@@ -226,15 +309,73 @@ export default function VolunteerProjectProposalPage() {
 
   const inputBase = 'w-full rounded-md px-3 py-2 outline-none transition';
   const okBorder =
-    'border border-green-700 focus:border-green-800 focus:ring-1 focus:ring-green-800';
+    'border border-[#0E5A4A] focus:border-[#0E5A4A] focus:ring-1 focus:ring-[#0E5A4A]';
   const errBorder =
     'border border-red-500 focus:border-red-600 focus:ring-1 focus:ring-red-600';
 
-  const inputBase = 'w-full rounded-md px-3 py-2 outline-none transition';
-  const okBorder =
-    'border border-green-700 focus:border-green-800 focus:ring-1 focus:ring-green-800';
-  const errBorder =
-    'border border-red-500 focus:border-red-600 focus:ring-1 focus:ring-red-600';
+  const buildPayload = (): ProposeVolunteerProjectPayload => ({
+    title: title.trim(),
+    initiatorName: initiatorName.trim() || undefined,
+    location: location.trim(),
+
+    aboutDesc: aboutDesc.trim(),
+    beneficiaries: beneficiaries.trim(),
+    proposedPlan: proposedPlan.trim() || undefined,
+
+    objectives: objectives
+      .map((o) => o.trim())
+      .filter(Boolean)
+      .map((o) => `- ${o}`)
+      .join('\n'),
+
+    startDate: toISODateOnly(startDate),
+    endDate: toISODateOnly(endDate),
+    startTime: toISODateTime(startDate, startTime),
+    endTime: toISODateTime(startDate, endTime),
+
+    frequency,
+    dayOfWeek: frequencyNotes.trim() || undefined,
+    attachments: TEMP_PDF_URL,
+    image: TEMP_IMAGE_URL,
+    positions: positions.map((p) => ({
+      id: p.id,
+      role: p.role.trim(),
+      description: p.description.trim(),
+      totalSlots: Math.max(1, Number(p.totalSlots) || 1),
+      skills: p.skills.map((s) => s.trim()).filter(Boolean),
+    })),
+  });
+
+  const onSaveDraft = async () => {
+    try {
+      setSavingDraft(true);
+      const payload = buildPayload();
+      if (draftId) {
+        await updateVolunteerProposal(draftId, payload);
+      } else {
+        const res = await proposeVolunteerProject(payload);
+        const newId = res?.data?.id ?? res?.id;
+        if (newId) {
+          router.replace(`/partner/volunteers/projects/proposal?projectId=${newId}`);
+        }
+      }
+      setToast({
+        open: true,
+        type: 'success',
+        title: 'Draft saved',
+        message: 'You can continue editing this draft anytime.',
+      });
+    } catch (err: unknown) {
+      setToast({
+        open: true,
+        type: 'error',
+        title: 'Save failed',
+        message: `Failed to save draft: ${String(err)}`,
+      });
+    } finally {
+      setSavingDraft(false);
+    }
+  };
 
   const onSubmit = async () => {
     const e = validate();
@@ -256,40 +397,22 @@ export default function VolunteerProjectProposalPage() {
 
     try {
       setSubmitting(true);
+      const payload = buildPayload();
 
-      const payload: ProposeVolunteerProjectPayload = {
-        title: title.trim(),
-        initiatorName: initiatorName.trim() || undefined,
-        location: location.trim(),
-
-        aboutDesc: aboutDesc.trim(),
-        beneficiaries: beneficiaries.trim(),
-        proposedPlan: proposedPlan.trim() || undefined,
-
-        objectives: objectives
-          .map((o) => o.trim())
-          .filter(Boolean)
-          .map((o) => `- ${o}`)
-          .join('\n'),
-
-        startDate: toISODateOnly(startDate),
-        endDate: toISODateOnly(endDate),
-        startTime: toISODateTime(startDate, startTime),
-        endTime: toISODateTime(startDate, endTime),
-
-        frequency,
-        dayOfWeek: frequencyNotes.trim() || undefined,
-        attachments: TEMP_PDF_URL,
-        image: TEMP_IMAGE_URL,
-        positions: positions.map((p) => ({
-          role: p.role.trim(),
-          description: p.description.trim(),
-          totalSlots: Math.max(1, Number(p.totalSlots) || 1),
-          skills: p.skills.map((s) => s.trim()).filter(Boolean),
-        })),
-      };
-
-      await proposeVolunteerProject(payload);
+      if (draftId) {
+        await updateVolunteerProposal(draftId, {
+          ...payload,
+          submissionStatus: 'submitted',
+        });
+      } else {
+        const res = await proposeVolunteerProject(payload);
+        const newId = res?.data?.id ?? res?.id;
+        if (newId) {
+          await updateVolunteerProposal(newId, {
+            submissionStatus: 'submitted',
+          });
+        }
+      }
 
       setToast({
         open: true,
@@ -314,7 +437,7 @@ export default function VolunteerProjectProposalPage() {
   };
 
   return (
-    <div className="flex h-screen bg-gray-50">
+    <div className="flex min-h-screen bg-gray-50">
       <Toast
         open={toast.open}
         type={toast.type}
@@ -324,7 +447,7 @@ export default function VolunteerProjectProposalPage() {
         onClose={() => setToast((t) => ({ ...t, open: false }))}
       />
 
-      <main className="flex-1 px-10 py-8 overflow-y-auto">
+      <main className="flex-1 px-10 py-8">
         {/* Header */}
         <div className="mb-10 flex items-start gap-3">
           <div className="w-[5px] h-[39px] bg-[#56E0C2] mt-2" />
@@ -591,7 +714,7 @@ export default function VolunteerProjectProposalPage() {
                   addObjective();
                   clearError('objectives');
                 }}
-                className="text-sm font-bold text-green-800 hover:underline"
+                className="text-sm font-bold text-[#0E5A4A] hover:opacity-80"
               >
                 + Add objective
               </button>
@@ -652,7 +775,7 @@ export default function VolunteerProjectProposalPage() {
                 addPosition();
                 clearError('positions');
               }}
-              className="text-sm font-bold text-green-800 hover:underline"
+              className="text-sm font-bold text-[#0E5A4A] hover:opacity-80"
             >
               + Add another position
             </button>
@@ -729,7 +852,7 @@ export default function VolunteerProjectProposalPage() {
                             addSkill(pIdx);
                             clearError(skillsKey);
                           }}
-                          className="text-sm font-bold text-green-800 hover:underline"
+                          className="text-sm font-bold text-[#0E5A4A] hover:opacity-80"
                         >
                           + Add another skill
                         </button>
@@ -832,14 +955,27 @@ export default function VolunteerProjectProposalPage() {
         </div>
 
         {/* Submit */}
-        <div className="mt-10 flex items-center justify-end">
+        <div className="mt-10 flex items-center justify-end gap-3">
+          <button
+            type="button"
+            disabled={savingDraft}
+            onClick={onSaveDraft}
+            className={[
+              'rounded-xl px-10 py-4 font-bold',
+              'border border-gray-300 bg-white text-gray-700',
+              'hover:bg-gray-50 transition',
+              savingDraft ? 'opacity-50 cursor-not-allowed' : '',
+            ].join(' ')}
+          >
+            {savingDraft ? 'Saving...' : 'Save Draft'}
+          </button>
           <button
             type="button"
             disabled={submitting}
             onClick={onSubmit}
             className={[
               'rounded-xl px-10 py-4 text-white font-bold',
-              'bg-[#0E5A4A] hover:opacity-95 transition',
+              'bg-gradient-to-r from-[#1F7A67] to-[#2AAE92] hover:from-[#1A6A59] hover:to-[#22997F] transition',
               submitting ? 'opacity-50 cursor-not-allowed' : '',
             ].join(' ')}
           >

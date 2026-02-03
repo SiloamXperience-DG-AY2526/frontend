@@ -5,11 +5,14 @@ import { redirect } from 'next/navigation';
 
 export default async function PartnerLayout({ children }: { children: React.ReactNode }) {
 
-  const { role } = await getUserCredentialsServer();
+  const { role, hasOnboarded } = await getUserCredentialsServer();
 
   if (!role) redirect('/login');
 
   if (role !== UserRole.PARTNER) redirect('/unauthorized');
+
+  // Redirect to onboarding if user hasn't completed it
+  if (!hasOnboarded) redirect('/onboarding');
 
   return (
     <div className="flex h-screen overflow-hidden bg-gray-50">

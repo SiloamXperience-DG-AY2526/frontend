@@ -2,23 +2,19 @@
 
 import { useState } from 'react';
 import StepPersonal from './StepPersonal';
-import StepAbout from './StepMoreDetails';
-import StepVolunteer from './StepVolunteerInterest';
 import { SignUpData } from '@/types/SignUpData';
-import StepEmergency from './StepEmergency';
-import StepCommunication from './StepCommunication';
 
 const initialData: SignUpData = {
-  // Page 1 - Personal Details
+  // Basic signup info
   firstName: '',
-  lastName: '', 
+  lastName: '',
   email: '',
   countryCode: '',
   contact: '',
   password: '',
   confirmPassword: '',
 
-  // Page 2 - More About You
+  // These fields are collected during onboarding now
   nationality: '',
   identificationNumber: '',
   gender: 'male',
@@ -27,23 +23,16 @@ const initialData: SignUpData = {
   languages: [],
   qualification: '',
   address: '',
-
-  // Page 3 - Volunteer Interest
   interest: [],
   otherInterest: '',
   passportName: '',
   passportNumber: '',
   passportExpiry: '',
   healthNotes: '',
-
-  // Page 4 - Emergency Contact
-
   emergencyContactNumber: '',
   skills: '',
   volunteeredBefore: 'No',
   availability: '',
-
-  // Page 5 - Communication Preferences
   foundUsThrough: '',
   preferredContactMethod: '',
   agreeUpdates: false,
@@ -51,30 +40,8 @@ const initialData: SignUpData = {
 };
 
 export default function SignupForm() {
-  const [step, setStep] = useState<number>(1);
   const [data, setData] = useState<SignUpData>(initialData);
 
-  const next = () => setStep((prev) => Math.min(prev + 1, 5));
-  const back = () => setStep((prev) => Math.max(prev - 1, 1));
-
-  switch (step) {
-  case 1:
-    return <StepPersonal data={data} setData={setData} next={next} />;
-  case 2:
-    return (
-      <StepAbout data={data} setData={setData} back={back} next={next} />
-    );
-  case 3:
-    return (
-      <StepVolunteer data={data} setData={setData} back={back} next={next} />
-    );
-  case 4:
-    return (
-      <StepEmergency data={data} setData={setData} back={back} next={next} />
-    );
-  case 5:
-    return <StepCommunication data={data} setData={setData} back={back} />;
-  default:
-    return null;
-  }
+  // Signup is now a single step - onboarding happens after
+  return <StepPersonal data={data} setData={setData} next={() => {}} />;
 }

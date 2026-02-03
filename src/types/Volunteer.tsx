@@ -180,6 +180,7 @@ export type VolunteerProjectDetail = {
 
   approvalStatus: ProjectApprovalStatus;
   operationStatus: ProjectOperationStatus;
+  submissionStatus?: 'draft' | 'submitted' | 'withdrawn';
 };
 
 export type VolunteerProjectDetailResponse = {
@@ -250,8 +251,10 @@ export type ProposeVolunteerProjectPayload = {
   dayOfWeek?: string | null;
 
   positions: Array<{
+    id?: string;
     role: string;
     description: string;
+    totalSlots: number;
     skills: string[];
   }>;
 
@@ -282,8 +285,10 @@ export type EditVolunteerProjectPayload = {
   dayOfWeek?: string | null;
 
   positions: Array<{
+    id?: string;
     role: string;
     description: string;
+    totalSlots: number;
     skills: string[];
   }>;
 
@@ -293,6 +298,7 @@ export type EditVolunteerProjectPayload = {
 
   approvalStatus: ProjectApprovalStatus;
   operationStatus: ProjectOperationStatus;
+  submissionStatus?: 'draft' | 'submitted' | 'withdrawn';
 };
 
 export type MyProposedProject = {
@@ -303,6 +309,7 @@ export type MyProposedProject = {
   location: string;
   initiatorName: string;
   approvalStatus: ProjectApprovalStatus;
+  submissionStatus?: string;
   totalCapacity: number;
   acceptedCount: number;
 };

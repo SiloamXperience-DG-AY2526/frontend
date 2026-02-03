@@ -19,10 +19,10 @@ export default function Button({
       onClick={onClick}
       disabled={disabled}
       className={`
-        px-8 py-3 rounded-md font-medium transition cursor-pointer
+        px-8 py-3 rounded-xl font-bold text-sm transition cursor-pointer shadow-sm
         ${
     variant === 'primary'
-      ? 'bg-[#195D4B] text-white hover:bg-green-800'
+      ? 'bg-gradient-to-r from-[#1F7A67] to-[#2AAE92] text-white hover:from-[#1A6A59] hover:to-[#22997F]'
       : 'text-black hover:underline'
     }
       `}

@@ -6,6 +6,15 @@ import Image from 'next/image';
 import { getDonationProjectById } from '@/lib/api/donation';
 import { DonationProject } from '@/types/DonationProject';
 import { useAuth } from '@/contexts/AuthContext';
+import Section from '@/components/volunteer/project/Section';
+import ObjectiveList from '@/components/volunteer/project/ObjectiveList';
+import InfoRow from '@/components/volunteer/project/InfoRow';
+import {
+  CalendarIcon,
+  CurrencyDollarIcon,
+  MapPinIcon,
+} from '@heroicons/react/24/outline';
+import Toast from '@/components/ui/Toast';
 
 export default function ProjectDetailPage() {
   const router = useRouter();
@@ -15,6 +24,7 @@ export default function ProjectDetailPage() {
 
   const [project, setProject] = useState<DonationProject | null>(null);
   const [loading, setLoading] = useState(true);
+  const [toast, setToast] = useState<{ open: boolean; type: 'success' | 'error'; title: string }>({ open: false, type: 'error', title: '' });
 
   useEffect(() => {
     // Redirect to login if not authenticated
@@ -32,8 +42,8 @@ export default function ProjectDetailPage() {
         setProject(data);
       } catch (error) {
         console.error('Failed to load project:', error);
-        alert('Failed to load project details.');
-        router.push('/partner/donations');
+        setToast({ open: true, type: 'error', title: 'Failed to load project details.' });
+        setTimeout(() => router.push('/partner/donations'), 1500);
       } finally {
         setLoading(false);
       }
@@ -71,137 +81,140 @@ export default function ProjectDetailPage() {
 
   if (loading) {
     return (
-      <main className="flex-1 px-10 py-8 overflow-y-auto">
-        <div className="text-center py-12">
-          <p className="text-gray-500">Loading project details...</p>
-        </div>
-      </main>
+      <div className="flex min-h-screen bg-gray-50">
+        <main className="w-full px-6 py-6 md:px-10">
+          <div className="rounded-2xl border bg-white p-8 text-sm text-gray-600 shadow-sm">
+            Loading project details...
+          </div>
+        </main>
+      </div>
     );
   }
 
   if (!project) {
     return (
-      <main className="flex-1 px-10 py-8 overflow-y-auto">
-        <div className="text-center py-12">
-          <p className="text-gray-500">Project not found</p>
-        </div>
-      </main>
+      <div className="flex min-h-screen bg-gray-50">
+        <main className="w-full px-6 py-6 md:px-10">
+          <div className="rounded-2xl border bg-white p-8 text-sm text-gray-600 shadow-sm">
+            Project not found.
+          </div>
+        </main>
+      </div>
     );
   }
 
-  // Parse objectives if it's a string
-  const objectivesList = project.objectives
-    ? project.objectives.split('\n').filter((o) => o.trim())
-    : [];
-
   return (
-    <main className="flex-1 px-10 py-8 overflow-y-auto">
-        {/* Back Button */}
+    <div className="flex h-screen overflow-y-auto bg-gray-50">
+      <Toast open={toast.open} type={toast.type} title={toast.title} onClose={() => setToast((t) => ({ ...t, open: false }))} />
+      <main className="w-full px-6 py-6 md:px-10">
         <button
+          type="button"
           onClick={() => router.back()}
-          className="mb-6 text-gray-600 hover:text-gray-900 flex items-center gap-2 cursor-pointer"
+          aria-label="Go back"
+          className="mt-1 inline-flex h-8 w-8 rounded-lg cursor-pointer focus:outline-none focus:ring-2 focus:ring-teal-600/40"
         >
-          <span className="text-2xl">←</span>
-          <span>Back</span>
+          <svg
+            width="9"
+            height="17"
+            viewBox="0 0 9 17"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M8 15.0468L1 8.02338L8 1"
+              stroke="#333333"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
         </button>
 
-        {/* Project Title */}
-        <h1 className="text-3xl font-bold mb-6">{project.title}</h1>
+        <div className="mb-8 mt-1 flex items-start gap-3">
+          <div className="w-[5px] h-[39px] bg-[#56E0C2]" />
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">
+              {project.title}
+            </h1>
+            <p className="mt-2 text-sm text-gray-600">
+              Support this project with a donation.
+            </p>
+          </div>
+        </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Left Column - Project Image & Details */}
-          <div className="lg:col-span-2 space-y-6">
+        <div className="flex flex-col gap-6 lg:flex-row">
+          {/* Left Column */}
+          <div className="flex-1">
             {/* Project Image */}
-            <div className="bg-gray-300 rounded-lg h-80 flex items-center justify-center overflow-hidden relative">
-              {project.image ? (
-                <Image
-                  src={project.image}
-                  alt={project.title}
-                  fill
-                  className="object-cover rounded-lg"
-                  sizes="(max-width: 768px) 100vw, 50vw"
-                />
-              ) : (
-                <p className="text-gray-500">Project Image Placeholder</p>
-              )}
-            </div>
-
-            {/* Organiser Section */}
-            <div className="bg-white rounded-lg p-6">
-              <h2 className="text-xl font-bold mb-3">Organiser</h2>
-              <p className="text-gray-700">
-                {project.initiatorName || 'Organisation Name'}
-              </p>
-              {project.organisingTeam && (
-                <p className="text-gray-600 text-sm mt-2">
-                  Team: {project.organisingTeam}
-                </p>
-              )}
-            </div>
-
-            {/* About Section */}
-            <div className="bg-white rounded-lg p-6">
-              <h2 className="text-xl font-bold mb-3">About</h2>
-              <p className="text-gray-700 whitespace-pre-line">
-                {project.about}
-              </p>
-            </div>
-
-            {/* Objectives/Goals Section */}
-            <div className="bg-white rounded-lg p-6">
-              <h2 className="text-xl font-bold mb-3">Objectives/ Goals</h2>
-              <div className="space-y-3">
-                {objectivesList.map((objective, index) => (
-                  <div key={index} className="flex items-start gap-3">
-                    <div className="w-6 h-6 bg-gray-300 rounded flex-shrink-0 mt-1" />
-                    <p className="text-gray-700">{objective}</p>
+            <div className="mt-5 overflow-hidden rounded-2xl border bg-white shadow-sm">
+              <div className="relative h-[280px] w-full bg-gray-100">
+                {project.image ? (
+                  <Image
+                    src={project.image}
+                    alt={project.title}
+                    fill
+                    className="object-cover"
+                    sizes="100vw"
+                  />
+                ) : (
+                  <div className="flex h-full items-center justify-center text-sm text-gray-500">
+                    No image
                   </div>
-                ))}
-                {objectivesList.length === 0 && (
-                  <p className="text-gray-500 italic">
-                    No objectives specified
-                  </p>
                 )}
               </div>
             </div>
 
-            {/* Beneficiary Details Section */}
-            <div className="bg-white rounded-lg p-6">
-              <h2 className="text-xl font-bold mb-3">Beneficiary Details</h2>
-              <p className="text-gray-700 whitespace-pre-line">
-                {project.beneficiaries ||
-                  'Details about the beneficiaries of this project.'}
-              </p>
-            </div>
+            <Section title="Organiser">
+              <p>{project.initiatorName || 'Organisation Name'}</p>
+              {project.organisingTeam && (
+                <p className="mt-2 text-sm text-gray-600">
+                  Team: {project.organisingTeam}
+                </p>
+              )}
+            </Section>
+
+            <Section title="About">
+              <p className="whitespace-pre-line">{project.about}</p>
+            </Section>
+
+            <Section title="Objectives/ Goals">
+              {project.objectives ? (
+                <ObjectiveList text={project.objectives} />
+              ) : (
+                '—'
+              )}
+            </Section>
+
+            <Section title="Beneficiary Details">
+              {project.beneficiaries ||
+                'Details about the beneficiaries of this project.'}
+            </Section>
           </div>
 
-          {/* Right Column - Donation Widget */}
-          <div className="lg:col-span-1">
-            <div className="bg-gray-200 rounded-lg p-6 sticky top-8">
-              {/* Deadline */}
-              {project.deadline && (
-                <div className="bg-gray-400 rounded p-3 mb-4">
-                  <p className="text-sm text-gray-700">deadline</p>
-                  <p className="font-semibold">
-                    {formatDate(project.deadline)}
-                  </p>
-                </div>
-              )}
+          {/* Right Column */}
+          <aside className="w-full lg:w-[340px]">
+            <div className="mt-6 lg:mt-16 rounded-2xl border bg-white p-6 shadow-sm">
+              <div className="space-y-5">
+                {project.deadline && (
+                  <InfoRow
+                    icon={CalendarIcon}
+                    text={`Deadline: ${formatDate(project.deadline)}`}
+                  />
+                )}
+                {project.targetFund && (
+                  <InfoRow
+                    icon={CurrencyDollarIcon}
+                    text={`Goal: ${formatCurrency(
+                      parseFloat(project.targetFund)
+                    )}`}
+                  />
+                )}
+                <InfoRow icon={MapPinIcon} text={project.location} />
+              </div>
 
-              {/* Goal */}
-              {project.targetFund && (
-                <div className="bg-gray-400 rounded p-3 mb-4">
-                  <p className="text-sm text-gray-700">goal</p>
-                  <p className="font-semibold">
-                    {formatCurrency(parseFloat(project.targetFund))}
-                  </p>
-                </div>
-              )}
-
-              {/* Progress Bar */}
-              <div className="bg-white rounded p-4 mb-4">
-                <div className="flex justify-between mb-2">
-                  <span className="font-bold">
+              <div className="mt-6 rounded-xl bg-[#F0F0F2] p-4">
+                <div className="flex justify-between mb-2 text-sm">
+                  <span className="font-semibold text-gray-900">
                     {formatCurrency(project.totalRaised || '0')}
                   </span>
                   {project.targetFund && (
@@ -213,25 +226,28 @@ export default function ProjectDetailPage() {
                 {project.targetFund && (
                   <div className="w-full h-2 bg-gray-300 rounded-full overflow-hidden">
                     <div
-                      className="h-full bg-black"
+                      className="h-full bg-teal-600"
                       style={{
-                        width: `${calculateProgress(project.totalRaised || '0', project.targetFund)}%`,
+                        width: `${calculateProgress(
+                          project.totalRaised || '0',
+                          project.targetFund
+                        )}%`,
                       }}
                     />
                   </div>
                 )}
               </div>
 
-              {/* Donate Button */}
               <button
                 onClick={handleDonate}
-                className="w-full px-6 py-3 bg-gray-800 hover:bg-gray-900 text-white font-semibold rounded-lg transition-colors duration-200"
+                className="mt-6 w-full rounded-lg bg-teal-600 px-4 py-3 text-sm font-semibold text-white hover:bg-teal-700 active:bg-teal-800"
               >
                 I want to donate
               </button>
             </div>
-          </div>
+          </aside>
         </div>
       </main>
+    </div>
   );
 }

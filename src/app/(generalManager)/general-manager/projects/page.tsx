@@ -10,6 +10,7 @@ import { VolunteerProjectRow } from '@/types/Volunteer';
 import Link from 'next/link';
 import Toast from '@/components/ui/Toast';
 import VolunteerProjectsTable from '@/components/general-manager/VolunteerProjectsTable';
+import { useManagerBasePath } from '@/lib/utils/managerBasePath';
 
 function useDebouncedValue<T>(value: T, delayMs = 450) {
   const [debounced, setDebounced] = useState(value);
@@ -23,6 +24,7 @@ function useDebouncedValue<T>(value: T, delayMs = 450) {
 export default function VolunteerProjectsPage() {
   const [search, setSearch] = useState('');
   const debouncedSearch = useDebouncedValue(search, 450);
+  const basePath = useManagerBasePath('general');
 
   const [page, setPage] = useState(1);
   const limit = 6;
@@ -84,13 +86,16 @@ export default function VolunteerProjectsPage() {
       <main className="w-full px-6 py-6 md:px-10">
         {/* Header */}
         <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">All Projects</h1>
-            <p className="mt-1 text-gray-600">Manage all Volunteer Projects</p>
+          <div className="flex items-start gap-3">
+            <div className="w-[5px] h-[39px] bg-[#56E0C2] mt-1" />
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900">All Projects</h1>
+              <p className="mt-1 text-gray-600">Manage all Volunteer Projects</p>
+            </div>
           </div>
 
           <Link
-            href="/general-manager/projects/new"
+            href={`${basePath}/projects/new`}
             className="inline-flex items-center justify-center
         rounded-xl px-6 py-2.5 text-sm font-bold text-white
         bg-gradient-to-r from-[#1F7A67] to-[#2AAE92]

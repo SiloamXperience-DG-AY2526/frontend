@@ -3,6 +3,7 @@ import React, { useMemo, useState } from 'react';
 
 import VolunteeringTab from '@/components/contribution/VolunteeringTab';
 import ApplicationTab from '@/components/contribution/ApplicationTab';
+import DonationsTab from '@/components/contribution/DonationsTab';
 import Link from 'next/link';
 
 type TabKey = 'volunteering' | 'donations' | 'applications';
@@ -34,20 +35,27 @@ export default function MyContributions() {
 
         <div className="mb-6 flex items-start gap-3">
           <div className="w-[5px] h-[39px] bg-[#56E0C2] mt-1" />
-          <h1 className="text-2xl mt-2 font-bold">My Contributions</h1>
+          <div>
+            <h1 className="text-2xl mt-2 font-bold">My Contributions</h1>
+            <p className="mt-1 text-sm text-gray-600">
+              Track your volunteer activities, donations, and applications
+            </p>
+          </div>
         </div>
- <Link
+        <div className="flex flex-wrap gap-3">
+          <Link
             href="/partner/volunteers/projects/proposal/view"
-            className="inline-flex items-center justify-center
-        rounded-xl px-6 py-2.5 text-sm font-bold text-white
-        bg-gradient-to-r from-[#1F7A67] to-[#2AAE92]
-        hover:from-[#1A6A59] hover:to-[#22997F]
-        shadow-sm
-        active:scale-[0.99]
-        transition cursor-pointer"
+            className="inline-flex items-center justify-center rounded-xl px-6 py-2.5 text-sm font-bold text-white bg-gradient-to-r from-[#1F7A67] to-[#2AAE92] hover:from-[#1A6A59] hover:to-[#22997F] shadow-sm active:scale-[0.99] transition cursor-pointer"
           >
-            View My Proposed Projects
+            View Volunteer Proposals
           </Link>
+          <Link
+            href="/partner/donations/proposal/view"
+            className="inline-flex items-center justify-center rounded-xl px-6 py-2.5 text-sm font-bold text-white bg-gradient-to-r from-[#1F7A67] to-[#2AAE92] hover:from-[#1A6A59] hover:to-[#22997F] shadow-sm active:scale-[0.99] transition cursor-pointer"
+          >
+            View Donation Proposals
+          </Link>
+        </div>
         </div>
 
         {/* Tabs */}
@@ -84,11 +92,7 @@ export default function MyContributions() {
 
         {activeTab === 'applications' && <ApplicationTab  />}
 
-        {activeTab === 'donations' && (
-          <div className="text-sm text-gray-500 mt-6">
-            No donation records yet.
-          </div>
-        )}
+        {activeTab === 'donations' && <DonationsTab />}
       </main>
     </div>
   );

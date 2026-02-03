@@ -4,15 +4,18 @@ import { useState } from 'react';
 import Image from 'next/image';
 import Input from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
+import Toast from '@/components/ui/Toast';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { ROLE_HOME } from '@/lib/homeRoutes';
+import { UserRole } from '@/types/AuthData';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [remember, setRemember] = useState(false);
+  const [toast, setToast] = useState<{ open: boolean; type: 'success' | 'error'; title: string; message?: string }>({ open: false, type: 'error', title: '' });
 
   const router = useRouter();
   const { authLogin } = useAuth();
@@ -29,13 +32,15 @@ export default function LoginPage() {
 
       const role = authUser.role;
 
-      // redirect based on role
-      const home = ROLE_HOME[role] || '/login-error'; 
+      const home =
+        role === UserRole.PARTNER && !authUser.hasOnboarded
+          ? '/onboarding'
+          : ROLE_HOME[role] || '/login-error';
 
       router.replace(home); 
 
     } catch (e: unknown) {
-      alert(`Login failed. Please try again. \n${e}`);
+      setToast({ open: true, type: 'error', title: 'Login failed', message: `Please try again. ${e}` });
       return;
     }
 
@@ -44,6 +49,7 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex">
+      <Toast open={toast.open} type={toast.type} title={toast.title} message={toast.message} onClose={() => setToast((t) => ({ ...t, open: false }))} />
       {/* Left */}
       <div className="w-2/3 bg-white flex items-center justify-center px-16">
         <div className="w-full max-w-md space-y-8">

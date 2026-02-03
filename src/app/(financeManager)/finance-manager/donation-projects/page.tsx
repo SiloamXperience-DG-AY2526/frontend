@@ -8,9 +8,11 @@ import Pagination from '@/components/ui/Pagination';
 import { getFinanceManagerProjects } from '@/lib/api/donation';
 import { DonationProject } from '@/types/DonationProjectData';
 import FilterButton from '@/components/ui/FilterButton';
+import { useManagerBasePath } from '@/lib/utils/managerBasePath';
 
 export default function DonationProjectsPage() {
   const router = useRouter();
+  const basePath = useManagerBasePath('finance');
   const [projects, setProjects] = useState<DonationProject[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -47,7 +49,7 @@ export default function DonationProjectsPage() {
   };
 
   const handleEditClick = (projectId: string) => {
-    router.push(`/finance-manager/donation-projects/${projectId}`);
+    router.push(`${basePath}/donation-projects/${projectId}`);
   };
 
   const handleDeleteClick = (projectId: string) => {
@@ -79,9 +81,18 @@ export default function DonationProjectsPage() {
   return (
     <div className="flex min-h-screen bg-gray-50">
       <main className="flex-1 px-10 py-8">
-        <PageHeader title="All Projects" />
+        <div className="flex items-start justify-between gap-6">
+          <PageHeader title="All Projects" />
+          <button
+            type="button"
+            onClick={() => router.push(`${basePath}/donation-projects/new`)}
+            className="rounded-full bg-[#0E5A4A] px-6 py-2 text-sm font-semibold text-white hover:opacity-95"
+          >
+            Add project
+          </button>
+        </div>
 
-        <div className="mt-6 mb-4">
+        <div className="mt-2 mb-4">
           <FilterButton onClick={handleFilterClick} />
         </div>
 

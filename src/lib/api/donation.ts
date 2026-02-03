@@ -5,6 +5,7 @@ import {
   DonationProjectsResponse,
   DonationProject,
   DonationProjectWithFinance,
+  DonationProjectDetail,
 } from '@/types/DonationProjectData';
 import {
   SubmitDonationApplication,
@@ -12,6 +13,41 @@ import {
   DonationHistoryResponse,
   DonationHomepage 
 } from '@/types/DonationData';
+
+export type ProposeDonationProjectPayload = {
+  title: string;
+  initiatorName: string;
+  location: string;
+  startDate: string;
+  endDate: string;
+  targetFund: number;
+  about: string;
+  beneficiaries: string;
+  objectives: string;
+  attachments?: string | null;
+  image?: string | null;
+};
+
+export type UpdateDonationProjectPayload = {
+  title?: string;
+  initiatorName?: string | null;
+  organisingTeam?: string | null;
+  location?: string;
+  type?: 'brick' | 'sponsor' | 'partnerLed';
+  targetFund?: number | null;
+  brickSize?: number | null;
+  startDate?: string;
+  endDate?: string;
+  deadline?: string;
+  about?: string;
+  beneficiaries?: string | null;
+  objectives?: string;
+  attachments?: string | null;
+  image?: string | null;
+  submissionStatus?: 'draft' | 'submitted' | 'withdrawn';
+  approvalStatus?: 'pending' | 'reviewing' | 'approved' | 'rejected';
+  operationStatus?: 'notStarted' | 'ongoing' | 'paused' | 'cancelled' | 'completed';
+};
 
 // Get donation homepage data (statistics and featured projects)
 export async function getDonationHomepage(): Promise<DonationHomepage> {
@@ -56,14 +92,41 @@ export async function getDonationProjects(
 export async function getDonationProjectById(
   projectId: string
 ): Promise<DonationProject> {
-  const res = await fetch(`/api/donation-projects/${projectId}`);
+  const res = await fetch(`/api/v1/donation-projects/${projectId}`);
 
-  if (!res.ok) {
+  if (res.ok) {
+    const data = await res.json();
+    return {
+      ...data.project,
+      totalRaised:
+        data.totalRaised?.toString?.() ?? String(data.totalRaised ?? '0'),
+    };
+  }
+
+  if (res.status !== 403 && res.status !== 404) {
     throw new Error('Failed to fetch donation project details.');
   }
 
-  const data = await res.json();
-  return data;
+  const params = new URLSearchParams({
+    page: '1',
+    limit: '100',
+  });
+  const listRes = await fetch(`/api/v1/donation-projects?${params.toString()}`);
+
+  if (!listRes.ok) {
+    throw new Error('Failed to fetch donation project details.');
+  }
+
+  const listData = await listRes.json();
+  const project = listData.projects?.find(
+    (item: DonationProject) => item.id === projectId
+  );
+
+  if (!project) {
+    throw new Error('Donation project not found.');
+  }
+
+  return project;
 }
 
 // Submit a donation application
@@ -145,6 +208,142 @@ export async function getFinanceManagerProjects(
   }
   const data = await res.json();
   return data;
+}
+
+// Get donation projects proposed by the current partner
+export async function getMyDonationProjectProposals(): Promise<
+  DonationProjectDetail[]
+> {
+  const res = await fetch('/api/v1/donation-projects/me');
+
+  if (!res.ok) {
+    throw new Error('Failed to fetch donation project proposals.');
+  }
+
+  return res.json();
+}
+
+// Submit a donation project proposal
+export async function proposeDonationProject(
+  payload: ProposeDonationProjectPayload
+): Promise<DonationProjectDetail> {
+  const res = await fetch('/api/v1/donation-projects', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      title: payload.title,
+      initiatorName: payload.initiatorName,
+      location: payload.location,
+      about: payload.about,
+      objectives: payload.objectives,
+      beneficiaries: payload.beneficiaries,
+      targetFund: payload.targetFund,
+      startDate: payload.startDate,
+      endDate: payload.endDate,
+      deadline: payload.endDate,
+      type: 'partnerLed',
+      attachments: payload.attachments ?? null,
+      image: payload.image ?? null,
+    }),
+  });
+
+  if (!res.ok) {
+    const error = await res.json().catch(() => ({}));
+    throw new Error(error.message || 'Failed to submit donation project.');
+  }
+
+  return res.json();
+}
+
+export async function updateDonationProject(
+  projectId: string,
+  payload: UpdateDonationProjectPayload
+): Promise<DonationProjectDetail> {
+  const res = await fetch(`/api/v1/donation-projects/me/${projectId}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+
+  if (!res.ok) {
+    const error = await res.json().catch(() => ({}));
+    throw new Error(error.message || 'Failed to update donation project.');
+  }
+
+  return res.json();
+}
+
+export async function updateDonationProjectById(
+  projectId: string,
+  payload: UpdateDonationProjectPayload
+): Promise<DonationProjectDetail> {
+  const res = await fetch(`/api/v1/donation-projects/${projectId}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+
+  if (!res.ok) {
+    const error = await res.json().catch(() => ({}));
+    throw new Error(error.message || 'Failed to update donation project.');
+  }
+
+  return res.json();
+}
+
+export async function createDonationProjectAdmin(
+  payload: ProposeDonationProjectPayload & {
+    type: 'brick' | 'sponsor' | 'partnerLed';
+    brickSize?: number | null;
+    deadline?: string | null;
+    organisingTeam?: string | null;
+  }
+): Promise<DonationProjectDetail> {
+  const res = await fetch('/api/v1/donation-projects', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      title: payload.title,
+      initiatorName: payload.initiatorName,
+      organisingTeam: payload.organisingTeam ?? null,
+      location: payload.location,
+      about: payload.about,
+      objectives: payload.objectives,
+      beneficiaries: payload.beneficiaries,
+      targetFund: payload.targetFund,
+      startDate: payload.startDate,
+      endDate: payload.endDate,
+      deadline: payload.deadline ?? payload.endDate,
+      type: payload.type,
+      brickSize: payload.brickSize ?? null,
+      attachments: payload.attachments ?? null,
+      image: payload.image ?? null,
+    }),
+  });
+
+  if (!res.ok) {
+    const error = await res.json().catch(() => ({}));
+    throw new Error(error.message || 'Failed to create donation project.');
+  }
+
+  return res.json();
+}
+
+// Update donation receipt status (finance manager only)
+export async function updateDonationReceiptStatus(
+  donationId: string,
+  receiptStatus: 'pending' | 'received' | 'cancelled'
+): Promise<void> {
+  const res = await fetch(`/api/v1/donations/${donationId}/receiptStatus`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ receiptStatus }),
+  });
+
+  if (!res.ok) {
+    const error = await res.json().catch(() => ({}));
+    throw new Error(error.message || 'Failed to update donation receipt status.');
+  }
 }
 
 // Get donation project finance details (donations and donors)

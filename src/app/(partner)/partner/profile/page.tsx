@@ -1,6 +1,7 @@
 'use client';
 
 import Button from '@/components/ui/Button';
+import Toast from '@/components/ui/Toast';
 import { getUserProfile, updateUserProfile } from '@/lib/api/user';
 import { PartnerProfile } from '@/types/UserData';
 import { useEffect, useState } from 'react';
@@ -10,6 +11,7 @@ import DropdownFieldBox from '@/components/partner/DropdownFieldBox';
 export default function ProfilePage() {
   const [partnerProfile, setPartnerProfile] = useState<PartnerProfile | null>(null);
   const [isEditing, setIsEditing] = useState(false);
+  const [toast, setToast] = useState<{ open: boolean; type: 'success' | 'error'; title: string }>({ open: false, type: 'success', title: '' });
 
   // form state
   const [form, setForm] = useState({
@@ -79,7 +81,7 @@ export default function ProfilePage() {
       email: form.email.trim(),
       contactNumber: form.contactNumber.trim(),
       occupation: form.occupation.trim(),
-      otherInterests: form.education.trim(),
+      otherInterests: form.education.trim() || undefined,
       languages: form.languages
         .split(',')
         .map((s) => s.trim())
@@ -97,7 +99,7 @@ export default function ProfilePage() {
     const updated = await updateUserProfile(payload);
     setPartnerProfile(updated as PartnerProfile);
     setIsEditing(false);
-    alert('Profile updated successfully!');
+    setToast({ open: true, type: 'success', title: 'Profile updated successfully!' });
   };
 
   const volunteerExperienceOptions = [
@@ -107,6 +109,7 @@ export default function ProfilePage() {
 
   return (
     <div className="h-full overflow-y-auto bg-white">
+      <Toast open={toast.open} type={toast.type} title={toast.title} onClose={() => setToast((t) => ({ ...t, open: false }))} />
       <div className="mx-auto w-full max-w-6xl px-6 py-10">
         {/* Header */}
         <div className="flex items-start justify-between">

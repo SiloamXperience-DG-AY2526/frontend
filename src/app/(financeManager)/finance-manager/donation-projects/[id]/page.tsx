@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import PageHeader from '@/components/ui/PageHeader';
 import LoadingTableState from '@/components/table/LoadingTableState';
@@ -9,6 +10,7 @@ import { DonationProjectWithFinance } from '@/types/DonationProjectData';
 import TotalFundsRaisedCard from './_components/TotalFundsRaisedCard';
 import DonationsTab from './_components/DonationsTab';
 import YourDonorsTab from './_components/YourDonorsTab';
+import { useManagerBasePath } from '@/lib/utils/managerBasePath';
 
 type TabKey = 'donations' | 'donors';
 
@@ -20,27 +22,32 @@ const tabs: { key: TabKey; label: string }[] = [
 export default function DonationProjectDetail() {
   const params = useParams<{ id: string }>();
   const projectId = params.id;
+  const basePath = useManagerBasePath('finance');
 
   const [projectData, setProjectData] =
     useState<DonationProjectWithFinance | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<TabKey>('donations');
 
-  useEffect(() => {
-    const fetchProjectData = async () => {
-      try {
-        setLoading(true);
-        const data = await getDonationProjectFinance(projectId);
-        setProjectData(data);
-      } catch (error) {
-        console.error('Error fetching project finance data:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchProjectData = async () => {
+    try {
+      setLoading(true);
+      const data = await getDonationProjectFinance(projectId);
+      setProjectData(data);
+    } catch (error) {
+      console.error('Error fetching project finance data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchProjectData();
   }, [projectId]);
+
+  const handleRefresh = () => {
+    fetchProjectData();
+  };
 
   if (loading) {
     return (
@@ -69,7 +76,13 @@ export default function DonationProjectDetail() {
       {/* Page Header with Funds Card */}
       <div className="flex items-start justify-between gap-6 mb-6">
         <PageHeader title={projectData.project.title} />
-        <div className="w-full max-w-md">
+        <div className="flex w-full max-w-md flex-col items-end gap-3">
+          <Link
+            href={`${basePath}/donation-projects/${projectId}/edit`}
+            className="rounded-full border border-[#0E5A4A] px-6 py-2 text-sm font-semibold text-[#0E5A4A] hover:bg-[#E6F5F1]"
+          >
+            Edit project
+          </Link>
           <TotalFundsRaisedCard
             currentFund={parseFloat(projectData.totalRaised)}
             targetFund={
@@ -107,7 +120,7 @@ export default function DonationProjectDetail() {
       {/* Tab Content */}
       <div className="mt-6">
         {activeTab === 'donations' && (
-          <DonationsTab donations={projectData.donations} />
+          <DonationsTab donations={projectData.donations} onRefresh={handleRefresh} />
         )}
         {activeTab === 'donors' && (
           <YourDonorsTab donors={projectData.donors} />

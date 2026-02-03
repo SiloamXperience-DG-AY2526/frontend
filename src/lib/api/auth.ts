@@ -1,4 +1,4 @@
-import { AuthUser, LoginInputData, UserCredentials } from '@/types/AuthData';
+import { AuthUser, LoginInputData, UserCredentials, UserRole } from '@/types/AuthData';
 import { getUserProfile } from './user';
 
 // DO NOT CALL THESE FUNCTIONS
@@ -36,9 +36,9 @@ export async function getUserCredentials(): Promise<UserCredentials> {
     throw Error(body.errMsg);
   }
   
-  const { userId, role } = await res.json();
+  const { userId, role, hasOnboarded } = await res.json();
 
-  return { userId: userId, role: role };
+  return { userId: userId, role: role, hasOnboarded: hasOnboarded ?? false };
 }
 
 export async function getAuthUser(): Promise<AuthUser> {
@@ -48,14 +48,28 @@ export async function getAuthUser(): Promise<AuthUser> {
 
   console.log('userInfo:', userInfo);
 
-  const { firstName, lastName, email } = await getUserProfile();
+  try {
+    const { firstName, lastName, email } = await getUserProfile();
+    return {
+      userId: userInfo.userId,
+      role: userInfo.role,
+      firstName,
+      lastName,
+      email,
+      hasOnboarded: userInfo.hasOnboarded,
+    };
+  } catch (error) {
+    if (userInfo.role === UserRole.PARTNER && !userInfo.hasOnboarded) {
+      return {
+        userId: userInfo.userId,
+        role: userInfo.role,
+        firstName: '',
+        lastName: '',
+        email: '',
+        hasOnboarded: false,
+      };
+    }
+    throw error;
+  }
 
-  return {
-    userId: userInfo.userId,
-    role: userInfo.role,
-    firstName,
-    lastName,
-    email,
-  };
 }
-

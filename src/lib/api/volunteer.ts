@@ -94,6 +94,35 @@ export async function getVolunteerProjectDetails(
   return json as VolunteerProjectDetailResponse;
 }
 
+export async function getVolunteerApplicationsForProject(projectId: string) {
+  const qs = new URLSearchParams({ projectId });
+  const res = await fetch(`/api/v1/volunteer-applications?${qs.toString()}`);
+  const json = await res.json().catch(() => null);
+  if (!res.ok) {
+    throw new Error(json?.message ?? 'Failed to fetch volunteer applications');
+  }
+  return json;
+}
+
+export async function updateVolunteerApplicationStatus(
+  matchId: string,
+  status: 'reviewing' | 'approved' | 'rejected' | 'active' | 'inactive'
+) {
+  const res = await fetch(`/api/v1/volunteer-applications/${matchId}/status`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ status }),
+  });
+
+  const json = await res.json().catch(() => null);
+  if (!res.ok) {
+    throw new Error(
+      json?.message ?? 'Failed to update volunteer application status'
+    );
+  }
+  return json;
+}
+
 export async function fetchMyVolunteerApplications(args?: {
   status?: string;
 }): Promise<VolunteerApplicationDTO[]> {
@@ -156,6 +185,26 @@ export async function proposeVolunteerProject(payload: ProposeVolunteerProjectPa
   return json;
 }
 
+export async function updateVolunteerProposal(
+  projectId: string,
+  payload: Partial<ProposeVolunteerProjectPayload> & {
+    submissionStatus?: 'draft' | 'submitted' | 'withdrawn';
+  }
+) {
+  const res = await fetch(`/api/volunteer/project/proposal/${projectId}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify(payload),
+  });
+
+  const json = await res.json().catch(() => null);
+  if (!res.ok) {
+    throw new Error(json?.message ?? `Unable to update proposal (${res.status})`);
+  }
+  return json;
+}
+
 export async function createVolunteerProject(payload: EditVolunteerProjectPayload) {
   const res = await fetch('/api/volunteer/project/create', {
     method: 'POST',
@@ -181,4 +230,3 @@ export async function updateVolunteerProject(projectId: string, payload: EditVol
   if (!res.ok) throw new Error(json?.message ?? `Failed to edit project (${res.status})`);
   return json;
 }
-

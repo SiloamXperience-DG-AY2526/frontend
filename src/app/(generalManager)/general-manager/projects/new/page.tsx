@@ -17,6 +17,7 @@ import {
   ProjectApprovalStatus,
   ProjectOperationStatus,
 } from '@/types/ProjectData';
+import { useManagerBasePath } from '@/lib/utils/managerBasePath';
 type TimePeriod = 'one-time' | 'ongoing';
 type FrequencyUI = 'weekly' | 'monthly' | 'ad-hoc';
 
@@ -34,6 +35,7 @@ export const APPROVAL_STATUS_OPTIONS = [
 ] as const;
 
 export const OPERATION_STATUS_OPTIONS = [
+  { value: ProjectOperationStatus.notStarted, label: 'Not Started' },
   { value: ProjectOperationStatus.ongoing, label: 'Ongoing' },
   { value: ProjectOperationStatus.paused, label: 'Paused' },
   { value: ProjectOperationStatus.cancelled, label: 'Cancelled' },
@@ -46,6 +48,7 @@ const TEMP_IMAGE_URL =
 
 export default function VolunteerProjectProposalPage() {
   const router = useRouter();
+  const basePath = useManagerBasePath('general');
 
   // Project details
   const [title, setTitle] = useState('');
@@ -93,6 +96,7 @@ export default function VolunteerProjectProposalPage() {
 
   // submit state
   const [submitting, setSubmitting] = useState(false);
+  const [savingDraft, setSavingDraft] = useState(false);
 
   const frequency: ProjectFrequency = useMemo(() => {
     if (timePeriod === 'one-time') return 'once';
@@ -171,56 +175,80 @@ export default function VolunteerProjectProposalPage() {
       ),
     );
 
-  const onSubmit = async () => {
+  const buildPayload = (submissionStatus: 'draft' | 'submitted') => ({
+    title: title.trim(),
+    initiatorName: initiatorName.trim() || undefined,
+    location: location.trim(),
+
+    aboutDesc: aboutDesc.trim(),
+    beneficiaries: beneficiaries.trim(),
+    proposedPlan: proposedPlan.trim() || undefined,
+
+    objectives: objectives
+      .map((o) => o.trim())
+      .filter(Boolean)
+      .map((o) => `- ${o}`)
+      .join('\n'),
+
+    startDate: toISODateOnly(startDate),
+    endDate: toISODateOnly(endDate),
+    startTime: toISODateTime(startDate, startTime),
+    endTime: toISODateTime(startDate, endTime),
+
+    frequency,
+    dayOfWeek: frequencyNotes.trim() || undefined,
+    attachments: TEMP_PDF_URL,
+    image: TEMP_IMAGE_URL, //replace with s3 link
+    positions: positions.map((p) => ({
+      role: p.role.trim(),
+      description: p.description.trim(),
+      skills: p.skills.map((s) => s.trim()).filter(Boolean),
+    })),
+
+    approvalStatus: submissionStatus === 'submitted' ? ProjectApprovalStatus.pending : approvalStatus,
+    operationStatus: submissionStatus === 'submitted' ? ProjectOperationStatus.notStarted : operationStatus,
+    submissionStatus,
+  });
+
+  const onSaveDraft = async () => {
     try {
-      setSubmitting(true);
-
-      const payload: EditVolunteerProjectPayload = {
-        title: title.trim(),
-        initiatorName: initiatorName.trim() || undefined,
-        location: location.trim(),
-
-        aboutDesc: aboutDesc.trim(),
-        beneficiaries: beneficiaries.trim(),
-        proposedPlan: proposedPlan.trim() || undefined,
-
-        objectives: objectives
-          .map((o) => o.trim())
-          .filter(Boolean)
-          .map((o) => `- ${o}`)
-          .join('\n'),
-
-        startDate: toISODateOnly(startDate),
-        endDate: toISODateOnly(endDate),
-        startTime: toISODateTime(startDate, startTime),
-        endTime: toISODateTime(startDate, endTime),
-
-        frequency,
-        dayOfWeek: frequencyNotes.trim() || undefined,
-        attachments: TEMP_PDF_URL,
-        image: TEMP_IMAGE_URL, //replace with s3 link
-        positions: positions.map((p) => ({
-          role: p.role.trim(),
-          description: p.description.trim(),
-          skills: p.skills.map((s) => s.trim()).filter(Boolean),
-        })),
-
-        approvalStatus,
-        operationStatus,
-      };
-
+      setSavingDraft(true);
+      const payload = buildPayload('draft');
       await createVolunteerProject(payload);
 
       setToastType('success');
-      setToastTitle('Project Created Successfully');
+      setToastTitle('Draft Saved');
+      setToastMsg('You can continue editing this draft anytime.');
       setToastOpen(true);
       setTimeout(() => {
-        router.push('/general-manager/projects');
+        router.push(`${basePath}/projects`);
+      }, 2000);
+    } catch (e: unknown) {
+      setToastType('error');
+      setToastTitle('Save failed');
+      setToastMsg(`Failed to save draft: ${e} `);
+      setToastOpen(true);
+    } finally {
+      setSavingDraft(false);
+    }
+  };
+
+  const onSubmit = async () => {
+    try {
+      setSubmitting(true);
+      const payload: EditVolunteerProjectPayload = buildPayload('submitted');
+      await createVolunteerProject(payload);
+
+      setToastType('success');
+      setToastTitle('Project Submitted');
+      setToastOpen(true);
+      setTimeout(() => {
+        router.push(`${basePath}/projects`);
       }, 2000);
     } catch (e: unknown) {
       setToastType('error');
       setToastTitle('Submission failed');
-      setToastMsg(`Failed to create project: ${e} `);
+      setToastMsg(`Failed to submit project: ${e} `);
       setToastOpen(true);
     } finally {
       setSubmitting(false);
@@ -228,7 +256,7 @@ export default function VolunteerProjectProposalPage() {
   };
 
   const onCancel = () => {
-    router.push('/general-manager/projects');
+    router.push(`${basePath}/projects`);
   };
 
   return (
@@ -639,27 +667,44 @@ export default function VolunteerProjectProposalPage() {
           <button
             type="button"
             onClick={onCancel}
-            disabled={submitting}
+            disabled={submitting || savingDraft}
             className={[
               'rounded-xl px-10 py-4 font-bold',
               'border border-gray-300 bg-white text-gray-700',
               'hover:bg-gray-50 transition',
-              submitting ? 'opacity-50 cursor-not-allowed' : '',
+              submitting || savingDraft ? 'opacity-50 cursor-not-allowed' : '',
             ].join(' ')}
           >
             Cancel
           </button>
           <button
             type="button"
-            disabled={!canSubmit || submitting}
+            disabled={!canSubmit || savingDraft || submitting}
+            onClick={onSaveDraft}
+            className={[
+              'rounded-xl px-10 py-4 font-bold',
+              'border border-[#0E5A4A] text-[#0E5A4A]',
+              'hover:bg-[#E6F5F1] transition',
+              !canSubmit || savingDraft || submitting
+                ? 'opacity-50 cursor-not-allowed'
+                : '',
+            ].join(' ')}
+          >
+            {savingDraft ? 'Saving...' : 'Save Draft'}
+          </button>
+          <button
+            type="button"
+            disabled={!canSubmit || submitting || savingDraft}
             onClick={onSubmit}
             className={[
               'rounded-xl px-10 py-4 text-white font-bold',
               'bg-[#0E5A4A] hover:opacity-95 transition',
-              !canSubmit || submitting ? 'opacity-50 cursor-not-allowed' : '',
+              !canSubmit || submitting || savingDraft
+                ? 'opacity-50 cursor-not-allowed'
+                : '',
             ].join(' ')}
           >
-            {submitting ? 'Saving...' : 'Save Changes'}
+            {submitting ? 'Submitting...' : 'Submit for Review'}
           </button>
         </div>
       </main>

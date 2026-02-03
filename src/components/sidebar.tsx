@@ -8,20 +8,23 @@ import {
   HandRaisedIcon,
   ClipboardDocumentListIcon,
 } from '@heroicons/react/24/outline';
-
-const menu = [
-  { name: 'Home', icon: HomeIcon, href: '/' },
-  { name: 'Volunteer', icon: HandRaisedIcon, href: '/volunteers' },
-  { name: 'Donate', icon: HeartIcon, href: '/donate' },
-  {
-    name: 'My Contributions',
-    icon: ClipboardDocumentListIcon,
-    href: '/contributions',
-  },
-  { name: 'My Profile', icon: UserIcon, href: '/profile' },
-];
+import { useAuth } from '@/contexts/AuthContext';
+import { ROLE_HOME } from '@/lib/homeRoutes';
 
 export default function Sidebar() {
+  const { user } = useAuth();
+  const homeHref = user ? ROLE_HOME[user.role] ?? '/' : '/';
+  const menu = [
+    { name: 'Home', icon: HomeIcon, href: homeHref },
+    { name: 'Volunteer', icon: HandRaisedIcon, href: '/volunteers' },
+    { name: 'Donate', icon: HeartIcon, href: '/donate' },
+    {
+      name: 'My Contributions',
+      icon: ClipboardDocumentListIcon,
+      href: '/contributions',
+    },
+    { name: 'My Profile', icon: UserIcon, href: '/profile' },
+  ];
   return (
     <aside className="hidden md:flex w-64 bg-[#195D4B] text-white flex-col">
       <div className="px-6 py-5 text-lg font-semibold">HOME</div>
