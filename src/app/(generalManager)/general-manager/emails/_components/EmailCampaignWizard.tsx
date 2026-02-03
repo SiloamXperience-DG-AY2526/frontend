@@ -124,9 +124,10 @@ export default function EmailCampaignWizard({
     const controller = new AbortController();
     getAllVolunteerProjects(1, 100, undefined, controller.signal)
       .then((res) => {
-        const list = res?.data ?? res?.projects ?? [];
+        const list: Array<{ id: string; title: string }> =
+          res?.data ?? res?.projects ?? [];
         setProjects(
-          list.map((p: any) => ({
+          list.map((p) => ({
             id: p.id,
             title: p.title,
           }))
@@ -220,6 +221,7 @@ export default function EmailCampaignWizard({
     volunteerInterests,
     volunteerSkills,
     languages,
+    loading,
   ]);
 
   const steps = useMemo(

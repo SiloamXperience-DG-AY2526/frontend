@@ -3,7 +3,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { getMyProposedProjects } from '@/lib/api/project';
-import { ProjectApprovalStatus } from '@/types/ProjectData';
 import { MyProposedProject } from '@/types/Volunteer';
 
 export default function Projects() {

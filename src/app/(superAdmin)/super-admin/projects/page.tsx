@@ -94,7 +94,7 @@ export default function SuperAdminProjectsPage() {
         );
         setDonationProjects(response.projects);
         setDonationTotalPages(response.pagination.totalPages);
-      } catch (err) {
+      } catch {
         setDonationError('Unable to load donation projects.');
         setDonationProjects([]);
         setDonationTotalPages(1);

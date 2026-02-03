@@ -18,6 +18,14 @@ const TEMP_PDF_URL = 'https://example.com/sample-proposal.pdf';
 const TEMP_IMAGE_URL =
   'https://nvpc.org.sg/wp-content/uploads/2025/04/two-women-gardening-1024x682.jpg';
 
+const pad2 = (n: number) => String(n).padStart(2, '0');
+const toYYYYMMDD = (d: Date) => {
+  const y = d.getFullYear();
+  const m = pad2(d.getMonth() + 1);
+  const day = pad2(d.getDate());
+  return `${y}-${m}-${day}`;
+};
+
 export default function DonationProjectProposalPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -91,14 +99,6 @@ export default function DonationProjectProposalPage() {
       mounted = false;
     };
   }, [draftId]);
-
-  const pad2 = (n: number) => String(n).padStart(2, '0');
-  const toYYYYMMDD = (d: Date) => {
-    const y = d.getFullYear();
-    const m = pad2(d.getMonth() + 1);
-    const day = pad2(d.getDate());
-    return `${y}-${m}-${day}`;
-  };
 
   const tomorrowMin = useMemo(() => {
     const t = new Date();

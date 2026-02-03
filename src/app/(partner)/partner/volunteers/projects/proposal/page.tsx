@@ -25,6 +25,15 @@ type PositionForm = {
   skills: string[];
 };
 
+type DraftSkill = string | { skill?: string | null };
+type DraftPosition = {
+  id?: string;
+  role?: string | null;
+  description?: string | null;
+  totalSlots?: number | string | null;
+  skills?: DraftSkill[] | null;
+};
+
 // TEMP placeholders (until S3 ready)
 const TEMP_PDF_URL = 'https://example.com/sample-proposal.pdf';
 const TEMP_IMAGE_URL =
@@ -117,13 +126,16 @@ export default function VolunteerProjectProposalPage() {
           setEndTime(draft.endTime.slice(11, 16));
         }
         if (Array.isArray(draft.positions) && draft.positions.length > 0) {
+          const positionsData = draft.positions as DraftPosition[];
           setPositions(
-            draft.positions.map((pos: any) => {
+            positionsData.map((pos) => {
               const skills =
                 Array.isArray(pos.skills) && pos.skills.length > 0
                   ? pos.skills
-                      .map((s: any) => (typeof s === 'string' ? s : s?.skill))
-                      .filter(Boolean)
+                      .map((skill) =>
+                        typeof skill === 'string' ? skill : skill?.skill ?? ''
+                      )
+                      .filter((skill): skill is string => Boolean(skill))
                   : [''];
               return {
                 id: pos.id,

@@ -81,7 +81,7 @@ export default function PartnerDetailPage() {
       } catch (e: unknown) {
         if (isMounted) {
           setApplicationsError(
-            e instanceof Error ? e.message : "Failed to load applications"
+            e instanceof Error ? e.message : 'Failed to load applications'
           );
         }
       } finally {
@@ -105,7 +105,7 @@ export default function PartnerDetailPage() {
       } catch (e: unknown) {
         if (isMounted) {
           setProposalsError(
-            e instanceof Error ? e.message : "Failed to load proposals"
+            e instanceof Error ? e.message : 'Failed to load proposals'
           );
         }
       } finally {
