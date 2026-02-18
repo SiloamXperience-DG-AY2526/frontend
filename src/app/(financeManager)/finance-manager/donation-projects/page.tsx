@@ -1,14 +1,19 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import PageHeader from '@/components/ui/PageHeader';
 import ProjectsDataTable from './_components/ProjectsDataTable';
 import Pagination from '@/components/ui/Pagination';
-import { getFinanceManagerProjects } from '@/lib/api/donation';
+import {
+  getFinanceManagerProjects,
+  cancelDonationProjectById,
+} from '@/lib/api/donation';
 import { DonationProject } from '@/types/DonationProjectData';
 import FilterButton from '@/components/ui/FilterButton';
 import { useManagerBasePath } from '@/lib/utils/managerBasePath';
+import DeleteConfirmDialog from '@/components/ui/DeleteConfirmDialog';
+import Toast from '@/components/ui/Toast';
 
 export default function DonationProjectsPage() {
   const router = useRouter();
@@ -19,14 +24,21 @@ export default function DonationProjectsPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const ITEMS_PER_PAGE = 20;
+  const [projectToDelete, setProjectToDelete] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
+  const [toast, setToast] = useState<{
+    open: boolean;
+    type: 'success' | 'error';
+    title: string;
+  }>({ open: false, type: 'success', title: '' });
 
-  const fetchProjects = async () => {
+  const fetchProjects = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
       const response = await getFinanceManagerProjects(
         currentPage,
-        ITEMS_PER_PAGE
+        ITEMS_PER_PAGE,
       );
       setProjects(response.projects);
       setTotalPages(response.pagination.totalPages);
@@ -36,12 +48,11 @@ export default function DonationProjectsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [currentPage]);
 
   useEffect(() => {
     fetchProjects();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentPage]);
+  }, [fetchProjects]);
 
   const handleFilterClick = () => {
     // Placeholder for filter functionality
@@ -49,14 +60,34 @@ export default function DonationProjectsPage() {
   };
 
   const handleEditClick = (projectId: string) => {
-    router.push(`${basePath}/donation-projects/${projectId}`);
+    router.push(`${basePath}/donation-projects/${projectId}/edit`);
   };
 
   const handleDeleteClick = (projectId: string) => {
-    // Placeholder for delete functionality
-    console.log(
-      `Delete project ${projectId} - functionality to be implemented`
-    );
+    setProjectToDelete(projectId);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!projectToDelete) return;
+    setDeleting(true);
+    try {
+      await cancelDonationProjectById(projectToDelete);
+      setProjectToDelete(null);
+      setToast({
+        open: true,
+        type: 'success',
+        title: 'Project cancelled successfully.',
+      });
+      await fetchProjects();
+    } catch (err) {
+      setToast({
+        open: true,
+        type: 'error',
+        title: err instanceof Error ? err.message : 'Failed to cancel project.',
+      });
+    } finally {
+      setDeleting(false);
+    }
   };
 
   const handlePageChange = (page: number) => {
@@ -111,6 +142,21 @@ export default function DonationProjectsPage() {
           />
         )}
       </main>
+
+      {projectToDelete && (
+        <DeleteConfirmDialog
+          onConfirm={handleConfirmDelete}
+          onClose={() => setProjectToDelete(null)}
+          loading={deleting}
+        />
+      )}
+
+      <Toast
+        open={toast.open}
+        type={toast.type}
+        title={toast.title}
+        onClose={() => setToast((t) => ({ ...t, open: false }))}
+      />
     </div>
   );
 }
