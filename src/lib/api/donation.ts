@@ -52,6 +52,7 @@ export type UpdateDonationProjectPayload = {
     | 'paused'
     | 'cancelled'
     | 'completed';
+  managedBy?: string | null;
 };
 
 // Get donation homepage data (statistics and featured projects)
