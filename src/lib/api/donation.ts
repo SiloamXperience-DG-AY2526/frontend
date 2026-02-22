@@ -388,3 +388,34 @@ export async function getDonationProjectFinance(
     donors,
   };
 }
+export type DonationTransaction = {
+  id: string;
+  donorId: string;
+  projectId: string;
+  paymentMode: string;
+  date: string;
+  amount: string | number;
+  receiptStatus: 'pending' | 'received' | 'cancelled';
+  submissionStatus: 'draft' | 'submitted' | 'withdrawn';
+  isThankYouSent: boolean;
+};
+
+export async function getProjectDonationTransactions(
+  projectId: string,
+  page: number = 1,
+  limit: number = 50
+): Promise<{ donations: DonationTransaction[]; pagination: any }> {
+  const params = new URLSearchParams({
+    page: String(page),
+    limit: String(limit),
+  });
+
+  const res = await fetch(`/api/donation-projects/${projectId}/donations?${params.toString()}`);
+  const json = await res.json().catch(() => null);
+
+  if (!res.ok) {
+    throw new Error(json?.error ?? 'Failed to fetch project donations');
+  }
+
+  return json;
+}

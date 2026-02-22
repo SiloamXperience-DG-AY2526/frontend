@@ -51,3 +51,14 @@ export type DonationProjectsResponse = {
     totalPages: number;
   };
 };
+export type DonationTransaction = {
+  id: string;
+  donorId: string;
+  projectId: string;
+  paymentMode: string;
+  date: string;
+  amount: string | number;
+  receiptStatus: 'pending' | 'received' | 'cancelled';
+  submissionStatus: 'draft' | 'submitted' | 'withdrawn';
+  isThankYouSent: boolean;
+};

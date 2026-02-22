@@ -1,4 +1,6 @@
 import {
+  DonationReviewTemplate,
+  DonationReviewTemplateType,
   EmailCampaignDetail,
   EmailCampaignListResponse,
   EmailCampaignSummary,
@@ -136,5 +138,66 @@ export async function deleteCampaign(campaignId: string) {
   if (!res.ok) {
     throw new Error(json?.error ?? 'Failed to delete campaign');
   }
+  return json;
+}
+//financial manager review
+
+
+export async function getDonationReviewTemplate(projectId: string, type: DonationReviewTemplateType) {
+  const res = await fetch(`/api/email-campaigns/financial-manager/get-templates/${projectId}?type=${type}`);
+  const json = await res.json().catch(() => null);
+  if (!res.ok) throw new Error(json?.error ?? 'Failed to load template');
+  return json as DonationReviewTemplate;
+}
+
+export async function saveDonationReviewTemplate(
+  projectId: string,
+  payload: {
+    type: DonationReviewTemplateType;
+    senderAddress: string;
+    subject: string;
+    body: string;
+    customNote?: string | null;
+  }
+) {
+  const res = await fetch(`/api/email-campaigns/financial-manager/save-template/${projectId}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+  const json = await res.json().catch(() => null);
+  if (!res.ok) throw new Error(json?.error ?? 'Failed to save template');
+  return json;
+}
+
+export async function sendDonationReviewThankYou(transactionId: string) {
+  const res = await fetch(`/api/email-campaigns/financial-manager/transactions/${transactionId}/thank-you`, {
+    method: 'POST',
+  });
+  const json = await res.json().catch(() => null);
+  if (!res.ok) throw new Error(json?.error ?? 'Failed to send thank you');
+  return json;
+}
+
+export async function sendDonationReviewFollowUp(transactionId: string) {
+  const res = await fetch(`/api/email-campaigns/financial-manager/transactions/${transactionId}/follow-up`, {
+    method: 'POST',
+  });
+  const json = await res.json().catch(() => null);
+  if (!res.ok) throw new Error(json?.error ?? 'Failed to send follow-up');
+  return json;
+}
+
+export async function processDonationReviewReceipt(
+  transactionId: string,
+  payload: { receiptNumber: string; remarks?: string | null }
+) {
+  const res = await fetch(`/api/email-campaigns/financial-manager/transactions/${transactionId}/process-receipt`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+  const json = await res.json().catch(() => null);
+  if (!res.ok) throw new Error(json?.error ?? 'Failed to process receipt');
   return json;
 }
