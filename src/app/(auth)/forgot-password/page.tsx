@@ -1,5 +1,5 @@
-import ForgotPasswordForm from "@/components/forgot-password/forgotPasswordForm";
-import Image from "next/image";
+import ForgotPasswordForm from '@/components/forgot-password/forgotPasswordForm';
+import Image from 'next/image';
 
 export default function ForgotPasswordPage() {
   return (
