@@ -1,3 +1,3 @@
 export function classNames(...c: Array<string | false | undefined | null>) {
-  return c.filter(Boolean).join(" ");
+  return c.filter(Boolean).join(' ');
 }

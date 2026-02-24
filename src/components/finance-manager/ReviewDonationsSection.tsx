@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import { useMemo } from "react";
-import { classNames } from "@/lib/utils/finance-manager-email/classNames";
-import { formatAmount } from "@/lib/utils/finance-manager-email/formatAmount";
-import { DonationTransaction } from "@/types/DonationProject";
-import DonationsTable from "./DonationTable";
+
+import { classNames } from '@/lib/utils/finance-manager-email/classNames';
+import { formatAmount } from '@/lib/utils/finance-manager-email/formatAmount';
+import { DonationTransaction } from '@/types/DonationProject';
+import DonationsTable from './DonationTable';
 
 
 type Props = {
@@ -62,8 +62,8 @@ export default function ReviewDonationsSection({
           selectedTxId={selectedTx?.id}
           onSelect={(d) => {
             setSelectedTx(d);
-            setReceiptNumber("");
-            setRemarks("");
+            setReceiptNumber('');
+            setRemarks('');
             setReceiptDate(new Date().toISOString().slice(0, 10));
           }}
         />
@@ -84,15 +84,15 @@ export default function ReviewDonationsSection({
                 <div className="text-sm font-semibold text-gray-900">Donation details</div>
                 <div className="mt-2 text-sm text-gray-700">
                   <div>
-                    <span className="text-gray-500">Amount:</span>{" "}
-                    {formatAmount(selectedTx.amount as any)}
+                    <span className="text-gray-500">Amount:</span>{' '}
+                    {formatAmount(selectedTx.amount)}
                   </div>
                   <div>
-                    <span className="text-gray-500">Payment:</span>{" "}
-                    {(selectedTx as any).paymentMode}
+                    <span className="text-gray-500">Payment:</span>{' '}
+                    {selectedTx.paymentMode}
                   </div>
                   <div>
-                    <span className="text-gray-500">Date:</span>{" "}
+                    <span className="text-gray-500">Date:</span>{' '}
                     {new Date(selectedTx.date).toLocaleString()}
                   </div>
 
@@ -110,10 +110,10 @@ export default function ReviewDonationsSection({
                   disabled={busy}
                   onClick={onSendThankYou}
                   className={classNames(
-                    "rounded-md px-3 py-2 text-sm font-semibold transition",
+                    'rounded-md px-3 py-2 text-sm font-semibold transition',
                     busy
-                      ? "bg-gray-200 text-gray-500"
-                      : "bg-[#206378] text-white hover:opacity-95",
+                      ? 'bg-gray-200 text-gray-500'
+                      : 'bg-[#206378] text-white hover:opacity-95',
                   )}
                 >
                   Send thank you
@@ -123,10 +123,10 @@ export default function ReviewDonationsSection({
                   disabled={busy}
                   onClick={onSendFollowUp}
                   className={classNames(
-                    "rounded-md px-3 py-2 text-sm font-semibold transition border",
+                    'rounded-md px-3 py-2 text-sm font-semibold transition border',
                     busy
-                      ? "bg-gray-200 text-gray-500 border-gray-200"
-                      : "bg-white text-gray-700 border-gray-200 hover:bg-gray-50",
+                      ? 'bg-gray-200 text-gray-500 border-gray-200'
+                      : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50',
                   )}
                 >
                   Send follow-up
@@ -172,10 +172,10 @@ export default function ReviewDonationsSection({
                   disabled={busy || !receiptNumber.trim() || !receiptDate}
                   onClick={onProcessReceipt}
                   className={classNames(
-                    "mt-4 w-full rounded-md px-4 py-2 text-sm font-semibold transition",
+                    'mt-4 w-full rounded-md px-4 py-2 text-sm font-semibold transition',
                     busy || !receiptNumber.trim()
-                      ? "bg-gray-200 text-gray-500"
-                      : "bg-[#206378] text-white hover:opacity-95",
+                      ? 'bg-gray-200 text-gray-500'
+                      : 'bg-[#206378] text-white hover:opacity-95',
                   )}
                 >
                   Confirm & send receipt

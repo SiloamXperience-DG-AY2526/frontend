@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { classNames } from "@/lib/utils/finance-manager-email/classNames";
-import { formatAmount } from "@/lib/utils/finance-manager-email/formatAmount";
-import { DonationTransaction } from "@/types/DonationProject";
+import { classNames } from '@/lib/utils/finance-manager-email/classNames';
+import { formatAmount } from '@/lib/utils/finance-manager-email/formatAmount';
+import { DonationTransaction } from '@/types/DonationProject';
 
 type Props = {
   rows: DonationTransaction[];
@@ -45,8 +45,8 @@ export default function DonationsTable({
                   <tr
                     key={d.id}
                     className={classNames(
-                      "border-b border-gray-100 last:border-b-0 cursor-pointer",
-                      isSelected ? "bg-emerald-50" : "hover:bg-gray-50",
+                      'border-b border-gray-100 last:border-b-0 cursor-pointer',
+                      isSelected ? 'bg-emerald-50' : 'hover:bg-gray-50',
                     )}
                     onClick={() => onSelect(d)}
                   >
@@ -54,14 +54,14 @@ export default function DonationsTable({
                       {new Date(d.date).toLocaleString()}
                     </td>
                     <td className="px-4 py-3 font-medium text-gray-900">
-                      {formatAmount(d.amount as any)}
+                      {formatAmount(d.amount)}
                     </td>
-                    <td className="px-4 py-3 text-gray-700">{(d as any).paymentMode}</td>
+                    <td className="px-4 py-3 text-gray-700">{d.paymentMode}</td>
                     <td className="px-4 py-3 text-gray-700 capitalize">
-                      {(d as any).receiptStatus}
+                      {d.receiptStatus}
                     </td>
                     <td className="px-4 py-3 text-gray-700">
-                      {(d as any).isThankYouSent ? "Sent" : "Not sent"}
+                      {d.isThankYouSent ? 'Sent' : 'Not sent'}
                     </td>
                   </tr>
                 );

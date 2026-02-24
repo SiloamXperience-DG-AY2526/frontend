@@ -190,7 +190,7 @@ export async function sendDonationReviewFollowUp(transactionId: string) {
 
 export async function processDonationReviewReceipt(
   transactionId: string,
-  payload: { receiptNumber: string; remarks?: string | null }
+  payload: { receiptNumber: string; receiptDate:string; remarks?: string | null }
 ) {
   const res = await fetch(`/api/email-campaigns/financial-manager/transactions/${transactionId}/process-receipt`, {
     method: 'POST',

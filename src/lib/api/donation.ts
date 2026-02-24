@@ -404,7 +404,7 @@ export async function getProjectDonationTransactions(
   projectId: string,
   page: number = 1,
   limit: number = 50
-): Promise<{ donations: DonationTransaction[]; pagination: any }> {
+): Promise<{ donations: DonationTransaction[]; pagination:number }> {
   const params = new URLSearchParams({
     page: String(page),
     limit: String(limit),

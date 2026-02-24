@@ -1,84 +1,84 @@
-"use client";
+'use client';
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   getFinanceManagerProjects,
   getDonationProjectFinance,
-} from "@/lib/api/donation";
+} from '@/lib/api/donation';
 import {
   getDonationReviewTemplate,
   saveDonationReviewTemplate,
   sendDonationReviewThankYou,
   sendDonationReviewFollowUp,
   processDonationReviewReceipt,
-} from "@/lib/api/emailCampaign";
-import type { DonationProject } from "@/types/DonationProjectData";
-import { getUserProfile } from "@/lib/api/user";
-import { StaffProfile } from "@/types/UserData";
-import { insertAtCursor } from "@/lib/utils/finance-manager-email/insertAtCursor";
-import { classNames } from "@/lib/utils/finance-manager-email/classNames";
+} from '@/lib/api/emailCampaign';
+import type { DonationProject } from '@/types/DonationProjectData';
+import { getUserProfile } from '@/lib/api/user';
+import { StaffProfile } from '@/types/UserData';
+
+import { classNames } from '@/lib/utils/finance-manager-email/classNames';
 import {
   htmlToText,
   safeTextToHtml,
-} from "@/lib/utils/finance-manager-email/text-html";
-import { formatAmount } from "@/lib/utils/finance-manager-email/formatAmount";
-import { TemplateForm } from "@/types/EmailCampaign";
-import { DonationTransaction } from "@/types/DonationProject";
-import ReviewDonationsSection from "@/components/finance-manager/ReviewDonationsSection";
-import TemplatesSection from "@/components/finance-manager/EmailTemplateSection";
-type Tab = "review" | "templates";
-type TemplateType = "thankyou" | "receipt";
+} from '@/lib/utils/finance-manager-email/text-html';
+
+import { TemplateForm } from '@/types/EmailCampaign';
+import { DonationTransaction } from '@/types/DonationProject';
+import ReviewDonationsSection from '@/components/finance-manager/ReviewDonationsSection';
+import TemplatesSection from '@/components/finance-manager/EmailTemplateSection';
+type Tab = 'review' | 'templates';
+type TemplateType = 'thankyou' | 'receipt';
 
 const DEFAULT_TEXT_TEMPLATE: Record<
   TemplateType,
-  Pick<TemplateForm, "subject" | "message">
+  Pick<TemplateForm, 'subject' | 'message'>
 > = {
   thankyou: {
     subject:
-      "Thank you {{name}} — we’ve received your donation for {{project}}",
+      'Thank you {{name}} — we’ve received your donation for {{project}}',
     message:
-      `Hi {{name}},\n\n` +
-      `Thank you for your donation to {{project}}.\n` +
-      `Donation amount: {{amount}}\n\n` +
-      `We’re currently processing your payment and will update you shortly.\n` +
-      `Once confirmed, we’ll send your official receipt.\n\n` +
-      `Warm regards,\n` +
-      `Finance Team`,
+      'Hi {{name}},\n\n' +
+      'Thank you for your donation to {{project}}.\n' +
+      'Donation amount: {{amount}}\n\n' +
+      'We’re currently processing your payment and will update you shortly.\n' +
+      'Once confirmed, we’ll send your official receipt.\n\n' +
+      'Warm regards,\n' +
+      'Finance Team',
   },
   receipt: {
-    subject: "Your receipt {{receiptNumber}} — {{project}}",
+    subject: 'Your receipt {{receiptNumber}} — {{project}}',
     message:
-      `Hi {{name}},\n\n` +
-      `Thank you for your donation to {{project}}.\n` +
-      `Your donation was successful.\n\n` +
-      `Receipt No: {{receiptNumber}}\n` +
-      `Receipt Date: {{receiptDate}}\n` +
-      `Amount: {{amount}}\n` +
-      `Remarks: {{remarks}}\n\n` +
-      `With gratitude,\n` +
-      `Finance Team`,
+      'Hi {{name}},\n\n' +
+      'Thank you for your donation to {{project}}.\n' +
+      'Your donation was successful.\n\n' +
+      'Receipt No: {{receiptNumber}}\n' +
+      'Receipt Date: {{receiptDate}}\n' +
+      'Amount: {{amount}}\n' +
+      'Remarks: {{remarks}}\n\n' +
+      'With gratitude,\n' +
+      'Finance Team',
   },
 };
 
 const VARIABLES: Array<{
   label: string;
   value: string;
-  showIn: TemplateType | "both";
+  showIn: TemplateType | 'both';
 }> = [
-  { label: "Donor name", value: "{{name}}", showIn: "both" },
-  { label: "Project", value: "{{project}}", showIn: "both" },
-  { label: "Amount", value: "{{amount}}", showIn: "both" },
-  { label: "Receipt number", value: "{{receiptNumber}}", showIn: "receipt" },
-  { label: "Remarks", value: "{{remarks}}", showIn: "receipt" },
-  { label: "Receipt date", value: "{{receiptDate}}", showIn: "receipt" },
+  { label: 'Donor name', value: '{{name}}', showIn: 'both' },
+  { label: 'Project', value: '{{project}}', showIn: 'both' },
+  { label: 'Amount', value: '{{amount}}', showIn: 'both' },
+  { label: 'Receipt number', value: '{{receiptNumber}}', showIn: 'receipt' },
+  { label: 'Remarks', value: '{{remarks}}', showIn: 'receipt' },
+  { label: 'Receipt date', value: '{{receiptDate}}', showIn: 'receipt' },
 ];
 
 export default function FinanceManagerEmailPage() {
-  const [tab, setTab] = useState<Tab>("review");
-  const [staffEmail, setStaffEmail] = useState<string>("");
+  const [tab, setTab] = useState<Tab>('review');
+  const [staffEmail, setStaffEmail] = useState<string>('');
 
   const [projects, setProjects] = useState<DonationProject[]>([]);
-  const [selectedProjectId, setSelectedProjectId] = useState("");
+  const [selectedProjectId, setSelectedProjectId] = useState('');
   const selectedProject = useMemo(
     () => projects.find((p) => p.id === selectedProjectId) ?? null,
     [projects, selectedProjectId],
@@ -92,23 +92,23 @@ export default function FinanceManagerEmailPage() {
     null,
   );
 
-  const [receiptNumber, setReceiptNumber] = useState("");
+  const [receiptNumber, setReceiptNumber] = useState('');
   const [receiptDate, setReceiptDate] = useState(() =>
     new Date().toISOString().slice(0, 10),
   );
-  const [remarks, setRemarks] = useState("");
+  const [remarks, setRemarks] = useState('');
 
-  const [templateType, setTemplateType] = useState<TemplateType>("thankyou");
+  const [templateType, setTemplateType] = useState<TemplateType>('thankyou');
   const [templateForm, setTemplateForm] = useState<TemplateForm>({
-    senderAddress: "",
+    senderAddress: '',
     subject: DEFAULT_TEXT_TEMPLATE.thankyou.subject,
     message: DEFAULT_TEXT_TEMPLATE.thankyou.message,
-    customNote: "",
+    customNote: '',
   });
   const templateMessageRef = useRef<HTMLTextAreaElement | null>(null);
 
   const [banner, setBanner] = useState<{
-    type: "error" | "success";
+    type: 'error' | 'success';
     message: string;
   } | null>(null);
   const [busy, setBusy] = useState(false);
@@ -123,16 +123,17 @@ export default function FinanceManagerEmailPage() {
         const list = res?.projects ?? [];
         if (!mounted) return;
         setProjects(list);
-        setSelectedProjectId(list[0]?.id ?? "");
+        setSelectedProjectId(list[0]?.id ?? '');
       } catch (e) {
         if (!mounted) return;
         setBanner({
-          type: "error",
-          message: e instanceof Error ? e.message : "Failed to load projects",
+          type: 'error',
+          message: e instanceof Error ? e.message : 'Failed to load projects',
         });
       } finally {
-        if (!mounted) return;
-        setIsLoadingProjects(false);
+        if (mounted) {
+          setIsLoadingProjects(false);
+        }
       }
     })();
     return () => {
@@ -147,7 +148,7 @@ export default function FinanceManagerEmailPage() {
 
     fetchProfile();
   }, []);
-  // Load donations 
+  // Load donations
   async function loadFinanceData(projectId: string) {
     setIsLoadingDonations(true);
     setBanner(null);
@@ -159,8 +160,8 @@ export default function FinanceManagerEmailPage() {
       setDonations(list);
     } catch (e) {
       setBanner({
-        type: "error",
-        message: e instanceof Error ? e.message : "Failed to load donations",
+        type: 'error',
+        message: e instanceof Error ? e.message : 'Failed to load donations',
       });
       setDonations([]);
     } finally {
@@ -174,43 +175,45 @@ export default function FinanceManagerEmailPage() {
   }, [selectedProjectId]);
 
   //Load template
-const templateReqIdRef = useRef(0);
+  const templateReqIdRef = useRef(0);
 
-// Load template
-useEffect(() => {
-  if (tab !== "templates") return;
-  if (!selectedProjectId) return;
+  // Load template
+  useEffect(() => {
+    if (tab !== 'templates') return;
+    if (!selectedProjectId) return;
 
-  const reqId = ++templateReqIdRef.current;
+    const reqId = ++templateReqIdRef.current;
 
-  (async () => {
-    try {
-      setBusy(true);
-      setBanner(null);
+    (async () => {
+      try {
+        setBusy(true);
+        setBanner(null);
 
-      const tpl = await getDonationReviewTemplate(selectedProjectId, templateType);
+        const tpl = await getDonationReviewTemplate(
+          selectedProjectId,
+          templateType,
+        );
 
-      // ✅ ignore stale response
-      if (reqId !== templateReqIdRef.current) return;
+        // ✅ ignore stale response
+        if (reqId !== templateReqIdRef.current) return;
 
-
-      setTemplateForm({
-         senderAddress: staffEmail ?? "",
-        subject: tpl.subject ?? "",
-        message: htmlToText(tpl.body ?? ""),
-        customNote: tpl.previewText ?? "",
-      });
-    } finally {
-      if (reqId === templateReqIdRef.current) setBusy(false);
-    }
-  })();
-}, [tab, selectedProjectId, templateType, staffEmail]);
+        setTemplateForm({
+          senderAddress: staffEmail ?? '',
+          subject: tpl.subject ?? '',
+          message: htmlToText(tpl.body ?? ''),
+          customNote: tpl.previewText ?? '',
+        });
+      } finally {
+        if (reqId === templateReqIdRef.current) setBusy(false);
+      }
+    })();
+  }, [tab, selectedProjectId, templateType, staffEmail]);
 
   const pendingDonations = useMemo(
     () =>
       donations.filter(
         (d) =>
-          d.receiptStatus === "pending" && d.submissionStatus === "submitted",
+          d.receiptStatus === 'pending' && d.submissionStatus === 'submitted',
       ),
     [donations],
   );
@@ -227,16 +230,16 @@ useEffect(() => {
       ...p,
       subject: DEFAULT_TEXT_TEMPLATE[next].subject,
       message: DEFAULT_TEXT_TEMPLATE[next].message,
-      customNote: "",
-      senderAddress: staffEmail ?? "",
+      customNote: '',
+      senderAddress: staffEmail ?? '',
     }));
   }
 
   async function runAction(fn: () => Promise<void>, success: string) {
     if (!selectedTx) {
       setBanner({
-        type: "error",
-        message: "Please select a donation to review.",
+        type: 'error',
+        message: 'Please select a donation to review.',
       });
       return;
     }
@@ -244,12 +247,12 @@ useEffect(() => {
     setBanner(null);
     try {
       await fn();
-      setBanner({ type: "success", message: success });
+      setBanner({ type: 'success', message: success });
       await refreshDonations();
     } catch (e) {
       setBanner({
-        type: "error",
-        message: e instanceof Error ? e.message : "Action failed",
+        type: 'error',
+        message: e instanceof Error ? e.message : 'Action failed',
       });
     } finally {
       setBusy(false);
@@ -268,11 +271,11 @@ useEffect(() => {
         body: safeTextToHtml(templateForm.message),
         customNote: templateForm.customNote || null,
       });
-      setBanner({ type: "success", message: "Template saved." });
+      setBanner({ type: 'success', message: 'Template saved.' });
     } catch (e) {
       setBanner({
-        type: "error",
-        message: e instanceof Error ? e.message : "Failed to save template",
+        type: 'error',
+        message: e instanceof Error ? e.message : 'Failed to save template',
       });
     } finally {
       setBusy(false);
@@ -294,10 +297,10 @@ useEffect(() => {
       {banner ? (
         <div
           className={classNames(
-            "mb-6 rounded-lg border px-4 py-3 text-sm",
-            banner.type === "error"
-              ? "border-red-200 bg-red-50 text-red-700"
-              : "border-emerald-200 bg-emerald-50 text-emerald-800",
+            'mb-6 rounded-lg border px-4 py-3 text-sm',
+            banner.type === 'error'
+              ? 'border-red-200 bg-red-50 text-red-700'
+              : 'border-emerald-200 bg-emerald-50 text-emerald-800',
           )}
         >
           {banner.message}
@@ -327,9 +330,9 @@ useEffect(() => {
             )}
           </div>
           <p className="mt-2 text-xs text-gray-500">
-            Selected:{" "}
+            Selected:{' '}
             <span className="text-gray-700">
-              {selectedProject?.title ?? "—"}
+              {selectedProject?.title ?? '—'}
             </span>
           </p>
         </div>
@@ -341,23 +344,23 @@ useEffect(() => {
           <div className="mt-3 flex gap-2">
             <button
               className={classNames(
-                "rounded-md px-3 py-2 text-sm font-semibold border transition",
-                tab === "review"
-                  ? "bg-[#206378] border-[#206378] text-white"
-                  : "bg-white border-gray-200 text-gray-700 hover:bg-gray-50",
+                'rounded-md px-3 py-2 text-sm font-semibold border transition',
+                tab === 'review'
+                  ? 'bg-[#206378] border-[#206378] text-white'
+                  : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50',
               )}
-              onClick={() => setTab("review")}
+              onClick={() => setTab('review')}
             >
               Review donations
             </button>
             <button
               className={classNames(
-                "rounded-md px-3 py-2 text-sm font-semibold border transition",
-                tab === "templates"
-                  ? "bg-[#206378] border-[#206378] text-white"
-                  : "bg-white border-gray-200 text-gray-700 hover:bg-gray-50",
+                'rounded-md px-3 py-2 text-sm font-semibold border transition',
+                tab === 'templates'
+                  ? 'bg-[#206378] border-[#206378] text-white'
+                  : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50',
               )}
-              onClick={() => setTab("templates")}
+              onClick={() => setTab('templates')}
             >
               Templates
             </button>
@@ -372,7 +375,7 @@ useEffect(() => {
             Needs attention
           </p>
           <p className="mt-2 text-2xl font-semibold text-gray-900">
-            {isLoadingDonations ? "..." : pendingDonations.length}
+            {isLoadingDonations ? '...' : pendingDonations.length}
           </p>
           <p className="mt-1 text-xs text-gray-500">
             Pending receipts (submitted).
@@ -380,7 +383,7 @@ useEffect(() => {
         </div>
       </section>
 
-      {tab === "review" ? (
+      {tab === 'review' ? (
         <ReviewDonationsSection
           pendingDonations={pendingDonations}
           isLoadingDonations={isLoadingDonations}
@@ -396,13 +399,13 @@ useEffect(() => {
           onSendThankYou={() =>
             runAction(
               () => sendDonationReviewThankYou(selectedTx!.id),
-              "Thank you email sent.",
+              'Thank you email sent.',
             )
           }
           onSendFollowUp={() =>
             runAction(
               () => sendDonationReviewFollowUp(selectedTx!.id),
-              "Payment reminder sent.",
+              'Payment reminder sent.',
             )
           }
           onProcessReceipt={() =>
@@ -412,8 +415,8 @@ useEffect(() => {
                   receiptNumber,
                   receiptDate,
                   remarks: remarks || null,
-                } as any),
-              "Receipt issued and emailed.",
+                }),
+              'Receipt issued and emailed.',
             )
           }
         />
@@ -433,10 +436,10 @@ useEffect(() => {
               subject: DEFAULT_TEXT_TEMPLATE[templateType].subject,
               message: DEFAULT_TEXT_TEMPLATE[templateType].message,
             }));
-            setBanner({ type: "success", message: "Reset to default." });
+            setBanner({ type: 'success', message: 'Reset to default.' });
           }}
           variables={VARIABLES}
-          defaultText={DEFAULT_TEXT_TEMPLATE as any}
+          defaultText={DEFAULT_TEXT_TEMPLATE}
         />
       )}
     </div>

@@ -1,14 +1,14 @@
-"use client";
+'use client';
 
-import { RefObject } from "react";
-import { classNames } from "@/lib/utils/finance-manager-email/classNames";
-import { insertAtCursor } from "@/lib/utils/finance-manager-email/insertAtCursor";
-import { safeTextToHtml } from "@/lib/utils/finance-manager-email/text-html";
-import { TemplateForm } from "@/types/EmailCampaign";
+import { RefObject } from 'react';
+import { classNames } from '@/lib/utils/finance-manager-email/classNames';
 
-type TemplateType = "thankyou" | "receipt";
+import { safeTextToHtml } from '@/lib/utils/finance-manager-email/text-html';
+import { TemplateForm } from '@/types/EmailCampaign';
 
-type Variable = { label: string; value: string; showIn: TemplateType | "both" };
+type TemplateType = 'thankyou' | 'receipt';
+
+type Variable = { label: string; value: string; showIn: TemplateType | 'both' };
 
 type Props = {
   staffEmail: string;
@@ -26,7 +26,7 @@ type Props = {
   onReset: () => void;
 
   variables: Variable[];
-  defaultText: Record<TemplateType, { subject: string; message: string }>;
+
 };
 
 export default function TemplatesSection({
@@ -40,7 +40,7 @@ export default function TemplatesSection({
   onSave,
   onReset,
   variables,
-  defaultText,
+
 }: Props) {
   return (
     <section className="rounded-xl border border-[#195D4B] bg-white overflow-hidden">
@@ -53,23 +53,23 @@ export default function TemplatesSection({
         <div className="mb-4 flex items-center gap-2">
           <button type="button"
             className={classNames(
-              "rounded-md px-3 py-2 text-sm font-semibold border transition",
-              templateType === "thankyou"
-                ? "bg-[#206378] border-[#206378] text-white"
-                : "bg-white border-gray-200 text-gray-700 hover:bg-gray-50",
+              'rounded-md px-3 py-2 text-sm font-semibold border transition',
+              templateType === 'thankyou'
+                ? 'bg-[#206378] border-[#206378] text-white'
+                : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50',
             )}
-            onClick={() => setTemplateType("thankyou")}
+            onClick={() => setTemplateType('thankyou')}
           >
             Thank you
           </button>
           <button type="button" 
             className={classNames(
-              "rounded-md px-3 py-2 text-sm font-semibold border transition",
-              templateType === "receipt"
-                ? "bg-[#206378] border-[#206378] text-white"
-                : "bg-white border-gray-200 text-gray-700 hover:bg-gray-50",
+              'rounded-md px-3 py-2 text-sm font-semibold border transition',
+              templateType === 'receipt'
+                ? 'bg-[#206378] border-[#206378] text-white'
+                : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50',
             )}
-            onClick={() => setTemplateType("receipt")}
+            onClick={() => setTemplateType('receipt')}
           >
             Receipt
           </button>
@@ -77,7 +77,7 @@ export default function TemplatesSection({
 
       <div className="mb-3 flex flex-wrap gap-2">
   {variables
-    .filter((v) => v.showIn === "both" || v.showIn === templateType)
+    .filter((v) => v.showIn === 'both' || v.showIn === templateType)
     .map((v) => (
       <button
         key={v.value}
@@ -115,7 +115,7 @@ export default function TemplatesSection({
               Staff email
             </label>
             <input
-              value={staffEmail || "Loading..."}
+              value={staffEmail || 'Loading...'}
               readOnly
               disabled={!staffEmail}
               className="mt-2 w-full rounded-md border border-gray-200 bg-gray-100 px-3 py-2 text-sm text-gray-700 cursor-not-allowed"
@@ -161,10 +161,10 @@ export default function TemplatesSection({
                 disabled={busy}
                 onClick={onSave}
                 className={classNames(
-                  "rounded-md px-4 py-2 text-sm font-semibold transition",
+                  'rounded-md px-4 py-2 text-sm font-semibold transition',
                   busy
-                    ? "bg-gray-200 text-gray-500"
-                    : "bg-[#206378] text-white hover:opacity-95",
+                    ? 'bg-gray-200 text-gray-500'
+                    : 'bg-[#206378] text-white hover:opacity-95',
                 )}
               >
                 Save template

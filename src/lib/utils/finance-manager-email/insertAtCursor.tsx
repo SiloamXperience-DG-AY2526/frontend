@@ -4,5 +4,5 @@ export function insertAtCursor(el: HTMLTextAreaElement, value: string) {
   el.value = el.value.slice(0, start) + value + el.value.slice(end);
   const cursor = start + value.length;
   el.setSelectionRange(cursor, cursor);
-  el.dispatchEvent(new Event("input", { bubbles: true }));
+  el.dispatchEvent(new Event('input', { bubbles: true }));
 }
