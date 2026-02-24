@@ -13,50 +13,50 @@ import {
   processDonationReviewReceipt,
 } from "@/lib/api/emailCampaign";
 import type { DonationProject } from "@/types/DonationProjectData";
-
+import { getUserProfile } from "@/lib/api/user";
+import { StaffProfile } from "@/types/UserData";
+import { insertAtCursor } from "@/lib/utils/finance-manager-email/insertAtCursor";
+import { classNames } from "@/lib/utils/finance-manager-email/classNames";
+import {
+  htmlToText,
+  safeTextToHtml,
+} from "@/lib/utils/finance-manager-email/text-html";
+import { formatAmount } from "@/lib/utils/finance-manager-email/formatAmount";
+import { TemplateForm } from "@/types/EmailCampaign";
+import { DonationTransaction } from "@/types/DonationProject";
+import ReviewDonationsSection from "@/components/finance-manager/ReviewDonationsSection";
+import TemplatesSection from "@/components/finance-manager/EmailTemplateSection";
 type Tab = "review" | "templates";
 type TemplateType = "thankyou" | "receipt";
-
-type DonationTransaction = {
-  id: string;
-  date: string;
-  amount: string | number;
-  paymentMode: string;
-  receiptStatus: "pending" | "received" | "cancelled";
-  submissionStatus: "draft" | "submitted" | "withdrawn";
-  isThankYouSent: boolean;
-};
-
-type TemplateForm = {
-  senderAddress: string;
-  subject: string;
-  message: string; // plain text
-  customNote: string;
-};
 
 const DEFAULT_TEXT_TEMPLATE: Record<
   TemplateType,
   Pick<TemplateForm, "subject" | "message">
 > = {
   thankyou: {
-    subject: "Thank you {{name}} — {{project}}",
+    subject:
+      "Thank you {{name}} — we’ve received your donation for {{project}}",
     message:
       `Hi {{name}},\n\n` +
-      `Thank you for your interest in {{project}}.\n` +
-      `Amount: {{amount}}\n\n` +
-      `Your payment is still being reviewed.\n\n 
-       Receipt will be sent in a short while.` +
-      `Regards,\nFinance Team`,
+      `Thank you for your donation to {{project}}.\n` +
+      `Donation amount: {{amount}}\n\n` +
+      `We’re currently processing your payment and will update you shortly.\n` +
+      `Once confirmed, we’ll send your official receipt.\n\n` +
+      `Warm regards,\n` +
+      `Finance Team`,
   },
   receipt: {
-    subject: "Receipt {{receiptNumber}} — {{project}}",
+    subject: "Your receipt {{receiptNumber}} — {{project}}",
     message:
       `Hi {{name}},\n\n` +
-      `Thank you for your donation to {{project}}.\n\n` +
+      `Thank you for your donation to {{project}}.\n` +
+      `Your donation was successful.\n\n` +
       `Receipt No: {{receiptNumber}}\n` +
+      `Receipt Date: {{receiptDate}}\n` +
       `Amount: {{amount}}\n` +
       `Remarks: {{remarks}}\n\n` +
-      `Regards,\nFinance Team`,
+      `With gratitude,\n` +
+      `Finance Team`,
   },
 };
 
@@ -70,52 +70,12 @@ const VARIABLES: Array<{
   { label: "Amount", value: "{{amount}}", showIn: "both" },
   { label: "Receipt number", value: "{{receiptNumber}}", showIn: "receipt" },
   { label: "Remarks", value: "{{remarks}}", showIn: "receipt" },
+  { label: "Receipt date", value: "{{receiptDate}}", showIn: "receipt" },
 ];
 
-const currencyFormatter = new Intl.NumberFormat("en-US", {
-  style: "currency",
-  currency: "USD",
-  maximumFractionDigits: 2,
-});
-
-function classNames(...c: Array<string | false | undefined | null>) {
-  return c.filter(Boolean).join(" ");
-}
-
-function safeTextToHtml(text: string) {
-  const escaped = text
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;");
-  return escaped.replaceAll("\n", "<br/>");
-}
-
-function htmlToText(html: string) {
-  return (html || "")
-    .replaceAll("<br/>", "\n")
-    .replaceAll("<br />", "\n")
-    .replaceAll("<br>", "\n")
-    .replaceAll("&lt;", "<")
-    .replaceAll("&gt;", ">")
-    .replaceAll("&amp;", "&");
-}
-
-function insertAtCursor(el: HTMLTextAreaElement, value: string) {
-  const start = el.selectionStart ?? el.value.length;
-  const end = el.selectionEnd ?? el.value.length;
-  el.value = el.value.slice(0, start) + value + el.value.slice(end);
-  const cursor = start + value.length;
-  el.setSelectionRange(cursor, cursor);
-  el.dispatchEvent(new Event("input", { bubbles: true }));
-}
-
-function formatAmount(v: string | number) {
-  const n = typeof v === "string" ? Number(v) : v;
-  return Number.isFinite(n) ? currencyFormatter.format(n) : String(v);
-}
-
-export default function FinanceManagerReportsPage() {
+export default function FinanceManagerEmailPage() {
   const [tab, setTab] = useState<Tab>("review");
+  const [staffEmail, setStaffEmail] = useState<string>("");
 
   const [projects, setProjects] = useState<DonationProject[]>([]);
   const [selectedProjectId, setSelectedProjectId] = useState("");
@@ -179,8 +139,15 @@ export default function FinanceManagerReportsPage() {
       mounted = false;
     };
   }, []);
+  useEffect(() => {
+    const fetchProfile = async () => {
+      const p = (await getUserProfile()) as StaffProfile;
+      setStaffEmail(p.email);
+    };
 
-  // Load donations using existing getDonationProjectFinance()
+    fetchProfile();
+  }, []);
+  // Load donations 
   async function loadFinanceData(projectId: string) {
     setIsLoadingDonations(true);
     setBanner(null);
@@ -204,50 +171,40 @@ export default function FinanceManagerReportsPage() {
   useEffect(() => {
     if (!selectedProjectId) return;
     loadFinanceData(selectedProjectId);
- 
   }, [selectedProjectId]);
 
-  // Load template when template tab changes type/project
-  useEffect(() => {
-    if (tab !== "templates") return;
-    if (!selectedProjectId) return;
+  //Load template
+const templateReqIdRef = useRef(0);
 
-    let mounted = true;
-    (async () => {
-      try {
-        setBusy(true);
-        setBanner(null);
-        const tpl = await getDonationReviewTemplate(
-          selectedProjectId,
-          templateType,
-        );
-        if (!mounted) return;
+// Load template
+useEffect(() => {
+  if (tab !== "templates") return;
+  if (!selectedProjectId) return;
 
-        setTemplateForm({
-          senderAddress: tpl.senderAddress ?? "",
-          subject: tpl.subject ?? DEFAULT_TEXT_TEMPLATE[templateType].subject,
-          message: htmlToText(
-            tpl.body ??
-              safeTextToHtml(DEFAULT_TEXT_TEMPLATE[templateType].message),
-          ),
-          customNote: tpl.previewText ?? "",
-        });
-      } catch (e) {
-        if (!mounted) return;
-        setBanner({
-          type: "error",
-          message: e instanceof Error ? e.message : "Failed to load template",
-        });
-      } finally {
-        if (!mounted) return;
-        setBusy(false);
-      }
-    })();
+  const reqId = ++templateReqIdRef.current;
 
-    return () => {
-      mounted = false;
-    };
-  }, [tab, selectedProjectId, templateType]);
+  (async () => {
+    try {
+      setBusy(true);
+      setBanner(null);
+
+      const tpl = await getDonationReviewTemplate(selectedProjectId, templateType);
+
+      // ✅ ignore stale response
+      if (reqId !== templateReqIdRef.current) return;
+
+
+      setTemplateForm({
+         senderAddress: staffEmail ?? "",
+        subject: tpl.subject ?? "",
+        message: htmlToText(tpl.body ?? ""),
+        customNote: tpl.previewText ?? "",
+      });
+    } finally {
+      if (reqId === templateReqIdRef.current) setBusy(false);
+    }
+  })();
+}, [tab, selectedProjectId, templateType, staffEmail]);
 
   const pendingDonations = useMemo(
     () =>
@@ -261,6 +218,18 @@ export default function FinanceManagerReportsPage() {
   async function refreshDonations() {
     if (!selectedProjectId) return;
     await loadFinanceData(selectedProjectId);
+  }
+  function changeTemplateType(next: TemplateType) {
+    setTemplateType(next);
+
+    // show correct default instantly
+    setTemplateForm((p) => ({
+      ...p,
+      subject: DEFAULT_TEXT_TEMPLATE[next].subject,
+      message: DEFAULT_TEXT_TEMPLATE[next].message,
+      customNote: "",
+      senderAddress: staffEmail ?? "",
+    }));
   }
 
   async function runAction(fn: () => Promise<void>, success: string) {
@@ -294,7 +263,7 @@ export default function FinanceManagerReportsPage() {
     try {
       await saveDonationReviewTemplate(selectedProjectId, {
         type: templateType,
-        senderAddress: templateForm.senderAddress.trim() || "finance@siloamXperience.org",
+        senderAddress: staffEmail,
         subject: templateForm.subject,
         body: safeTextToHtml(templateForm.message),
         customNote: templateForm.customNote || null,
@@ -394,7 +363,7 @@ export default function FinanceManagerReportsPage() {
             </button>
           </div>
           <p className="mt-2 text-xs text-gray-500">
-            Review first, templates are settings.
+            Toggle between review and templates
           </p>
         </div>
 
@@ -412,388 +381,63 @@ export default function FinanceManagerReportsPage() {
       </section>
 
       {tab === "review" ? (
-        <section className="rounded-xl border border-[#195D4B] bg-white overflow-hidden">
-          <div className="px-5 pt-5 pb-3">
-            <h2 className="text-lg font-semibold text-gray-900">
-              Donations to review
-            </h2>
-            <p className="text-sm text-gray-500">
-              Select a donation to send messages or issue receipts.
-            </p>
-          </div>
-
-          <div className="grid gap-4 px-5 pb-6 lg:grid-cols-3">
-            <div className="lg:col-span-2 rounded-lg border border-gray-200 overflow-hidden">
-              <div className="overflow-x-auto">
-                <table className="min-w-full text-left text-sm">
-                  <thead className="bg-[#206378] text-white text-xs uppercase tracking-[0.16em]">
-                    <tr>
-                      <th className="px-4 py-3 font-bold">Date</th>
-                      <th className="px-4 py-3 font-bold">Amount</th>
-                      <th className="px-4 py-3 font-bold">Payment</th>
-                      <th className="px-4 py-3 font-bold">Receipt</th>
-                      <th className="px-4 py-3 font-bold">Thank you</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {isLoadingDonations ? (
-                      <tr>
-                        <td className="px-4 py-4 text-gray-500" colSpan={5}>
-                          Loading donations...
-                        </td>
-                      </tr>
-                    ) : pendingDonations.length ? (
-                      pendingDonations.map((d) => {
-                        const isSelected = selectedTx?.id === d.id;
-                        return (
-                          <tr
-                            key={d.id}
-                            className={classNames(
-                              "border-b border-gray-100 last:border-b-0 cursor-pointer",
-                              isSelected ? "bg-emerald-50" : "hover:bg-gray-50",
-                            )}
-                            onClick={() => {
-                              setSelectedTx(d);
-                              setReceiptNumber("");
-                              setRemarks("");
-                              setReceiptDate(
-                                new Date().toISOString().slice(0, 10),
-                              );
-                            }}
-                          >
-                            
-                            <td className="px-4 py-3 text-gray-700">
-                              {new Date(d.date).toLocaleString()}
-                            </td>
-                            <td className="px-4 py-3 font-medium text-gray-900">
-                              {formatAmount(d.amount)}
-                            </td>
-                            <td className="px-4 py-3 text-gray-700">
-                              {d.paymentMode}
-                            </td>
-                            <td className="px-4 py-3 text-gray-700 capitalize">
-                              {d.receiptStatus}
-                            </td>
-                            <td className="px-4 py-3 text-gray-700">
-                              {d.isThankYouSent ? "Sent" : "Not sent"}
-                            </td>
-                          </tr>
-                        );
-                      })
-                    ) : (
-                      <tr>
-                        <td className="px-4 py-4 text-gray-500" colSpan={5}>
-                          No pending donations for this project.
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-
-            <div className="rounded-lg border border-gray-200 bg-gray-50 p-4">
-              <p className="text-xs uppercase tracking-[0.16em] text-gray-500">
-                Review actions
-              </p>
-
-              {!selectedTx ? (
-                <div className="mt-3 text-sm text-gray-600">
-                  Select a donation from the table to proceed.
-                </div>
-              ) : (
-                <>
-                  <div className="mt-3 rounded-lg border border-gray-200 bg-white p-3">
-                    <div className="text-sm font-semibold text-gray-900">
-                      Donation details
-                    </div>
-                    <div className="mt-2 text-sm text-gray-700">
-                      <div>
-                        <span className="text-gray-500">Amount:</span>{" "}
-                        {formatAmount(selectedTx.amount)}
-                      </div>
-                      <div>
-                        <span className="text-gray-500">Payment:</span>{" "}
-                        {selectedTx.paymentMode}
-                      </div>
-                      <div>
-                        <span className="text-gray-500">Date:</span>{" "}
-                        {new Date(selectedTx.date).toLocaleString()}
-                      </div>
-                      <div className="mt-2">
-                        <span className="text-gray-500">Reference:</span>
-                        <div className="mt-1 rounded-md bg-gray-50 border border-gray-200 px-2 py-1 text-xs break-all">
-                          {selectedTx.id}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="mt-4 flex flex-wrap gap-2">
-                    <button
-                      disabled={busy}
-                      onClick={() =>
-                        runAction(
-                          () => sendDonationReviewThankYou(selectedTx.id),
-                          "Thank you email sent.",
-                        )
-                      }
-                      className={classNames(
-                        "rounded-md px-3 py-2 text-sm font-semibold transition",
-                        busy
-                          ? "bg-gray-200 text-gray-500"
-                          : "bg-[#206378] text-white hover:opacity-95",
-                      )}
-                    >
-                      Send thank you
-                    </button>
-
-                    <button
-                      disabled={busy}
-                      onClick={() =>
-                        runAction(
-                          () => sendDonationReviewFollowUp(selectedTx.id),
-                          "Payment reminder sent.",
-                        )
-                      }
-                      className={classNames(
-                        "rounded-md px-3 py-2 text-sm font-semibold transition border",
-                        busy
-                          ? "bg-gray-200 text-gray-500 border-gray-200"
-                          : "bg-white text-gray-700 border-gray-200 hover:bg-gray-50",
-                      )}
-                    >
-                      Send follow-up
-                    </button>
-                  </div>
-
-                  <div className="mt-4 rounded-lg border border-gray-200 bg-white p-3">
-                    <div className="text-sm font-semibold text-gray-900">
-                      Issue receipt
-                    </div>
-
-                    <label className="mt-3 block text-xs uppercase tracking-[0.16em] text-gray-500">
-                      Receipt number
-                    </label>
-                    <input
-                      value={receiptNumber}
-                      onChange={(e) => setReceiptNumber(e.target.value)}
-                      className="mt-2 w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm"
-                      placeholder="e.g. RCP-2026-0001"
-                    />
-
-                    <label className="mt-3 block text-xs uppercase tracking-[0.16em] text-gray-500">
-                      Receipt date (optional)
-                    </label>
-                    <input
-                      type="date"
-                      value={receiptDate}
-                      onChange={(e) => setReceiptDate(e.target.value)}
-                      className="mt-2 w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm"
-                    />
-
-                    <label className="mt-3 block text-xs uppercase tracking-[0.16em] text-gray-500">
-                      Remarks (optional)
-                    </label>
-                    <input
-                      value={remarks}
-                      onChange={(e) => setRemarks(e.target.value)}
-                      className="mt-2 w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm"
-                      placeholder="Optional"
-                    />
-
-                    <button
-                      disabled={busy || !receiptNumber.trim()}
-                      onClick={() =>
-                        runAction(
-                          () =>
-                            processDonationReviewReceipt(selectedTx.id, {
-                              receiptNumber,
-                              remarks: remarks || null,
-                              // only send receiptDate if your backend schema accepts it.
-                              // receiptDate,
-                            } as any),
-                          "Receipt issued and emailed.",
-                        )
-                      }
-                      className={classNames(
-                        "mt-4 w-full rounded-md px-4 py-2 text-sm font-semibold transition",
-                        busy || !receiptNumber.trim()
-                          ? "bg-gray-200 text-gray-500"
-                          : "bg-[#206378] text-white hover:opacity-95",
-                      )}
-                    >
-                      Confirm & send receipt
-                    </button>
-                  </div>
-                </>
-              )}
-            </div>
-          </div>
-        </section>
+        <ReviewDonationsSection
+          pendingDonations={pendingDonations}
+          isLoadingDonations={isLoadingDonations}
+          selectedTx={selectedTx}
+          setSelectedTx={setSelectedTx}
+          receiptNumber={receiptNumber}
+          setReceiptNumber={setReceiptNumber}
+          receiptDate={receiptDate}
+          setReceiptDate={setReceiptDate}
+          remarks={remarks}
+          setRemarks={setRemarks}
+          busy={busy}
+          onSendThankYou={() =>
+            runAction(
+              () => sendDonationReviewThankYou(selectedTx!.id),
+              "Thank you email sent.",
+            )
+          }
+          onSendFollowUp={() =>
+            runAction(
+              () => sendDonationReviewFollowUp(selectedTx!.id),
+              "Payment reminder sent.",
+            )
+          }
+          onProcessReceipt={() =>
+            runAction(
+              () =>
+                processDonationReviewReceipt(selectedTx!.id, {
+                  receiptNumber,
+                  receiptDate,
+                  remarks: remarks || null,
+                } as any),
+              "Receipt issued and emailed.",
+            )
+          }
+        />
       ) : (
-        <section className="rounded-xl border border-[#195D4B] bg-white overflow-hidden">
-          <div className="px-5 pt-5 pb-3">
-            <h2 className="text-lg font-semibold text-gray-900">Templates</h2>
-            <p className="text-sm text-gray-500">
-              Write emails like normal text. Use buttons to insert fields.
-            </p>
-          </div>
-
-          <div className="px-5 pb-6">
-            <div className="mb-4 flex items-center gap-2">
-              <button
-                className={classNames(
-                  "rounded-md px-3 py-2 text-sm font-semibold border transition",
-                  templateType === "thankyou"
-                    ? "bg-[#206378] border-[#206378] text-white"
-                    : "bg-white border-gray-200 text-gray-700 hover:bg-gray-50",
-                )}
-                onClick={() => setTemplateType("thankyou")}
-              >
-                Thank you
-              </button>
-              <button
-                className={classNames(
-                  "rounded-md px-3 py-2 text-sm font-semibold border transition",
-                  templateType === "receipt"
-                    ? "bg-[#206378] border-[#206378] text-white"
-                    : "bg-white border-gray-200 text-gray-700 hover:bg-gray-50",
-                )}
-                onClick={() => setTemplateType("receipt")}
-              >
-                Receipt
-              </button>
-            </div>
-
-            <div className="mb-3 flex flex-wrap gap-2">
-              {VARIABLES.filter(
-                (v) => v.showIn === "both" || v.showIn === templateType,
-              ).map((v) => (
-                <button
-                  key={v.value}
-                  type="button"
-                  className="rounded-full border border-gray-200 bg-gray-50 px-3 py-1 text-xs text-gray-700 hover:bg-gray-100"
-                  onClick={() => {
-                    if (templateMessageRef.current)
-                      insertAtCursor(templateMessageRef.current, v.value);
-                  }}
-                >
-                  Insert {v.label}
-                </button>
-              ))}
-            </div>
-
-            <div className="grid gap-4 lg:grid-cols-2">
-              <div className="rounded-lg border border-gray-200 bg-gray-50 p-4">
-                <label className="block text-xs uppercase tracking-[0.16em] text-gray-500">
-                  Sender email
-                </label>
-                <input
-                  value={templateForm.senderAddress}
-                  onChange={(e) =>
-                    setTemplateForm((p) => ({
-                      ...p,
-                      senderAddress: e.target.value,
-                    }))
-                  }
-                  className="mt-2 w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm"
-                />
-
-                <label className="mt-4 block text-xs uppercase tracking-[0.16em] text-gray-500">
-                  Subject
-                </label>
-                <input
-                  value={templateForm.subject}
-                  onChange={(e) =>
-                    setTemplateForm((p) => ({ ...p, subject: e.target.value }))
-                  }
-                  className="mt-2 w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm"
-                />
-
-                <label className="mt-4 block text-xs uppercase tracking-[0.16em] text-gray-500">
-                  Custom note (optional)
-                </label>
-                <input
-                  value={templateForm.customNote}
-                  onChange={(e) =>
-                    setTemplateForm((p) => ({
-                      ...p,
-                      customNote: e.target.value,
-                    }))
-                  }
-                  className="mt-2 w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm"
-                />
-
-                <label className="mt-4 block text-xs uppercase tracking-[0.16em] text-gray-500">
-                  Message
-                </label>
-                <textarea
-                  ref={templateMessageRef}
-                  value={templateForm.message}
-                  onChange={(e) =>
-                    setTemplateForm((p) => ({ ...p, message: e.target.value }))
-                  }
-                  rows={12}
-                  className="mt-2 w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm"
-                />
-
-                <div className="mt-4 flex gap-2">
-                  <button
-                    disabled={busy}
-                    onClick={saveTemplate}
-                    className={classNames(
-                      "rounded-md px-4 py-2 text-sm font-semibold transition",
-                      busy
-                        ? "bg-gray-200 text-gray-500"
-                        : "bg-[#206378] text-white hover:opacity-95",
-                    )}
-                  >
-                    Save template
-                  </button>
-
-                  <button
-                    onClick={() => {
-                      setTemplateForm((p) => ({
-                        ...p,
-                        subject: DEFAULT_TEXT_TEMPLATE[templateType].subject,
-                        message: DEFAULT_TEXT_TEMPLATE[templateType].message,
-                      }));
-                      setBanner({
-                        type: "success",
-                        message: "Reset to default.",
-                      });
-                    }}
-                    className="rounded-md border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50"
-                  >
-                    Reset
-                  </button>
-                </div>
-              </div>
-
-              <div className="rounded-lg border border-gray-200 bg-gray-50 p-4">
-                <p className="text-xs uppercase tracking-[0.16em] text-gray-500">
-                  Preview
-                </p>
-                <div className="mt-3 rounded-lg border border-gray-200 bg-white p-4">
-                  <div className="text-sm font-semibold text-gray-900">
-                    {templateForm.subject}
-                  </div>
-                  <div
-                    className="mt-3 text-sm text-gray-700 leading-6"
-                    dangerouslySetInnerHTML={{
-                      __html: safeTextToHtml(templateForm.message),
-                    }}
-                  />
-                </div>
-                <p className="mt-3 text-xs text-gray-500">
-                  Preview shows formatting only. Real donor values appear when
-                  sent.
-                </p>
-              </div>
-            </div>
-          </div>
-        </section>
+        <TemplatesSection
+          staffEmail={staffEmail}
+          templateType={templateType}
+          setTemplateType={changeTemplateType}
+          templateForm={templateForm}
+          setTemplateForm={(updater) => setTemplateForm(updater)}
+          templateMessageRef={templateMessageRef}
+          busy={busy}
+          onSave={saveTemplate}
+          onReset={() => {
+            setTemplateForm((p) => ({
+              ...p,
+              subject: DEFAULT_TEXT_TEMPLATE[templateType].subject,
+              message: DEFAULT_TEXT_TEMPLATE[templateType].message,
+            }));
+            setBanner({ type: "success", message: "Reset to default." });
+          }}
+          variables={VARIABLES}
+          defaultText={DEFAULT_TEXT_TEMPLATE as any}
+        />
       )}
     </div>
   );

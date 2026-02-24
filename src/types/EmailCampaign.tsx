@@ -53,3 +53,10 @@ export type DonationReviewTemplate = {
   previewText?: string | null;
   body?: string | null;
 };
+
+export type TemplateForm = {
+  senderAddress: string;
+  subject: string;
+  message: string; // plain text
+  customNote: string;
+};

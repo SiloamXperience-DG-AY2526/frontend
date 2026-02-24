@@ -62,3 +62,5 @@ export type DonationTransaction = {
   submissionStatus: 'draft' | 'submitted' | 'withdrawn';
   isThankYouSent: boolean;
 };
+
+
