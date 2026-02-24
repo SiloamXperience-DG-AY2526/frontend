@@ -73,7 +73,7 @@ export default function ManagersDataTable({
       accessor: (manager) => (
         <StatusBadge
           label={manager.status}
-          variant={manager.status ? 'success' : 'neutral'}
+          variant={manager.status == "Active" ? 'success' : 'neutral'}
         />
       ),
     },
