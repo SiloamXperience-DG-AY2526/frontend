@@ -24,6 +24,8 @@ export async function GET(request: Request) {
       backendParams.set('limit', searchParams.get('limit')!);
     if (searchParams.has('type'))
       backendParams.set('type', searchParams.get('type')!);
+    if (searchParams.has('search'))
+      backendParams.set('search', searchParams.get('search')!);
 
     // Call backend API
     const response = await fetch(

@@ -10,7 +10,7 @@ import { useManagerBasePath } from '@/lib/utils/managerBasePath';
 interface DonorsDataTableProps {
   donors: Donor[];
   loading: boolean;
-  onEditClick: (donorId: string) => void;
+  onEditClick?: (donorId: string) => void;
 }
 
 export default function DonorsDataTable({
@@ -67,15 +67,19 @@ export default function DonorsDataTable({
         />
       ),
     },
-    {
-      header: '',
-      accessor: (donor) => (
-        <EditButton
-          onClick={() => onEditClick(donor.donorId)}
-          ariaLabel="Edit donor"
-        />
-      ),
-    },
+    ...(onEditClick
+      ? [
+          {
+            header: '',
+            accessor: (donor: Donor) => (
+              <EditButton
+                onClick={() => onEditClick(donor.donorId)}
+                ariaLabel="Edit donor"
+              />
+            ),
+          },
+        ]
+      : []),
   ];
 
   return (

@@ -28,11 +28,10 @@ export default function SuperAdminPartnersPage() {
     error: donorsError,
     statusCode: donorsStatus,
   } = useDonors();
-  const basePath = useManagerBasePath('general');
-  const router = useRouter();
-
   const filteredPartners = usePartnerSearchFilter(partners, searchQuery);
   const filteredDonors = useSearchFilter(donors, searchQuery);
+  const basePath = useManagerBasePath('finance');
+  const router = useRouter();
 
   const isUnauthorized = useMemo(
     () => partnersStatus === 403 || donorsStatus === 403,
@@ -109,7 +108,7 @@ export default function SuperAdminPartnersPage() {
             donors={filteredDonors}
             loading={donorsLoading}
             onEditClick={(donorId) =>
-              router.push(`${basePath}/donors/${donorId}`)
+              router.push(`${basePath}/donors/${donorId}/edit`)
             }
           />
         )}

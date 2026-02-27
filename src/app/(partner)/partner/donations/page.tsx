@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
+import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 import { getDonationHomepage, getDonationProjects } from '@/lib/api/donation';
 import { DonationProject } from '@/types/DonationProject';
 import { useAuth } from '@/contexts/AuthContext';
@@ -23,7 +24,12 @@ export default function DonationsPage() {
   });
   const router = useRouter();
   const { user, isLoading: authLoading } = useAuth();
-  const [toast, setToast] = useState<{ open: boolean; type: 'success' | 'error'; title: string; message?: string }>({ open: false, type: 'error', title: '' });
+  const [toast, setToast] = useState<{
+    open: boolean;
+    type: 'success' | 'error';
+    title: string;
+    message?: string;
+  }>({ open: false, type: 'error', title: '' });
 
   useEffect(() => {
     // Redirect to login if not authenticated
@@ -31,32 +37,55 @@ export default function DonationsPage() {
       router.push('/partner/login');
       return;
     }
-
-    // Load data only when authenticated
-    if (user) {
-      loadData();
-    }
   }, [user, authLoading, router]);
 
-  const loadData = async () => {
-    setLoading(true);
-    try {
-      // Load homepage statistics
-      const homepage = await getDonationHomepage();
-      if (homepage.statistics) {
-        setStatistics(homepage.statistics);
-      }
+  // Debounce the search input so we only hit the API after 450 ms of no typing
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+  const cancelledRef = useRef(false);
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedSearch(searchQuery), 450);
+    return () => clearTimeout(t);
+  }, [searchQuery]);
 
-      // Load projects
-      const response = await getDonationProjects('all');
-      setProjects(response.projects);
-    } catch (error) {
-      console.error('Failed to load donation data:', error);
-      setToast({ open: true, type: 'error', title: 'Failed to load donation data', message: 'Please try again.' });
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Load homepage stats once after authentication
+  useEffect(() => {
+    if (!user) return;
+    getDonationHomepage()
+      .then((homepage) => {
+        if (homepage.statistics) setStatistics(homepage.statistics);
+      })
+      .catch(() => {
+        /* stats are non-critical */
+      });
+  }, [user]);
+
+  // Reload projects whenever the debounced search term changes (server-side)
+  useEffect(() => {
+    if (!user) return;
+    cancelledRef.current = false;
+    setLoading(true);
+    getDonationProjects('all', 1, 50, debouncedSearch || undefined)
+      .then((response) => {
+        if (!cancelledRef.current) setProjects(response.projects);
+      })
+      .catch((error) => {
+        if (!cancelledRef.current) {
+          console.error('Failed to load donation projects:', error);
+          setToast({
+            open: true,
+            type: 'error',
+            title: 'Failed to load donation data',
+            message: 'Please try again.',
+          });
+        }
+      })
+      .finally(() => {
+        if (!cancelledRef.current) setLoading(false);
+      });
+    return () => {
+      cancelledRef.current = true;
+    };
+  }, [user, debouncedSearch]);
 
   const handleProjectClick = (projectId: string) => {
     router.push(`/partner/donations/${projectId}`);
@@ -78,24 +107,22 @@ export default function DonationsPage() {
     return Math.min((current / target) * 100, 100);
   };
 
-  const filteredProjects = (projects || []).filter((project) =>
-    project.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    project.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    project.about.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
   return (
     <div className="flex h-screen overflow-y-auto bg-gray-50">
-      <Toast open={toast.open} type={toast.type} title={toast.title} message={toast.message} onClose={() => setToast((t) => ({ ...t, open: false }))} />
+      <Toast
+        open={toast.open}
+        type={toast.type}
+        title={toast.title}
+        message={toast.message}
+        onClose={() => setToast((t) => ({ ...t, open: false }))}
+      />
       <main className="w-full px-6 py-6 md:px-10">
         {/* Header */}
         <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
           <div className="mt-1 flex items-start gap-3">
             <div className="w-[5px] h-[39px] bg-[#56E0C2] mt-2" />
             <div>
-              <h1 className="text-3xl font-bold text-[#0F172A]">
-                Donations
-              </h1>
+              <h1 className="text-3xl font-bold text-[#0F172A]">Donations</h1>
               <p className="mt-2 text-sm text-gray-600">
                 Support causes that matter to you and create lasting impact.
               </p>
@@ -138,6 +165,7 @@ export default function DonationsPage() {
           {/* Search Bar */}
           <div className="mt-4">
             <div className="flex w-full md:w-1/2 items-center gap-3 rounded-xl bg-[#F0F0F2] px-4 py-3 shadow-sm">
+              <MagnifyingGlassIcon className="h-5 w-5 shrink-0 text-gray-400" />
               <input
                 type="text"
                 placeholder="Search donation projects"
@@ -156,9 +184,9 @@ export default function DonationsPage() {
           )}
 
           {/* Projects Grid */}
-          {!loading && filteredProjects.length > 0 && (
+          {!loading && projects.length > 0 && (
             <div className="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredProjects.map((project) => (
+              {projects.map((project) => (
                 <div
                   key={project.id}
                   onClick={() => handleProjectClick(project.id)}
@@ -212,7 +240,7 @@ export default function DonationsPage() {
                             style={{
                               width: `${calculateProgress(
                                 parseFloat(project.totalRaised || '0'),
-                                parseFloat(project.targetFund)
+                                parseFloat(project.targetFund),
                               )}%`,
                             }}
                           />
@@ -242,7 +270,7 @@ export default function DonationsPage() {
           )}
 
           {/* Empty State */}
-          {!loading && filteredProjects.length === 0 && (
+          {!loading && projects.length === 0 && (
             <div className="mt-6 rounded-2xl border bg-white p-8 text-sm text-gray-600 shadow-sm">
               <p className="font-semibold text-gray-700">
                 No donation projects found

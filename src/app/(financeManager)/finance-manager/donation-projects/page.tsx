@@ -1,7 +1,13 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
+import {
+  FunnelIcon,
+  ChevronUpIcon,
+  ChevronDownIcon,
+  MagnifyingGlassIcon,
+} from '@heroicons/react/24/outline';
 import PageHeader from '@/components/ui/PageHeader';
 import ProjectsDataTable from './_components/ProjectsDataTable';
 import Pagination from '@/components/ui/Pagination';
@@ -17,6 +23,17 @@ import { useManagerBasePath } from '@/lib/utils/managerBasePath';
 import DeleteConfirmDialog from '@/components/ui/DeleteConfirmDialog';
 import Toast from '@/components/ui/Toast';
 
+const ITEMS_PER_PAGE = 20;
+
+function useDebouncedValue<T>(value: T, delayMs = 450) {
+  const [debounced, setDebounced] = useState(value);
+  useEffect(() => {
+    const t = setTimeout(() => setDebounced(value), delayMs);
+    return () => clearTimeout(t);
+  }, [value, delayMs]);
+  return debounced;
+}
+
 export default function DonationProjectsPage() {
   const router = useRouter();
   const basePath = useManagerBasePath('finance');
@@ -26,7 +43,11 @@ export default function DonationProjectsPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [typeFilter, setTypeFilter] = useState<DonationProjectType | ''>('');
-  const ITEMS_PER_PAGE = 20;
+  const [showFilters, setShowFilters] = useState(false);
+  const [search, setSearch] = useState('');
+  const debouncedSearch = useDebouncedValue(search, 450);
+  const prevDebouncedSearch = useRef(debouncedSearch);
+  const [refreshKey, setRefreshKey] = useState(0);
   const [projectToDelete, setProjectToDelete] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
   const [toast, setToast] = useState<{
@@ -35,28 +56,40 @@ export default function DonationProjectsPage() {
     title: string;
   }>({ open: false, type: 'success', title: '' });
 
-  const fetchProjects = useCallback(async () => {
-    try {
+  useEffect(() => {
+    const controller = new AbortController();
+    const searchChanged = prevDebouncedSearch.current !== debouncedSearch;
+    if (searchChanged) {
+      prevDebouncedSearch.current = debouncedSearch;
+      if (currentPage !== 1) {
+        setCurrentPage(1);
+        return () => controller.abort();
+      }
+    }
+    async function fetchProjects() {
       setLoading(true);
       setError(null);
-      const response = await getFinanceManagerProjects(
-        currentPage,
-        ITEMS_PER_PAGE,
-        typeFilter || undefined,
-      );
-      setProjects(response.projects);
-      setTotalPages(response.pagination.totalPages);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load projects');
-      console.error('Error fetching projects:', err);
-    } finally {
-      setLoading(false);
+      try {
+        const response = await getFinanceManagerProjects(
+          currentPage,
+          ITEMS_PER_PAGE,
+          typeFilter || undefined,
+          debouncedSearch || undefined,
+        );
+        setProjects(response.projects);
+        setTotalPages(response.pagination.totalPages);
+      } catch (err) {
+        if ((err as DOMException).name === 'AbortError') return;
+        setError(
+          err instanceof Error ? err.message : 'Failed to load projects',
+        );
+      } finally {
+        setLoading(false);
+      }
     }
-  }, [currentPage, typeFilter]);
-
-  useEffect(() => {
     fetchProjects();
-  }, [fetchProjects]);
+    return () => controller.abort();
+  }, [currentPage, typeFilter, debouncedSearch, refreshKey]);
 
   const handleEditClick = (projectId: string) => {
     router.push(`${basePath}/donation-projects/${projectId}/edit`);
@@ -77,7 +110,7 @@ export default function DonationProjectsPage() {
         type: 'success',
         title: 'Project cancelled successfully.',
       });
-      await fetchProjects();
+      setRefreshKey((k) => k + 1);
     } catch (err) {
       setToast({
         open: true,
@@ -122,21 +155,68 @@ export default function DonationProjectsPage() {
           </button>
         </div>
 
-        <div className="mt-2 mb-4 flex items-center gap-3">
-          <label className="text-sm font-medium text-gray-700">Type:</label>
-          <select
-            value={typeFilter}
-            onChange={(e) => {
-              setTypeFilter(e.target.value as DonationProjectType | '');
-              setCurrentPage(1);
-            }}
-            className="rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm text-gray-700 outline-none focus:border-[#0E5A4A] focus:ring-1 focus:ring-[#0E5A4A]"
+        <div className="mt-4 flex w-full md:w-1/2 items-center gap-3 rounded-xl bg-[#F0F0F2] px-4 py-3 shadow-sm">
+          <MagnifyingGlassIcon className="h-5 w-5 shrink-0 text-gray-400" />
+          <input
+            type="text"
+            placeholder="Search projects"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full bg-transparent text-sm text-gray-800 outline-none placeholder:text-gray-400"
+          />
+        </div>
+
+        <div className="mt-3 mb-4">
+          <button
+            type="button"
+            onClick={() => setShowFilters((prev) => !prev)}
+            className="flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition"
           >
-            <option value="">All types</option>
-            <option value="brick">Brick</option>
-            <option value="sponsor">Sponsor</option>
-            <option value="partnerLed">Partner Led</option>
-          </select>
+            <FunnelIcon className="h-4 w-4" />
+            Filters
+            {typeFilter && (
+              <span className="ml-1 flex h-5 w-5 items-center justify-center rounded-full bg-[#0E5A4A] text-xs font-semibold text-white">
+                1
+              </span>
+            )}
+            {showFilters ? (
+              <ChevronUpIcon className="h-4 w-4" />
+            ) : (
+              <ChevronDownIcon className="h-4 w-4" />
+            )}
+          </button>
+
+          {showFilters && (
+            <div className="mt-2 flex flex-wrap items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-3 shadow-sm">
+              <span className="mr-1 text-sm font-medium text-gray-600">
+                Type:
+              </span>
+              {(
+                [
+                  { value: '', label: 'All types' },
+                  { value: 'brick', label: 'Brick' },
+                  { value: 'sponsor', label: 'Sponsor' },
+                  { value: 'partnerLed', label: 'Partner Led' },
+                ] as { value: DonationProjectType | ''; label: string }[]
+              ).map(({ value, label }) => (
+                <button
+                  key={value || 'all'}
+                  type="button"
+                  onClick={() => {
+                    setTypeFilter(value);
+                    setCurrentPage(1);
+                  }}
+                  className={`rounded-full px-3 py-1 text-sm font-medium transition ${
+                    typeFilter === value
+                      ? 'bg-[#0E5A4A] text-white'
+                      : 'border border-gray-200 bg-gray-50 text-gray-700 hover:bg-gray-100'
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
         <ProjectsDataTable

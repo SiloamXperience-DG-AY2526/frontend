@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import PageHeader from '@/components/ui/PageHeader';
-import BackButton from '@/components/ui/BackButton';
 import Toast from '@/components/ui/Toast';
 import LoadingTableState from '@/components/table/LoadingTableState';
 import { useDonor } from '@/hooks/useDonors';
@@ -80,10 +79,6 @@ export default function EditDonorPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 p-8">
-      <BackButton
-        label="Back to Donor"
-        href={`${basePath}/donors/${donorId}`}
-      />
       <PageHeader title={`Edit — ${donor?.fullName ?? 'Donor'}`} />
 
       <div className="space-y-6">

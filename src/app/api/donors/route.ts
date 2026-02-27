@@ -5,7 +5,7 @@ import { BackendDonorsResponseSchema } from '@/types/DonorData';
 
 const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:3000/api/v1';
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
     // Get auth token from cookies
     const cookieStore = await cookies();
@@ -15,13 +15,26 @@ export async function GET() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    // Forward query params (page, limit, search) to the backend
+    const { searchParams } = new URL(request.url);
+    const backendParams = new URLSearchParams();
+    if (searchParams.has('page'))
+      backendParams.set('page', searchParams.get('page')!);
+    if (searchParams.has('limit'))
+      backendParams.set('limit', searchParams.get('limit')!);
+    if (searchParams.has('search'))
+      backendParams.set('search', searchParams.get('search')!);
+
     // Call backend API
-    const response = await fetch(`${BACKEND_URL}/donors`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
+    const response = await fetch(
+      `${BACKEND_URL}/donors?${backendParams.toString()}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
       },
-    });
+    );
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
@@ -61,7 +74,13 @@ export async function GET() {
       JSON.stringify(transformedDonors, null, 2),
     );
 
-    return NextResponse.json(transformedDonors, { status: 200 });
+    return NextResponse.json(
+      {
+        donors: transformedDonors,
+        pagination: validatedBackendData.pagination,
+      },
+      { status: 200 },
+    );
   } catch (error) {
     if (error instanceof z.ZodError) {
       console.error('Validation error:', error.message);

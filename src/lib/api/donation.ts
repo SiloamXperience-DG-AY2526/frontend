@@ -76,6 +76,7 @@ export async function getDonationProjects(
   type?: 'all' | 'ongoing' | 'specific' | 'brick' | 'sponsor' | 'partnerLed',
   page: number = 1,
   limit: number = 20,
+  search?: string,
 ): Promise<DonationProjectsResponse> {
   const params = new URLSearchParams({
     page: page.toString(),
@@ -84,6 +85,9 @@ export async function getDonationProjects(
 
   if (type && type !== 'all') {
     params.append('type', type);
+  }
+  if (search && search.trim()) {
+    params.append('search', search.trim());
   }
 
   const res = await fetch(`/api/donation-projects?${params.toString()}`);
@@ -210,12 +214,14 @@ export async function getFinanceManagerProjects(
   page: number = 1,
   limit: number = 20,
   type?: 'brick' | 'sponsor' | 'partnerLed',
+  search?: string,
 ): Promise<DonationProjectsResponse> {
   const params = new URLSearchParams({
     page: page.toString(),
     limit: limit.toString(),
   });
   if (type) params.set('type', type);
+  if (search && search.trim()) params.set('search', search.trim());
   const res = await fetch(`/api/donation-projects?${params.toString()}`);
   if (!res.ok) {
     throw new Error('Failed to fetch donation projects for finance manager.');

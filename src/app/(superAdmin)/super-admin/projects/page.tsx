@@ -3,6 +3,12 @@
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import {
+  FunnelIcon,
+  ChevronUpIcon,
+  ChevronDownIcon,
+  MagnifyingGlassIcon,
+} from '@heroicons/react/24/outline';
 import PageHeader from '@/components/ui/PageHeader';
 import VolunteerSearch from '@/components/volunteer/Search';
 import VolunteerPagination from '@/components/volunteer/VolunteerPagination';
@@ -56,6 +62,10 @@ export default function SuperAdminProjectsPage() {
   const [donationTypeFilter, setDonationTypeFilter] = useState<
     DonationProjectType | ''
   >('');
+  const [showDonationFilters, setShowDonationFilters] = useState(false);
+  const [donationSearch, setDonationSearch] = useState('');
+  const debouncedDonationSearch = useDebouncedValue(donationSearch, 450);
+  const prevDebouncedDonationSearch = useRef(debouncedDonationSearch);
   const donationLimit = 20;
 
   // Track previous search to avoid firing two requests when search changes on a non-first page.
@@ -103,28 +113,45 @@ export default function SuperAdminProjectsPage() {
   }, [page, limit, debouncedSearch]);
 
   useEffect(() => {
-    const loadDonationProjects = async () => {
+    const controller = new AbortController();
+    const searchChanged =
+      prevDebouncedDonationSearch.current !== debouncedDonationSearch;
+    if (searchChanged) {
+      prevDebouncedDonationSearch.current = debouncedDonationSearch;
+      if (donationPage !== 1) {
+        setDonationPage(1);
+        return () => controller.abort();
+      }
+    }
+    async function loadDonationProjects() {
+      setDonationLoading(true);
+      setDonationError(null);
       try {
-        setDonationLoading(true);
-        setDonationError(null);
         const response = await getFinanceManagerProjects(
           donationPage,
           donationLimit,
           donationTypeFilter || undefined,
+          debouncedDonationSearch || undefined,
         );
         setDonationProjects(response.projects);
         setDonationTotalPages(response.pagination.totalPages);
-      } catch {
+      } catch (e: unknown) {
+        if (e instanceof DOMException && e.name === 'AbortError') return;
         setDonationError('Unable to load donation projects.');
         setDonationProjects([]);
         setDonationTotalPages(1);
       } finally {
         setDonationLoading(false);
       }
-    };
-
+    }
     loadDonationProjects();
-  }, [donationPage, donationLimit, donationTypeFilter]);
+    return () => controller.abort();
+  }, [
+    donationPage,
+    donationLimit,
+    donationTypeFilter,
+    debouncedDonationSearch,
+  ]);
 
   const handleDonationEdit = (projectId: string) => {
     router.push(`${financeBasePath}/donation-projects/${projectId}`);
@@ -224,23 +251,68 @@ export default function SuperAdminProjectsPage() {
               </Link>
             </div>
 
-            <div className="mt-4 mb-4 flex items-center gap-3">
-              <label className="text-sm font-medium text-gray-700">Type:</label>
-              <select
-                value={donationTypeFilter}
-                onChange={(e) => {
-                  setDonationTypeFilter(
-                    e.target.value as DonationProjectType | '',
-                  );
-                  setDonationPage(1);
-                }}
-                className="rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm text-gray-700 outline-none focus:border-[#0E5A4A] focus:ring-1 focus:ring-[#0E5A4A]"
+            <div className="mt-4 flex w-full md:w-1/2 items-center gap-3 rounded-xl bg-[#F0F0F2] px-4 py-3 shadow-sm">
+              <MagnifyingGlassIcon className="h-5 w-5 shrink-0 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search donation projects"
+                value={donationSearch}
+                onChange={(e) => setDonationSearch(e.target.value)}
+                className="w-full bg-transparent text-sm text-gray-800 outline-none placeholder:text-gray-400"
+              />
+            </div>
+
+            <div className="mt-3 mb-4">
+              <button
+                type="button"
+                onClick={() => setShowDonationFilters((prev) => !prev)}
+                className="flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition"
               >
-                <option value="">All types</option>
-                <option value="brick">Brick</option>
-                <option value="sponsor">Sponsor</option>
-                <option value="partnerLed">Partner Led</option>
-              </select>
+                <FunnelIcon className="h-4 w-4" />
+                Filters
+                {donationTypeFilter && (
+                  <span className="ml-1 flex h-5 w-5 items-center justify-center rounded-full bg-[#0E5A4A] text-xs font-semibold text-white">
+                    1
+                  </span>
+                )}
+                {showDonationFilters ? (
+                  <ChevronUpIcon className="h-4 w-4" />
+                ) : (
+                  <ChevronDownIcon className="h-4 w-4" />
+                )}
+              </button>
+
+              {showDonationFilters && (
+                <div className="mt-2 flex flex-wrap items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-3 shadow-sm">
+                  <span className="mr-1 text-sm font-medium text-gray-600">
+                    Type:
+                  </span>
+                  {(
+                    [
+                      { value: '', label: 'All types' },
+                      { value: 'brick', label: 'Brick' },
+                      { value: 'sponsor', label: 'Sponsor' },
+                      { value: 'partnerLed', label: 'Partner Led' },
+                    ] as { value: DonationProjectType | ''; label: string }[]
+                  ).map(({ value, label }) => (
+                    <button
+                      key={value || 'all'}
+                      type="button"
+                      onClick={() => {
+                        setDonationTypeFilter(value);
+                        setDonationPage(1);
+                      }}
+                      className={`rounded-full px-3 py-1 text-sm font-medium transition ${
+                        donationTypeFilter === value
+                          ? 'bg-[#0E5A4A] text-white'
+                          : 'border border-gray-200 bg-gray-50 text-gray-700 hover:bg-gray-100'
+                      }`}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
 
             {donationError ? (
