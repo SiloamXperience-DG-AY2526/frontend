@@ -35,7 +35,16 @@ export default function DonorsDataTable({
     },
     {
       header: 'Projects',
-      accessor: (donor) => donor.projects.join(', '),
+      accessor: (donor) =>
+        donor.projects.length === 0 ? (
+          <span className="text-sm italic text-gray-400">No projects</span>
+        ) : (
+          <ul className="list-disc pl-4 text-sm text-gray-700">
+            {donor.projects.map((p, i) => (
+              <li key={i}>{p}</li>
+            ))}
+          </ul>
+        ),
     },
     {
       header: 'Cumulative Amount Donated',

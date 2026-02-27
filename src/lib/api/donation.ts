@@ -52,6 +52,7 @@ export type UpdateDonationProjectPayload = {
     | 'paused'
     | 'cancelled'
     | 'completed';
+  managedBy?: string | null;
 };
 
 // Get donation homepage data (statistics and featured projects)
@@ -302,6 +303,13 @@ export async function updateDonationProjectById(
   }
 
   return res.json();
+}
+
+// Cancel a donation project (soft delete via operationStatus)
+export async function cancelDonationProjectById(
+  projectId: string,
+): Promise<DonationProjectDetail> {
+  return updateDonationProjectById(projectId, { operationStatus: 'cancelled' });
 }
 
 export async function createDonationProjectAdmin(

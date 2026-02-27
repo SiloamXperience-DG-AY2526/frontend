@@ -1,19 +1,23 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import PageHeader from '@/components/ui/PageHeader';
 import SearchAndFilterBar from '@/components/ui/SearchAndFilterBar';
 import DonorsDataTable from './_components/DonorsDataTable';
 import UnauthorizedAccessCard from '@/components/UnauthorizedAccessCard';
 import { useDonors, useSearchFilter } from '@/hooks/useDonors';
+import { useManagerBasePath } from '@/lib/utils/managerBasePath';
 
 export default function DonorsPage() {
+  const router = useRouter();
+  const basePath = useManagerBasePath('finance');
   const { donors, loading, error, statusCode } = useDonors();
   const [searchQuery, setSearchQuery] = useState('');
   const filteredDonors = useSearchFilter(donors, searchQuery);
 
   const handleEditClick = (donorId: string) => {
-    console.log(`Edit donor ${donorId} - functionality to be implemented`);
+    router.push(`${basePath}/donors/${donorId}/edit`);
   };
 
   if (statusCode === 403) {

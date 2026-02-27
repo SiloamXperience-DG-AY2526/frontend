@@ -27,7 +27,7 @@ export async function GET() {
       const errorData = await response.json().catch(() => ({}));
       return NextResponse.json(
         { error: errorData.message || 'Failed to fetch donors' },
-        { status: response.status }
+        { status: response.status },
       );
     }
 
@@ -53,12 +53,12 @@ export async function GET() {
           : donor.totalDonations || 0,
       gender: donor.gender as 'male' | 'female' | 'others',
       contactNumber: donor.contactNumber,
-      status: 'Active' as const, // Default status, adjust if backend provides this
+      status: donor.user.isActive ? ('Active' as const) : ('Inactive' as const),
     }));
 
     console.log(
       'Transformed donors:',
-      JSON.stringify(transformedDonors, null, 2)
+      JSON.stringify(transformedDonors, null, 2),
     );
 
     return NextResponse.json(transformedDonors, { status: 200 });
@@ -67,21 +67,21 @@ export async function GET() {
       console.error('Validation error:', error.message);
       console.error(
         'Validation issues:',
-        JSON.stringify(error.issues, null, 2)
+        JSON.stringify(error.issues, null, 2),
       );
       return NextResponse.json(
         {
           error: 'Invalid response format from backend',
           details: error.issues,
         },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
     console.error('Error fetching donors:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

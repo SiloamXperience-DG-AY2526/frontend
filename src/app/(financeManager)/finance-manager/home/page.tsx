@@ -10,6 +10,7 @@ import type {
   DonationProject,
   DonationProjectsResponse,
 } from '@/types/DonationProjectData';
+import StatusBadge from '@/components/table/StatusBadge';
 
 type DashboardState = {
   homepage: DonationHomepage | null;
@@ -28,6 +29,24 @@ const parseAmount = (value?: string | number | null) => {
   if (value === null || value === undefined) return 0;
   const numeric = typeof value === 'string' ? Number(value) : value;
   return Number.isFinite(numeric) ? numeric : 0;
+};
+
+const getOperationStatusVariant = (status?: string) => {
+  if (!status) return 'neutral';
+  switch (status.toLowerCase()) {
+    case 'notstarted':
+      return 'neutral';
+    case 'ongoing':
+      return 'success';
+    case 'paused':
+      return 'warning';
+    case 'cancelled':
+      return 'error';
+    case 'completed':
+      return 'info';
+    default:
+      return 'neutral';
+  }
 };
 
 export default function FinanceManagerHomePage() {
@@ -204,7 +223,17 @@ export default function FinanceManagerHomePage() {
                         : '--'}
                     </td>
                     <td className="px-4 py-3 text-gray-600">
-                      {project.operationStatus ?? project.approvalStatus ?? '—'}
+                      <StatusBadge
+                        label={
+                          project.operationStatus
+                            ? project.operationStatus.charAt(0).toUpperCase() +
+                              project.operationStatus.slice(1)
+                            : '—'
+                        }
+                        variant={getOperationStatusVariant(
+                          project.operationStatus,
+                        )}
+                      />
                     </td>
                   </tr>
                 ))
