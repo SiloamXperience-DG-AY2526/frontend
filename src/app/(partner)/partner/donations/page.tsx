@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 import { getDonationHomepage, getDonationProjects } from '@/lib/api/donation';
-import { DonationProject } from '@/types/DonationProject';
+import { DonationProject } from '@/types/DonationProjectData';
 import { useAuth } from '@/contexts/AuthContext';
 import StatCard from '@/components/volunteer/StatCard';
 import HumanStatIcon from '@/components/icons/HumanIcon';
@@ -63,12 +63,17 @@ export default function DonationsPage() {
   useEffect(() => {
     if (!user) return;
     cancelledRef.current = false;
-    setLoading(true);
-    getDonationProjects('all', 1, 50, debouncedSearch || undefined)
-      .then((response) => {
+    const load = async () => {
+      setLoading(true);
+      try {
+        const response = await getDonationProjects(
+          'all',
+          1,
+          50,
+          debouncedSearch || undefined,
+        );
         if (!cancelledRef.current) setProjects(response.projects);
-      })
-      .catch((error) => {
+      } catch (error) {
         if (!cancelledRef.current) {
           console.error('Failed to load donation projects:', error);
           setToast({
@@ -78,10 +83,11 @@ export default function DonationsPage() {
             message: 'Please try again.',
           });
         }
-      })
-      .finally(() => {
+      } finally {
         if (!cancelledRef.current) setLoading(false);
-      });
+      }
+    };
+    load();
     return () => {
       cancelledRef.current = true;
     };

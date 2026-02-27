@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import PageHeader from '@/components/ui/PageHeader';
@@ -29,7 +29,7 @@ export default function DonationProjectDetail() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<TabKey>('donations');
 
-  const fetchProjectData = async () => {
+  const fetchProjectData = useCallback(async () => {
     try {
       setLoading(true);
       const data = await getDonationProjectFinance(projectId);
@@ -39,11 +39,11 @@ export default function DonationProjectDetail() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [projectId]);
 
   useEffect(() => {
     fetchProjectData();
-  }, [projectId]);
+  }, [fetchProjectData]);
 
   const handleRefresh = () => {
     fetchProjectData();

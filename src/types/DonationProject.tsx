@@ -2,7 +2,10 @@
 
 export type DonationProjectType = 'brick' | 'sponsor' | 'partnerLed';
 
-export type DonationProjectSubmissionStatus = 'draft' | 'submitted' | 'withdrawn';
+export type DonationProjectSubmissionStatus =
+  | 'draft'
+  | 'submitted'
+  | 'withdrawn';
 
 export type DonationProjectApprovalStatus =
   | 'pending'
@@ -27,12 +30,12 @@ export type DonationProject = {
   endDate: string;
   submissionStatus: DonationProjectSubmissionStatus;
   approvalStatus: DonationProjectApprovalStatus;
-  approvalNotes: string | null;
+  approvalNotes?: string | null;
   image: string | null;
   attachments: string | null;
-  managedBy: string;
+  managedBy?: string;
   createdAt: string;
-  updatedAt: string;
+  updatedAt?: string;
   projectManager: {
     id: string;
     firstName: string;
