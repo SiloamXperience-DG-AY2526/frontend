@@ -114,7 +114,7 @@ export default function EditDonationProjectPage() {
       try {
         setLoading(true);
         const data = (await getDonationProjectById(
-          projectId
+          projectId,
         )) as DonationProject;
         if (!mounted) return;
 
@@ -157,7 +157,8 @@ export default function EditDonationProjectPage() {
     const nextErrors: Record<string, string> = {};
     if (!title.trim()) nextErrors.title = 'Title is required';
     if (!location.trim()) nextErrors.location = 'Location is required';
-    if (!aboutDesc.trim()) nextErrors.aboutDesc = 'Problem statement is required';
+    if (!aboutDesc.trim())
+      nextErrors.aboutDesc = 'Problem statement is required';
     if (!startDate) nextErrors.startDate = 'Start date is required';
     if (!endDate) nextErrors.endDate = 'End date is required';
     if (type === 'partnerLed' && !targetFund.trim()) {
@@ -227,11 +228,14 @@ export default function EditDonationProjectPage() {
       return {
         ...base,
         submissionStatus: status,
-        ...(status === 'submitted' && {
-          approvalStatus:
-            approvalStatus === 'approved' ? 'approved' : 'pending',
-          operationStatus: 'notStarted',
-        }),
+        ...(status === 'submitted'
+          ? {
+              approvalStatus: (approvalStatus === 'approved'
+                ? 'approved'
+                : 'pending') as DonationProjectApprovalStatus,
+              operationStatus: 'notStarted' as DonationProjectOperationStatus,
+            }
+          : {}),
       };
     }
     return base;
@@ -422,7 +426,8 @@ export default function EditDonationProjectPage() {
               value={startDate}
               onChange={(v) => {
                 setStartDate(v);
-                if (errors.startDate) setErrors((p) => ({ ...p, startDate: '' }));
+                if (errors.startDate)
+                  setErrors((p) => ({ ...p, startDate: '' }));
               }}
               type="date"
               required
@@ -548,7 +553,7 @@ export default function EditDonationProjectPage() {
                 value={approvalStatus}
                 onChange={(e) =>
                   setApprovalStatus(
-                    e.target.value as DonationProjectApprovalStatus
+                    e.target.value as DonationProjectApprovalStatus,
                   )
                 }
                 className="w-full rounded-md border border-green-700 bg-white px-3 py-2 text-sm outline-none transition focus:border-green-800 focus:ring-1 focus:ring-green-800"
@@ -569,7 +574,7 @@ export default function EditDonationProjectPage() {
                 value={operationStatus}
                 onChange={(e) =>
                   setOperationStatus(
-                    e.target.value as DonationProjectOperationStatus
+                    e.target.value as DonationProjectOperationStatus,
                   )
                 }
                 className="w-full rounded-md border border-green-700 bg-white px-3 py-2 text-sm outline-none transition focus:border-green-800 focus:ring-1 focus:ring-green-800"
@@ -629,8 +634,12 @@ export default function EditDonationProjectPage() {
           ].join(' ')}
         >
           {submitting
-            ? isUpdate ? 'Updating...' : 'Submitting...'
-            : isUpdate ? 'Update' : 'Submit for Review'}
+            ? isUpdate
+              ? 'Updating...'
+              : 'Submitting...'
+            : isUpdate
+              ? 'Update'
+              : 'Submit for Review'}
         </button>
       </div>
 

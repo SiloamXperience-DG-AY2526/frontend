@@ -16,10 +16,18 @@ type TabKey = 'volunteers' | 'donors';
 export default function SuperAdminPartnersPage() {
   const [activeTab, setActiveTab] = useState<TabKey>('volunteers');
   const [searchQuery, setSearchQuery] = useState('');
-  const { partners, loading: partnersLoading, error: partnersError, statusCode: partnersStatus } =
-    usePartners();
-  const { donors, loading: donorsLoading, error: donorsError, statusCode: donorsStatus } =
-    useDonors();
+  const {
+    partners,
+    loading: partnersLoading,
+    error: partnersError,
+    statusCode: partnersStatus,
+  } = usePartners();
+  const {
+    donors,
+    loading: donorsLoading,
+    error: donorsError,
+    statusCode: donorsStatus,
+  } = useDonors();
   const basePath = useManagerBasePath('general');
   const router = useRouter();
 
@@ -28,18 +36,17 @@ export default function SuperAdminPartnersPage() {
 
   const isUnauthorized = useMemo(
     () => partnersStatus === 403 || donorsStatus === 403,
-    [partnersStatus, donorsStatus]
+    [partnersStatus, donorsStatus],
   );
-
-  const handleFilterClick = () => {
-    console.log('Filter button clicked - filters to be implemented');
-  };
 
   if (isUnauthorized) {
     return <UnauthorizedAccessCard />;
   }
 
-  if ((partnersError && partnersStatus !== 403) || (donorsError && donorsStatus !== 403)) {
+  if (
+    (partnersError && partnersStatus !== 403) ||
+    (donorsError && donorsStatus !== 403)
+  ) {
     return (
       <div className="flex min-h-screen bg-gray-50">
         <main className="flex-1 px-10 py-8">
@@ -63,9 +70,9 @@ export default function SuperAdminPartnersPage() {
           <button
             type="button"
             onClick={() => setActiveTab('volunteers')}
-            className={`rounded-full px-4 py-2 text-sm font-semibold ${
+            className={`rounded-full px-4 py-2 text-sm font-semibold transition shadow-sm active:scale-[0.99] ${
               activeTab === 'volunteers'
-                ? 'bg-[#0E5A4A] text-white border-[#0E5A4A]'
+                ? 'bg-gradient-to-r from-[#1F7A67] to-[#2AAE92] text-white hover:from-[#1A6A59] hover:to-[#22997F]'
                 : 'border border-gray-300 bg-white text-gray-700 hover:bg-gray-50'
             }`}
           >
@@ -74,9 +81,9 @@ export default function SuperAdminPartnersPage() {
           <button
             type="button"
             onClick={() => setActiveTab('donors')}
-            className={`rounded-full px-4 py-2 text-sm font-semibold ${
+            className={`rounded-full px-4 py-2 text-sm font-semibold transition shadow-sm active:scale-[0.99] ${
               activeTab === 'donors'
-                ? 'bg-[#0E5A4A] text-white border-[#0E5A4A]'
+                ? 'bg-gradient-to-r from-[#1F7A67] to-[#2AAE92] text-white hover:from-[#1A6A59] hover:to-[#22997F]'
                 : 'border border-gray-300 bg-white text-gray-700 hover:bg-gray-50'
             }`}
           >
@@ -87,17 +94,23 @@ export default function SuperAdminPartnersPage() {
         <SearchAndFilterBar
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
-          onFilterClick={handleFilterClick}
-          searchPlaceholder={activeTab === 'donors' ? 'Donor Name' : 'Partner Name'}
+          searchPlaceholder={
+            activeTab === 'donors' ? 'Donor Name' : 'Partner Name'
+          }
         />
 
         {activeTab === 'volunteers' ? (
-          <PartnersDataTable partners={filteredPartners} loading={partnersLoading} />
+          <PartnersDataTable
+            partners={filteredPartners}
+            loading={partnersLoading}
+          />
         ) : (
           <DonorsDataTable
             donors={filteredDonors}
             loading={donorsLoading}
-            onEditClick={(donorId) => router.push(`${basePath}/donors/${donorId}`)}
+            onEditClick={(donorId) =>
+              router.push(`${basePath}/donors/${donorId}`)
+            }
           />
         )}
       </main>

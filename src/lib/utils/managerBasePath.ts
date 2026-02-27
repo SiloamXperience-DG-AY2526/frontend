@@ -11,5 +11,9 @@ export function useManagerBasePath(scope: ManagerScope) {
     return '/super-admin';
   }
 
+  if (pathname.startsWith('/sub-admin')) {
+    return '/sub-admin';
+  }
+
   return scope === 'finance' ? '/finance-manager' : '/general-manager';
 }

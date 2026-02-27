@@ -11,7 +11,7 @@ import {
   SubmitDonationApplication,
   DonationApplication,
   DonationHistoryResponse,
-  DonationHomepage 
+  DonationHomepage,
 } from '@/types/DonationData';
 
 export type ProposeDonationProjectPayload = {
@@ -46,7 +46,12 @@ export type UpdateDonationProjectPayload = {
   image?: string | null;
   submissionStatus?: 'draft' | 'submitted' | 'withdrawn';
   approvalStatus?: 'pending' | 'reviewing' | 'approved' | 'rejected';
-  operationStatus?: 'notStarted' | 'ongoing' | 'paused' | 'cancelled' | 'completed';
+  operationStatus?:
+    | 'notStarted'
+    | 'ongoing'
+    | 'paused'
+    | 'cancelled'
+    | 'completed';
 };
 
 // Get donation homepage data (statistics and featured projects)
@@ -54,7 +59,9 @@ export async function getDonationHomepage(): Promise<DonationHomepage> {
   const res = await fetch('/api/v1/donations/home');
 
   if (!res.ok) {
-    const errorData = await res.json().catch(() => ({ error: 'Unknown error' }));
+    const errorData = await res
+      .json()
+      .catch(() => ({ error: 'Unknown error' }));
     console.error('Failed to fetch donation homepage:', res.status, errorData);
     throw new Error('Failed to fetch donation homepage data.');
   }
@@ -67,13 +74,13 @@ export async function getDonationHomepage(): Promise<DonationHomepage> {
 export async function getDonationProjects(
   type?: 'all' | 'ongoing' | 'specific' | 'brick' | 'sponsor' | 'partnerLed',
   page: number = 1,
-  limit: number = 20
+  limit: number = 20,
 ): Promise<DonationProjectsResponse> {
   const params = new URLSearchParams({
     page: page.toString(),
     limit: limit.toString(),
   });
-  
+
   if (type && type !== 'all') {
     params.append('type', type);
   }
@@ -90,7 +97,7 @@ export async function getDonationProjects(
 
 // Get a specific donation project by ID
 export async function getDonationProjectById(
-  projectId: string
+  projectId: string,
 ): Promise<DonationProject> {
   const res = await fetch(`/api/v1/donation-projects/${projectId}`);
 
@@ -119,7 +126,7 @@ export async function getDonationProjectById(
 
   const listData = await listRes.json();
   const project = listData.projects?.find(
-    (item: DonationProject) => item.id === projectId
+    (item: DonationProject) => item.id === projectId,
   );
 
   if (!project) {
@@ -131,7 +138,7 @@ export async function getDonationProjectById(
 
 // Submit a donation application
 export async function submitDonation(
-  donationData: SubmitDonationApplication
+  donationData: SubmitDonationApplication,
 ): Promise<DonationApplication> {
   const res = await fetch('/api/v1/donations', {
     method: 'POST',
@@ -152,7 +159,7 @@ export async function submitDonation(
 export async function getMyDonations(
   status?: 'pending' | 'completed' | 'cancelled' | 'all',
   page: number = 1,
-  limit: number = 10
+  limit: number = 10,
 ): Promise<DonationHistoryResponse> {
   const params = new URLSearchParams({
     status: status || 'all',
@@ -171,7 +178,9 @@ export async function getMyDonations(
 }
 
 // Get a specific donation detail
-export async function getDonationDetail(donationId: string): Promise<DonationApplication> {
+export async function getDonationDetail(
+  donationId: string,
+): Promise<DonationApplication> {
   const res = await fetch(`/api/v1/donations/me/${donationId}`);
 
   if (!res.ok) {
@@ -183,7 +192,9 @@ export async function getDonationDetail(donationId: string): Promise<DonationApp
 }
 
 // Download donation receipt (returns URL to receipt)
-export async function downloadDonationReceipt(donationId: string): Promise<{ receiptUrl: string }> {
+export async function downloadDonationReceipt(
+  donationId: string,
+): Promise<{ receiptUrl: string }> {
   const res = await fetch(`/api/v1/donations/${donationId}/receipt`);
 
   if (!res.ok) {
@@ -196,12 +207,14 @@ export async function downloadDonationReceipt(donationId: string): Promise<{ rec
 // Get all donation projects for finance manager with pagination
 export async function getFinanceManagerProjects(
   page: number = 1,
-  limit: number = 20
+  limit: number = 20,
+  type?: 'brick' | 'sponsor' | 'partnerLed',
 ): Promise<DonationProjectsResponse> {
   const params = new URLSearchParams({
     page: page.toString(),
     limit: limit.toString(),
   });
+  if (type) params.set('type', type);
   const res = await fetch(`/api/donation-projects?${params.toString()}`);
   if (!res.ok) {
     throw new Error('Failed to fetch donation projects for finance manager.');
@@ -225,7 +238,7 @@ export async function getMyDonationProjectProposals(): Promise<
 
 // Submit a donation project proposal
 export async function proposeDonationProject(
-  payload: ProposeDonationProjectPayload
+  payload: ProposeDonationProjectPayload,
 ): Promise<DonationProjectDetail> {
   const res = await fetch('/api/v1/donation-projects', {
     method: 'POST',
@@ -257,7 +270,7 @@ export async function proposeDonationProject(
 
 export async function updateDonationProject(
   projectId: string,
-  payload: UpdateDonationProjectPayload
+  payload: UpdateDonationProjectPayload,
 ): Promise<DonationProjectDetail> {
   const res = await fetch(`/api/v1/donation-projects/me/${projectId}`, {
     method: 'PATCH',
@@ -275,7 +288,7 @@ export async function updateDonationProject(
 
 export async function updateDonationProjectById(
   projectId: string,
-  payload: UpdateDonationProjectPayload
+  payload: UpdateDonationProjectPayload,
 ): Promise<DonationProjectDetail> {
   const res = await fetch(`/api/v1/donation-projects/${projectId}`, {
     method: 'PATCH',
@@ -297,7 +310,7 @@ export async function createDonationProjectAdmin(
     brickSize?: number | null;
     deadline?: string | null;
     organisingTeam?: string | null;
-  }
+  },
 ): Promise<DonationProjectDetail> {
   const res = await fetch('/api/v1/donation-projects', {
     method: 'POST',
@@ -332,7 +345,7 @@ export async function createDonationProjectAdmin(
 // Update donation receipt status (finance manager only)
 export async function updateDonationReceiptStatus(
   donationId: string,
-  receiptStatus: 'pending' | 'received' | 'cancelled'
+  receiptStatus: 'pending' | 'received' | 'cancelled',
 ): Promise<void> {
   const res = await fetch(`/api/v1/donations/${donationId}/receiptStatus`, {
     method: 'PATCH',
@@ -342,13 +355,15 @@ export async function updateDonationReceiptStatus(
 
   if (!res.ok) {
     const error = await res.json().catch(() => ({}));
-    throw new Error(error.message || 'Failed to update donation receipt status.');
+    throw new Error(
+      error.message || 'Failed to update donation receipt status.',
+    );
   }
 }
 
 // Get donation project finance details (donations and donors)
 export async function getDonationProjectFinance(
-  projectId: string
+  projectId: string,
 ): Promise<DonationProjectWithFinance> {
   // Fetch all three endpoints in parallel
   const [projectRes, donationsRes, donorsRes] = await Promise.all([

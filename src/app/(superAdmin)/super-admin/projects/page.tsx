@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import PageHeader from '@/components/ui/PageHeader';
@@ -9,11 +9,13 @@ import VolunteerPagination from '@/components/volunteer/VolunteerPagination';
 import VolunteerProjectsTable from '@/components/general-manager/VolunteerProjectsTable';
 import ProjectsDataTable from '@/app/(financeManager)/finance-manager/donation-projects/_components/ProjectsDataTable';
 import Pagination from '@/components/ui/Pagination';
-import FilterButton from '@/components/ui/FilterButton';
 import { getAllVolunteerProjects } from '@/lib/api/volunteer';
 import { getFinanceManagerProjects } from '@/lib/api/donation';
 import { VolunteerProjectRow } from '@/types/Volunteer';
-import { DonationProject } from '@/types/DonationProjectData';
+import {
+  DonationProject,
+  DonationProjectType,
+} from '@/types/DonationProjectData';
 import { useManagerBasePath } from '@/lib/utils/managerBasePath';
 
 type TabKey = 'volunteer' | 'donation';
@@ -44,17 +46,34 @@ export default function SuperAdminProjectsPage() {
   const [totalPages, setTotalPages] = useState(1);
   const [volunteerError, setVolunteerError] = useState<string | null>(null);
 
-  const [donationProjects, setDonationProjects] = useState<DonationProject[]>([]);
+  const [donationProjects, setDonationProjects] = useState<DonationProject[]>(
+    [],
+  );
   const [donationLoading, setDonationLoading] = useState(true);
   const [donationError, setDonationError] = useState<string | null>(null);
   const [donationPage, setDonationPage] = useState(1);
   const [donationTotalPages, setDonationTotalPages] = useState(1);
+  const [donationTypeFilter, setDonationTypeFilter] = useState<
+    DonationProjectType | ''
+  >('');
   const donationLimit = 20;
 
-  useEffect(() => setPage(1), [debouncedSearch]);
+  // Track previous search to avoid firing two requests when search changes on a non-first page.
+  const prevDebouncedSearch = useRef(debouncedSearch);
 
   useEffect(() => {
     const controller = new AbortController();
+
+    // If search changed and page isn't 1 yet, reset to page 1 and bail.
+    // The resulting page-change re-render will fire this effect again with page=1.
+    const searchChanged = prevDebouncedSearch.current !== debouncedSearch;
+    if (searchChanged) {
+      prevDebouncedSearch.current = debouncedSearch;
+      if (page !== 1) {
+        setPage(1);
+        return () => controller.abort();
+      }
+    }
 
     async function loadVolunteerProjects() {
       setLoading(true);
@@ -64,7 +83,7 @@ export default function SuperAdminProjectsPage() {
           page,
           limit,
           debouncedSearch,
-          controller.signal
+          controller.signal,
         );
 
         setProjects(Array.isArray(data) ? data : []);
@@ -90,7 +109,8 @@ export default function SuperAdminProjectsPage() {
         setDonationError(null);
         const response = await getFinanceManagerProjects(
           donationPage,
-          donationLimit
+          donationLimit,
+          donationTypeFilter || undefined,
         );
         setDonationProjects(response.projects);
         setDonationTotalPages(response.pagination.totalPages);
@@ -104,18 +124,16 @@ export default function SuperAdminProjectsPage() {
     };
 
     loadDonationProjects();
-  }, [donationPage, donationLimit]);
+  }, [donationPage, donationLimit, donationTypeFilter]);
 
   const handleDonationEdit = (projectId: string) => {
     router.push(`${financeBasePath}/donation-projects/${projectId}`);
   };
 
   const handleDonationDelete = (projectId: string) => {
-    console.log(`Delete project ${projectId} - functionality to be implemented`);
-  };
-
-  const handleFilterClick = () => {
-    console.log('Filter button clicked - filters to be implemented');
+    console.log(
+      `Delete project ${projectId} - functionality to be implemented`,
+    );
   };
 
   return (
@@ -127,9 +145,9 @@ export default function SuperAdminProjectsPage() {
           <button
             type="button"
             onClick={() => setActiveTab('volunteer')}
-            className={`rounded-full px-4 py-2 text-sm font-semibold ${
+            className={`rounded-full px-4 py-2 text-sm font-semibold transition shadow-sm active:scale-[0.99] ${
               activeTab === 'volunteer'
-                ? 'bg-[#0E5A4A] text-white border-[#0E5A4A]'
+                ? 'bg-gradient-to-r from-[#1F7A67] to-[#2AAE92] text-white hover:from-[#1A6A59] hover:to-[#22997F]'
                 : 'border border-gray-300 bg-white text-gray-700 hover:bg-gray-50'
             }`}
           >
@@ -138,9 +156,9 @@ export default function SuperAdminProjectsPage() {
           <button
             type="button"
             onClick={() => setActiveTab('donation')}
-            className={`rounded-full px-4 py-2 text-sm font-semibold ${
+            className={`rounded-full px-4 py-2 text-sm font-semibold transition shadow-sm active:scale-[0.99] ${
               activeTab === 'donation'
-                ? 'bg-[#0E5A4A] text-white border-[#0E5A4A]'
+                ? 'bg-gradient-to-r from-[#1F7A67] to-[#2AAE92] text-white hover:from-[#1A6A59] hover:to-[#22997F]'
                 : 'border border-gray-300 bg-white text-gray-700 hover:bg-gray-50'
             }`}
           >
@@ -152,8 +170,12 @@ export default function SuperAdminProjectsPage() {
           <>
             <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
               <div>
-                <h2 className="text-2xl font-bold text-gray-900">All Projects</h2>
-                <p className="mt-1 text-gray-600">Manage all Volunteer Projects</p>
+                <h2 className="text-2xl font-bold text-gray-900">
+                  All Projects
+                </h2>
+                <p className="mt-1 text-gray-600">
+                  Manage all Volunteer Projects
+                </p>
               </div>
 
               <Link
@@ -187,20 +209,38 @@ export default function SuperAdminProjectsPage() {
           <>
             <div className="flex items-start justify-between gap-6">
               <div>
-                <h2 className="text-2xl font-bold text-gray-900">Donation Projects</h2>
-                <p className="mt-1 text-gray-600">Manage all Donation Projects</p>
+                <h2 className="text-2xl font-bold text-gray-900">
+                  Donation Projects
+                </h2>
+                <p className="mt-1 text-gray-600">
+                  Manage all Donation Projects
+                </p>
               </div>
-              <button
-                type="button"
-                onClick={() => router.push(`${financeBasePath}/donation-projects/new`)}
-                className="rounded-full bg-[#0E5A4A] px-6 py-2 text-sm font-semibold text-white hover:opacity-95"
+              <Link
+                href={`${financeBasePath}/donation-projects/create`}
+                className="inline-flex items-center justify-center rounded-xl px-6 py-2.5 text-sm font-bold text-white bg-gradient-to-r from-[#1F7A67] to-[#2AAE92] hover:from-[#1A6A59] hover:to-[#22997F] shadow-sm active:scale-[0.99] transition"
               >
-                Add project
-              </button>
+                Add Donation Project
+              </Link>
             </div>
 
-            <div className="mt-4 mb-4">
-              <FilterButton onClick={handleFilterClick} />
+            <div className="mt-4 mb-4 flex items-center gap-3">
+              <label className="text-sm font-medium text-gray-700">Type:</label>
+              <select
+                value={donationTypeFilter}
+                onChange={(e) => {
+                  setDonationTypeFilter(
+                    e.target.value as DonationProjectType | '',
+                  );
+                  setDonationPage(1);
+                }}
+                className="rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm text-gray-700 outline-none focus:border-[#0E5A4A] focus:ring-1 focus:ring-[#0E5A4A]"
+              >
+                <option value="">All types</option>
+                <option value="brick">Brick</option>
+                <option value="sponsor">Sponsor</option>
+                <option value="partnerLed">Partner Led</option>
+              </select>
             </div>
 
             {donationError ? (

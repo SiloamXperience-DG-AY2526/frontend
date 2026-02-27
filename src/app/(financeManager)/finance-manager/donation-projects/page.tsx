@@ -6,8 +6,10 @@ import PageHeader from '@/components/ui/PageHeader';
 import ProjectsDataTable from './_components/ProjectsDataTable';
 import Pagination from '@/components/ui/Pagination';
 import { getFinanceManagerProjects } from '@/lib/api/donation';
-import { DonationProject } from '@/types/DonationProjectData';
-import FilterButton from '@/components/ui/FilterButton';
+import {
+  DonationProject,
+  DonationProjectType,
+} from '@/types/DonationProjectData';
 import { useManagerBasePath } from '@/lib/utils/managerBasePath';
 
 export default function DonationProjectsPage() {
@@ -18,6 +20,7 @@ export default function DonationProjectsPage() {
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [typeFilter, setTypeFilter] = useState<DonationProjectType | ''>('');
   const ITEMS_PER_PAGE = 20;
 
   const fetchProjects = async () => {
@@ -26,7 +29,8 @@ export default function DonationProjectsPage() {
       setError(null);
       const response = await getFinanceManagerProjects(
         currentPage,
-        ITEMS_PER_PAGE
+        ITEMS_PER_PAGE,
+        typeFilter || undefined,
       );
       setProjects(response.projects);
       setTotalPages(response.pagination.totalPages);
@@ -41,12 +45,7 @@ export default function DonationProjectsPage() {
   useEffect(() => {
     fetchProjects();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentPage]);
-
-  const handleFilterClick = () => {
-    // Placeholder for filter functionality
-    console.log('Filter button clicked - filters to be implemented');
-  };
+  }, [currentPage, typeFilter]);
 
   const handleEditClick = (projectId: string) => {
     router.push(`${basePath}/donation-projects/${projectId}`);
@@ -55,7 +54,7 @@ export default function DonationProjectsPage() {
   const handleDeleteClick = (projectId: string) => {
     // Placeholder for delete functionality
     console.log(
-      `Delete project ${projectId} - functionality to be implemented`
+      `Delete project ${projectId} - functionality to be implemented`,
     );
   };
 
@@ -85,15 +84,28 @@ export default function DonationProjectsPage() {
           <PageHeader title="All Projects" />
           <button
             type="button"
-            onClick={() => router.push(`${basePath}/donation-projects/new`)}
+            onClick={() => router.push(`${basePath}/donation-projects/create`)}
             className="rounded-full bg-[#0E5A4A] px-6 py-2 text-sm font-semibold text-white hover:opacity-95"
           >
             Add project
           </button>
         </div>
 
-        <div className="mt-2 mb-4">
-          <FilterButton onClick={handleFilterClick} />
+        <div className="mt-2 mb-4 flex items-center gap-3">
+          <label className="text-sm font-medium text-gray-700">Type:</label>
+          <select
+            value={typeFilter}
+            onChange={(e) => {
+              setTypeFilter(e.target.value as DonationProjectType | '');
+              setCurrentPage(1);
+            }}
+            className="rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm text-gray-700 outline-none focus:border-[#0E5A4A] focus:ring-1 focus:ring-[#0E5A4A]"
+          >
+            <option value="">All types</option>
+            <option value="brick">Brick</option>
+            <option value="sponsor">Sponsor</option>
+            <option value="partnerLed">Partner Led</option>
+          </select>
         </div>
 
         <ProjectsDataTable

@@ -104,9 +104,9 @@ export default function DonationProjectDetail() {
                 key={tab.key}
                 onClick={() => setActiveTab(tab.key)}
                 className={[
-                  'px-8 py-3 rounded-full text-sm font-medium border-2 transition cursor-pointer',
+                  'px-8 py-3 rounded-full text-sm font-medium border-2 transition cursor-pointer shadow-sm active:scale-[0.99]',
                   isActive
-                    ? 'bg-[#B8E6E0] text-[#195D4B] border-[#195D4B]'
+                    ? 'bg-gradient-to-r from-[#1F7A67] to-[#2AAE92] text-white border-transparent hover:from-[#1A6A59] hover:to-[#22997F]'
                     : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50',
                 ].join(' ')}
               >
@@ -120,7 +120,10 @@ export default function DonationProjectDetail() {
       {/* Tab Content */}
       <div className="mt-6">
         {activeTab === 'donations' && (
-          <DonationsTab donations={projectData.donations} onRefresh={handleRefresh} />
+          <DonationsTab
+            donations={projectData.donations}
+            onRefresh={handleRefresh}
+          />
         )}
         {activeTab === 'donors' && (
           <YourDonorsTab donors={projectData.donors} />

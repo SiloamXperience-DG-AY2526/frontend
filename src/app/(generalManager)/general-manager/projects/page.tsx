@@ -95,7 +95,7 @@ export default function VolunteerProjectsPage() {
           </div>
 
           <Link
-            href={`${basePath}/projects/new`}
+            href={`${basePath}/projects/create`}
             className="inline-flex items-center justify-center
         rounded-xl px-6 py-2.5 text-sm font-bold text-white
         bg-gradient-to-r from-[#1F7A67] to-[#2AAE92]

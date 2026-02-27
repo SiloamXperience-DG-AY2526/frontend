@@ -12,10 +12,6 @@ export default function DonorsPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const filteredDonors = useSearchFilter(donors, searchQuery);
 
-  const handleFilterClick = () => {
-    console.log('Filter button clicked - filters to be implemented');
-  };
-
   const handleEditClick = (donorId: string) => {
     console.log(`Edit donor ${donorId} - functionality to be implemented`);
   };
@@ -45,7 +41,6 @@ export default function DonorsPage() {
         <SearchAndFilterBar
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
-          onFilterClick={handleFilterClick}
           searchPlaceholder="Partner Name"
         />
 
