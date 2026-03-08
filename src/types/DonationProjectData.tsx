@@ -39,7 +39,7 @@ const DonationProjectBaseSchema = z.object({
   initiatorName: z.string().nullable(),
   organisingTeam: z.string().nullable(),
   targetFund: z.string().nullable(),
-  brickSize: z.string().nullable(),
+  brickCost: z.string().nullable(),
   deadline: z.string().nullable(),
   type: DonationProjectTypeSchema,
   startDate: z.string(),

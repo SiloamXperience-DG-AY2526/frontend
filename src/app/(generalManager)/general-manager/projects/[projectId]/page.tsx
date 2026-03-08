@@ -5,12 +5,14 @@ import {
   getVolunteerProjectDetails,
   getVolunteerApplicationsForProject,
   updateVolunteerApplicationStatus,
+  duplicateVolunteerProject,
 } from '@/lib/api/volunteer';
 import { formatShortDate, formatTimeRange } from '@/lib/utils/date';
 import {
   CalendarIcon,
   ClockIcon,
   MapPinIcon,
+  DocumentDuplicateIcon,
 } from '@heroicons/react/24/outline';
 import type { VolunteerProjectDetail } from '@/types/Volunteer';
 import Image from 'next/image';
@@ -23,6 +25,7 @@ import InfoRow from '@/components/volunteer/project/InfoRow';
 import { useRouter } from 'next/navigation';
 import { useManagerBasePath } from '@/lib/utils/managerBasePath';
 import Toast from '@/components/ui/Toast';
+import ConfirmDialog from '@/components/ui/ConfirmDialog';
 
 export default function VolunteerProjectDetailPage({
   params,
@@ -56,6 +59,8 @@ export default function VolunteerProjectDetailPage({
   const [applicationsError, setApplicationsError] = useState<string | null>(null);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [toast, setToast] = useState<{ open: boolean; type: 'success' | 'error'; title: string; message?: string }>({ open: false, type: 'error', title: '' });
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [isDuplicating, setIsDuplicating] = useState(false);
 
   const router = useRouter();
   const basePath = useManagerBasePath('general');
@@ -153,6 +158,38 @@ export default function VolunteerProjectDetailPage({
     }
   };
 
+  const handleDuplicateClick = () => {
+    setShowConfirmDialog(true);
+  };
+
+  const handleConfirmDuplicate = async () => {
+    if (!projectId) return;
+
+    setIsDuplicating(true);
+    setShowConfirmDialog(false);
+
+    try {
+      const duplicatedProject = await duplicateVolunteerProject(projectId);
+      setToast({ open: true, type: 'success', title: 'Project duplicated successfully' });
+      // Redirect to the edit page of the duplicated project
+      setTimeout(() => {
+        router.push(`${basePath}/projects/${duplicatedProject.id}/edit`);
+      }, 1000);
+    } catch (err) {
+      setToast({
+        open: true,
+        type: 'error',
+        title: 'Failed to duplicate project',
+        message: err instanceof Error ? err.message : 'Please try again',
+      });
+      setIsDuplicating(false);
+    }
+  };
+
+  const handleCancelDuplicate = () => {
+    setShowConfirmDialog(false);
+  };
+
   if (loading) {
     return (
       <div className="flex min-h-screen bg-gray-50">
@@ -244,6 +281,32 @@ export default function VolunteerProjectDetailPage({
           "
                   >
                     Edit Project
+                  </button>
+                  <button
+                    onClick={handleDuplicateClick}
+                    disabled={isDuplicating}
+                    className="
+            w-full rounded-lg flex items-center justify-center gap-2
+            bg-blue-600 px-4 py-2.5
+            text-sm font-semibold text-white
+            hover:bg-blue-700 active:bg-blue-800
+            disabled:opacity-50 disabled:cursor-not-allowed
+          "
+                  >
+                    {isDuplicating ? (
+                      <>
+                        <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                        </svg>
+                        Duplicating...
+                      </>
+                    ) : (
+                      <>
+                        <DocumentDuplicateIcon className="h-4 w-4" />
+                        Duplicate Project
+                      </>
+                    )}
                   </button>
                   <Link
                     href={`${basePath}/projects/${data.id}/feedback`}
@@ -402,6 +465,15 @@ export default function VolunteerProjectDetailPage({
           )}
         </div>
       </main>
+      <ConfirmDialog
+        open={showConfirmDialog}
+        title="Duplicate this project?"
+        message="This will create a copy of the project in draft status. You can then edit the duplicated project."
+        confirmText="Duplicate"
+        cancelText="Cancel"
+        onConfirm={handleConfirmDuplicate}
+        onCancel={handleCancelDuplicate}
+      />
     </div>
   );
 }

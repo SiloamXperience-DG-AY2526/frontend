@@ -8,12 +8,16 @@ import DeleteButton from '@/components/ui/DeleteButton';
 import { formatDateDDMMYYYY } from '@/lib/formatDate';
 import Link from 'next/link';
 import { useManagerBasePath } from '@/lib/utils/managerBasePath';
+import { DocumentDuplicateIcon } from '@heroicons/react/24/outline';
 
 interface ProjectsDataTableProps {
   projects: DonationProject[];
   loading: boolean;
   onEditClick: (projectId: string) => void;
   onDeleteClick: (projectId: string) => void;
+  onDuplicateClick: (projectId: string) => void;
+  isDuplicating: boolean;
+  duplicatingProjectId: string | null;
 }
 
 export default function ProjectsDataTable({
@@ -21,6 +25,9 @@ export default function ProjectsDataTable({
   loading,
   onEditClick,
   onDeleteClick,
+  onDuplicateClick,
+  isDuplicating,
+  duplicatingProjectId,
 }: ProjectsDataTableProps) {
   const basePath = useManagerBasePath('finance');
 
@@ -161,6 +168,22 @@ export default function ProjectsDataTable({
             onClick={() => onEditClick(project.id)}
             ariaLabel={`Edit ${project.title}`}
           />
+          <button
+            onClick={() => onDuplicateClick(project.id)}
+            disabled={isDuplicating && duplicatingProjectId === project.id}
+            className="rounded-md p-2 text-blue-600 hover:bg-blue-50 disabled:opacity-50 disabled:cursor-not-allowed"
+            aria-label={`Duplicate ${project.title}`}
+            title="Duplicate project"
+          >
+            {isDuplicating && duplicatingProjectId === project.id ? (
+              <svg className="h-5 w-5 animate-spin" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+              </svg>
+            ) : (
+              <DocumentDuplicateIcon className="h-5 w-5" />
+            )}
+          </button>
           <DeleteButton
             onClick={() => onDeleteClick(project.id)}
             ariaLabel={`Delete ${project.title}`}

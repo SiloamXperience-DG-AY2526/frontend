@@ -5,10 +5,12 @@ import { useRouter } from 'next/navigation';
 import PageHeader from '@/components/ui/PageHeader';
 import ProjectsDataTable from './_components/ProjectsDataTable';
 import Pagination from '@/components/ui/Pagination';
-import { getFinanceManagerProjects } from '@/lib/api/donation';
+import { getFinanceManagerProjects, duplicateDonationProject } from '@/lib/api/donation';
 import { DonationProject } from '@/types/DonationProjectData';
 import FilterButton from '@/components/ui/FilterButton';
 import { useManagerBasePath } from '@/lib/utils/managerBasePath';
+import Toast from '@/components/ui/Toast';
+import ConfirmDialog from '@/components/ui/ConfirmDialog';
 
 export default function DonationProjectsPage() {
   const router = useRouter();
@@ -18,6 +20,10 @@ export default function DonationProjectsPage() {
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [toast, setToast] = useState<{ open: boolean; type: 'success' | 'error'; title: string; message?: string }>({ open: false, type: 'success', title: '' });
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [duplicatingProjectId, setDuplicatingProjectId] = useState<string | null>(null);
+  const [isDuplicating, setIsDuplicating] = useState(false);
   const ITEMS_PER_PAGE = 20;
 
   const fetchProjects = async () => {
@@ -57,6 +63,42 @@ export default function DonationProjectsPage() {
     console.log(
       `Delete project ${projectId} - functionality to be implemented`
     );
+  };
+
+  const handleDuplicateClick = (projectId: string) => {
+    setDuplicatingProjectId(projectId);
+    setShowConfirmDialog(true);
+  };
+
+  const handleConfirmDuplicate = async () => {
+    if (!duplicatingProjectId) return;
+
+    setIsDuplicating(true);
+    setShowConfirmDialog(false);
+
+    try {
+      const duplicatedProject = await duplicateDonationProject(duplicatingProjectId);
+      setToast({ open: true, type: 'success', title: 'Project duplicated successfully' });
+      // Redirect to the edit page of the duplicated project
+      setTimeout(() => {
+        router.push(`${basePath}/donation-projects/${duplicatedProject.id}`);
+      }, 1000);
+    } catch (err) {
+      setToast({
+        open: true,
+        type: 'error',
+        title: 'Failed to duplicate project',
+        message: err instanceof Error ? err.message : 'Please try again',
+      });
+    } finally {
+      setIsDuplicating(false);
+      setDuplicatingProjectId(null);
+    }
+  };
+
+  const handleCancelDuplicate = () => {
+    setShowConfirmDialog(false);
+    setDuplicatingProjectId(null);
   };
 
   const handlePageChange = (page: number) => {
@@ -101,6 +143,9 @@ export default function DonationProjectsPage() {
           loading={loading}
           onEditClick={handleEditClick}
           onDeleteClick={handleDeleteClick}
+          onDuplicateClick={handleDuplicateClick}
+          isDuplicating={isDuplicating}
+          duplicatingProjectId={duplicatingProjectId}
         />
 
         {!loading && projects.length > 0 && (
@@ -110,6 +155,24 @@ export default function DonationProjectsPage() {
             onPageChange={handlePageChange}
           />
         )}
+
+        <Toast
+          open={toast.open}
+          type={toast.type}
+          title={toast.title}
+          message={toast.message}
+          onClose={() => setToast((t) => ({ ...t, open: false }))}
+        />
+
+        <ConfirmDialog
+          open={showConfirmDialog}
+          title="Duplicate this project?"
+          message="This will create a copy of the project in draft status. You can then edit the duplicated project."
+          confirmText="Duplicate"
+          cancelText="Cancel"
+          onConfirm={handleConfirmDuplicate}
+          onCancel={handleCancelDuplicate}
+        />
       </main>
     </div>
   );
