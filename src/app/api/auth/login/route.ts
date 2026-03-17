@@ -16,15 +16,16 @@ export async function POST(req: Request) {
 
   if (!res.ok) return NextResponse.json({ status: 401 });
 
-  const response = NextResponse.json({ status: 200 });
+  const response = NextResponse.json(data);
 
-  // set auth token cookie
-  response.cookies.set('access_token', data.token, {
-    httpOnly: true,
-    sameSite: 'lax',
-    secure: process.env.NODE_ENV === 'production',
-    path: '/',
-  });
-
+  // Only set cookie if user is fully logged in (no mustChangePassword)
+  if (!data.mustChangePassword && data.token) {
+    response.cookies.set('access_token', data.token, {
+      httpOnly: true,
+      sameSite: 'lax',
+      secure: process.env.NODE_ENV === 'production',
+      path: '/',
+    });
+  }
   return response;
 }
