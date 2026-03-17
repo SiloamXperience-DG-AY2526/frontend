@@ -27,7 +27,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return result;
     }
 
-    setUser(result as AuthUser)
+    setUser(result as AuthUser);
 
     return result;
   }, []);
