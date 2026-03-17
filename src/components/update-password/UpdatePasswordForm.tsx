@@ -41,7 +41,7 @@ export default function UpdatePasswordForm() {
     e.preventDefault();
 
     if (!token || !userId) {
-        setError("Invalid or missing token/user ID");
+        setError('Invalid or missing token/user ID');
         return;
     }
 
@@ -54,10 +54,10 @@ export default function UpdatePasswordForm() {
       setLoading(true);
       setError(undefined);
 
-      const res = await fetch("/api/auth/update-password-first-login", {
-        method: "POST",
+      const res = await fetch('/api/auth/update-password-first-login', {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json"
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({
           userId,
@@ -72,11 +72,11 @@ export default function UpdatePasswordForm() {
         return;
       }
 
-      setSuccess(true)
+      setSuccess(true);
 
       setTimeout(() => {
-        router.push("/login")
-      }, 2000)
+        router.push('/login');
+      }, 2000);
 
     } catch {
       setError('Something went wrong');

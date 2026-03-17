@@ -31,7 +31,7 @@ export default function LoginPage() {
       const result = await authLogin(loginData);
 
       function isFirstLogin(result: LoginResponse): result is { mustChangePassword: true; token: string } {
-        return (result as any).mustChangePassword === true;
+        return 'mustChangePassword' in result && result.mustChangePassword === true;
       }
 
       if (isFirstLogin(result)) {
