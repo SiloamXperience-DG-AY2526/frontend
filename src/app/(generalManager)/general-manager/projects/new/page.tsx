@@ -202,6 +202,7 @@ export default function VolunteerProjectProposalPage() {
     positions: positions.map((p) => ({
       role: p.role.trim(),
       description: p.description.trim(),
+      totalSlots: 1,
       skills: p.skills.map((s) => s.trim()).filter(Boolean),
     })),
 
