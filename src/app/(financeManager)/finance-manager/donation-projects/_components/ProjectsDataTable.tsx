@@ -133,8 +133,8 @@ export default function ProjectsDataTable({
       accessor: (project) => (
         <StatusBadge
           label={
-            project.approvalStatus.charAt(0).toUpperCase() +
-            project.approvalStatus.slice(1)
+            (project.approvalStatus ?? '').charAt(0).toUpperCase() +
+            (project.approvalStatus ?? '').slice(1)
           }
           variant={getApprovalStatusVariant(project.approvalStatus)}
         />
@@ -145,8 +145,8 @@ export default function ProjectsDataTable({
       accessor: (project) => (
         <StatusBadge
           label={
-            project.operationStatus.charAt(0).toUpperCase() +
-            project.operationStatus.slice(1)
+            (project.operationStatus ?? '').charAt(0).toUpperCase() +
+            (project.operationStatus ?? '').slice(1)
           }
           variant={getOperationStatusVariant(project.operationStatus)}
         />

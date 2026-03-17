@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { getDonationHomepage, getDonationProjects } from '@/lib/api/donation';
-import { DonationProject } from '@/types/DonationProject';
+import { DonationProject } from '@/types/DonationProjectData';
 import { useAuth } from '@/contexts/AuthContext';
 import StatCard from '@/components/volunteer/StatCard';
 import HumanStatIcon from '@/components/icons/HumanIcon';

@@ -108,7 +108,7 @@ export default function CreateDonationProjectPage() {
     organisingTeam: organisingTeam.trim() || null,
     location: location.trim(),
     type,
-    targetFund: targetFund.trim() ? Number(targetFund) : null,
+    targetFund: targetFund.trim() ? Number(targetFund) : 0,
     brickSize:
       type === 'brick' && brickSize.trim() ? Number(brickSize) : null,
     startDate: new Date(startDate).toISOString(),
