@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Image from 'next/image';
 import { getDonationProjectById } from '@/lib/api/donation';
-import { DonationProject } from '@/types/DonationProject';
+import { DonationProject } from '@/types/DonationProjectData';
 import { useAuth } from '@/contexts/AuthContext';
 import Section from '@/components/volunteer/project/Section';
 import ObjectiveList from '@/components/volunteer/project/ObjectiveList';

@@ -18,6 +18,7 @@ import {
 import {
   getDonationProjectById,
   updateDonationProjectById,
+  UpdateDonationProjectPayload,
 } from '@/lib/api/donation';
 import { useManagerBasePath } from '@/lib/utils/managerBasePath';
 import { usePartners } from '@/hooks/usePartners';
@@ -200,8 +201,8 @@ export default function EditDonationProjectPage() {
     return nextErrors;
   };
 
-  const buildPayload = (status?: DonationProjectSubmissionStatus) => {
-    const base = {
+  const buildPayload = (status?: DonationProjectSubmissionStatus): UpdateDonationProjectPayload => {
+    const base: UpdateDonationProjectPayload = {
       title: title.trim(),
       initiatorName: initiatorName.trim() || null,
       organisingTeam: organisingTeam.trim() || null,
