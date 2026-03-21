@@ -57,13 +57,12 @@ export default function DonationProjectsPage() {
   }>({ open: false, type: 'success', title: '' });
 
   useEffect(() => {
-    const controller = new AbortController();
     const searchChanged = prevDebouncedSearch.current !== debouncedSearch;
     if (searchChanged) {
       prevDebouncedSearch.current = debouncedSearch;
       if (currentPage !== 1) {
         setCurrentPage(1);
-        return () => controller.abort();
+        return;
       }
     }
     async function fetchProjects() {
@@ -79,7 +78,6 @@ export default function DonationProjectsPage() {
         setProjects(response.projects);
         setTotalPages(response.pagination.totalPages);
       } catch (err) {
-        if ((err as DOMException).name === 'AbortError') return;
         setError(
           err instanceof Error ? err.message : 'Failed to load projects',
         );
@@ -88,7 +86,6 @@ export default function DonationProjectsPage() {
       }
     }
     fetchProjects();
-    return () => controller.abort();
   }, [currentPage, typeFilter, debouncedSearch, refreshKey]);
 
   const handleEditClick = (projectId: string) => {
