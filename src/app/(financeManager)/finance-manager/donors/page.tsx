@@ -56,7 +56,7 @@ export default function DonorsPage() {
         <SearchAndFilterBar
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
-          searchPlaceholder="Partner Name"
+          searchPlaceholder="Donor Name"
         />
 
         <DonorsDataTable

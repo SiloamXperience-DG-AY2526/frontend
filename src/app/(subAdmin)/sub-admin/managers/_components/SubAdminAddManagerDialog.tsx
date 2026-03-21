@@ -119,13 +119,13 @@ export default function SubAdminAddManagerDialog({
               value={prefix}
               onChange={(v) => setPrefix(v as Prefix)}
               options={[
-                { value: 'Mr', label: 'Mr.' },
-                { value: 'Ms', label: 'Ms.' },
-                { value: 'Mrs', label: 'Mrs.' },
-                { value: 'Mx', label: 'Mx.' },
-                { value: 'Dr', label: 'Dr.' },
-                { value: 'Rev', label: 'Rev.' },
-                { value: '', label: 'Prefer not to say' },
+                { value: 'Mr.', label: 'Mr.' },
+                { value: 'Ms.', label: 'Ms.' },
+                { value: 'Mrs.', label: 'Mrs.' },
+                { value: 'Mx.', label: 'Mx.' },
+                { value: 'Dr.', label: 'Dr.' },
+                { value: 'Rev.', label: 'Rev.' },
+                { value: 'Prefer not to say', label: 'Prefer not to say' },
               ]}
             />
             <Input
