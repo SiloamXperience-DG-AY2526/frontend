@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import {
   FunnelIcon,
@@ -23,6 +23,8 @@ import {
   DonationProjectType,
 } from '@/types/DonationProjectData';
 import { useManagerBasePath } from '@/lib/utils/managerBasePath';
+import { useAuth } from '@/contexts/AuthContext';
+import { UserRole } from '@/types/AuthData';
 
 type TabKey = 'volunteer' | 'donation';
 
@@ -37,6 +39,8 @@ function useDebouncedValue<T>(value: T, delayMs = 450) {
 
 export default function SuperAdminProjectsPage() {
   const router = useRouter();
+  const pathname = usePathname() ?? '';
+  const { user } = useAuth();
   const basePath = useManagerBasePath('general');
   const financeBasePath = useManagerBasePath('finance');
 
@@ -67,6 +71,25 @@ export default function SuperAdminProjectsPage() {
   const debouncedDonationSearch = useDebouncedValue(donationSearch, 450);
   const prevDebouncedDonationSearch = useRef(debouncedDonationSearch);
   const donationLimit = 20;
+
+  useEffect(() => {
+    if (!user?.role) return;
+
+    if (
+      user.role === UserRole.SUPER_ADMIN &&
+      pathname.startsWith('/sub-admin')
+    ) {
+      router.replace(pathname.replace('/sub-admin', '/super-admin'));
+      return;
+    }
+
+    if (
+      user.role === UserRole.SUB_ADMIN &&
+      pathname.startsWith('/super-admin')
+    ) {
+      router.replace(pathname.replace('/super-admin', '/sub-admin'));
+    }
+  }, [pathname, router, user?.role]);
 
   // Track previous search to avoid firing two requests when search changes on a non-first page.
   const prevDebouncedSearch = useRef(debouncedSearch);
@@ -132,6 +155,7 @@ export default function SuperAdminProjectsPage() {
           donationLimit,
           donationTypeFilter || undefined,
           debouncedDonationSearch || undefined,
+          controller.signal,
         );
         setDonationProjects(response.projects);
         setDonationTotalPages(response.pagination.totalPages);
@@ -154,7 +178,7 @@ export default function SuperAdminProjectsPage() {
   ]);
 
   const handleDonationEdit = (projectId: string) => {
-    router.push(`${financeBasePath}/donation-projects/${projectId}`);
+    router.push(`${financeBasePath}/donation-projects/${projectId}/edit`);
   };
 
   const handleDonationDelete = (projectId: string) => {
@@ -206,7 +230,7 @@ export default function SuperAdminProjectsPage() {
               </div>
 
               <Link
-                href={`${basePath}/projects/new`}
+                href={`${basePath}/projects/create`}
                 className="inline-flex items-center justify-center rounded-xl px-6 py-2.5 text-sm font-bold text-white bg-gradient-to-r from-[#1F7A67] to-[#2AAE92] hover:from-[#1A6A59] hover:to-[#22997F] shadow-sm active:scale-[0.99] transition"
               >
                 Add Volunteer Project

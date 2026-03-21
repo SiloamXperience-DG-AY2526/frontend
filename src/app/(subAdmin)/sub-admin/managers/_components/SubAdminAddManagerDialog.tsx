@@ -4,14 +4,21 @@ import Input from '@/components/ui/Input';
 import RadioGroup from '@/components/ui/RadioGroup';
 import { useState } from 'react';
 
-type Prefix =
-  | 'Mr.'
-  | 'Ms.'
-  | 'Mrs.'
-  | 'Mx.'
-  | 'Dr.'
-  | 'Rev.'
-  | 'Prefer not to say';
+type Prefix = '' | 'Mr.' | 'Ms.' | 'Mrs.' | 'Mx.' | 'Dr.' | 'Rev.';
+
+const PREFIX_OPTIONS: { value: Prefix; label: string }[] = [
+  { value: 'Mr.', label: 'Mr.' },
+  { value: 'Ms.', label: 'Ms.' },
+  { value: 'Mrs.', label: 'Mrs.' },
+  { value: 'Mx.', label: 'Mx.' },
+  { value: 'Dr.', label: 'Dr.' },
+  { value: 'Rev.', label: 'Rev.' },
+  { value: '', label: 'Prefer not to say' },
+];
+
+function isPrefix(value: string): value is Prefix {
+  return PREFIX_OPTIONS.some((option) => option.value === value);
+}
 
 export default function SubAdminAddManagerDialog({
   open,
@@ -24,7 +31,7 @@ export default function SubAdminAddManagerDialog({
 }) {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
-  const [prefix, setPrefix] = useState('');
+  const [prefix, setPrefix] = useState<Prefix>('');
   const [password, setPassword] = useState('');
   const [email, setEmail] = useState('');
   const [role, setRole] = useState('');
@@ -117,16 +124,10 @@ export default function SubAdminAddManagerDialog({
             <RadioGroup
               label="Prefix *"
               value={prefix}
-              onChange={(v) => setPrefix(v as Prefix)}
-              options={[
-                { value: 'Mr.', label: 'Mr.' },
-                { value: 'Ms.', label: 'Ms.' },
-                { value: 'Mrs.', label: 'Mrs.' },
-                { value: 'Mx.', label: 'Mx.' },
-                { value: 'Dr.', label: 'Dr.' },
-                { value: 'Rev.', label: 'Rev.' },
-                { value: 'Prefer not to say', label: 'Prefer not to say' },
-              ]}
+              onChange={(v) => {
+                if (isPrefix(v)) setPrefix(v);
+              }}
+              options={PREFIX_OPTIONS}
             />
             <Input
               label="Email *"

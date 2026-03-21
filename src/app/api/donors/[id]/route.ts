@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { BackendDonorDetailResponseSchema } from '@/types/DonorData';
 
 const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:3000/api/v1';
+const DonorPatchPayloadSchema = z.object({ isActive: z.boolean() }).strict();
 
 export async function GET(
   req: Request,
@@ -125,12 +126,24 @@ export async function PATCH(
 ) {
   try {
     const { id } = await params;
-    const body = await request.json();
     const cookieStore = await cookies();
     const token = cookieStore.get('access_token')?.value;
 
     if (!token) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const rawBody = await request.json();
+    const parsedBody = DonorPatchPayloadSchema.safeParse(rawBody);
+
+    if (!parsedBody.success) {
+      return NextResponse.json(
+        {
+          error: 'Invalid request payload',
+          details: parsedBody.error.issues,
+        },
+        { status: 400 },
+      );
     }
 
     const res = await fetch(`${BACKEND_URL}/donors/${id}`, {
@@ -139,7 +152,7 @@ export async function PATCH(
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify(body),
+      body: JSON.stringify(parsedBody.data),
     });
 
     if (!res.ok) {

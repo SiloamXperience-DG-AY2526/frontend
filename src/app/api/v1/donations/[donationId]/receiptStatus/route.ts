@@ -39,8 +39,24 @@ export async function PATCH(
       );
     }
 
+    if (!res.headers.get('content-type')?.includes('application/json')) {
+      return NextResponse.json(
+        { error: 'Expected JSON response from server' },
+        { status: 502 },
+      );
+    }
+
     const responseBody = await res.text();
-    const data = responseBody ? JSON.parse(responseBody) : {};
+    let data;
+    try {
+      data = responseBody ? JSON.parse(responseBody) : {};
+    } catch (parseError) {
+      console.error('Failed to parse response as JSON:', parseError);
+      return NextResponse.json(
+        { error: 'Invalid JSON response from server' },
+        { status: 502 },
+      );
+    }
     return NextResponse.json(data);
   } catch (error) {
     console.error('Error updating donation receipt status:', error);
