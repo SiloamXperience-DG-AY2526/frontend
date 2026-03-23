@@ -14,7 +14,7 @@ export async function POST(req: Request) {
 
   const data = await res.json();
 
-  if (!res.ok) return NextResponse.json({ status: 401 });
+  if (!res.ok) return NextResponse.json({ status: 401 }, { status: 401 });
 
   const response = NextResponse.json(data);
 

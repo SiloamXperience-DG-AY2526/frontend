@@ -13,15 +13,19 @@ export async function login(loginData: LoginInputData): Promise<LoginResponse> {
     body: JSON.stringify(loginData),
   });
 
-  const data = await res.json();
-
   if (!res.ok) {
     throw new Error('Invalid email or password.');
   }
 
+  const data = await res.json();
+
   // Staff first log in flow
-  if (data.mustChangePassword) {
-    return data;
+  if (data && typeof data === 'object' && (data as any).mustChangePassword === true) {
+    const token = (data as any).token;
+    if (typeof token === 'string' && token.length > 0) {
+      return { mustChangePassword: true, token };
+    }
+    throw new Error('Invalid first-login response from server.');
   }
 
   // Normal login

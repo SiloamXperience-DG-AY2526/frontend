@@ -36,7 +36,7 @@ export default function LoginPage() {
 
       if (isFirstLogin(result)) {
         // First-login user → redirect to update-password page
-        router.replace(`/update-password?token=${result.token}`);
+        router.replace(`/update-password?token=${encodeURIComponent(result.token)}`);
         return;
       }
       

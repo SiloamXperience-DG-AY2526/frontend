@@ -18,6 +18,7 @@ export async function POST(req: Request) {
         },
         body: JSON.stringify({
           userId: body.userId,
+          token: body.token,
           newPassword: body.newPassword
         }),
       }
@@ -36,7 +37,7 @@ export async function POST(req: Request) {
 
   } catch (error) {
 
-    console.error('Reset password error:', error);
+    console.error('Update password first login error:', error);
 
     return NextResponse.json(
       { error: 'Internal server error' },

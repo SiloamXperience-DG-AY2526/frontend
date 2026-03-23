@@ -61,6 +61,7 @@ export default function UpdatePasswordForm() {
         },
         body: JSON.stringify({
           userId,
+          token,
           newPassword
         })
       });

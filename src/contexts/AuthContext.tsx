@@ -15,6 +15,10 @@ export function useAuth() {
   return authCtx;
 };
 
+ function isAuthUser(response: LoginResponse): response is AuthUser {
+   return !('mustChangePassword' in response && response.mustChangePassword);
+ }
+
 // auth provider
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
@@ -27,7 +31,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return result;
     }
 
-    setUser(result as AuthUser);
+    if (isAuthUser(result)) {
+      setUser(result);
+    }
 
     return result;
   }, []);
