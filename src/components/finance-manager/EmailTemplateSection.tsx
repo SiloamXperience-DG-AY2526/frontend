@@ -1,16 +1,17 @@
-'use client';
+"use client";
 
-import { RefObject } from 'react';
-import { classNames } from '@/lib/utils/finance-manager-email/classNames';
+import { RefObject } from "react";
+import { classNames } from "@/lib/utils/finance-manager-email/classNames";
 
-import { safeTextToHtml } from '@/lib/utils/finance-manager-email/text-html';
-import { TemplateForm } from '@/types/EmailCampaign';
+import { safeTextToHtml } from "@/lib/utils/finance-manager-email/text-html";
+import { TemplateForm } from "@/types/EmailCampaign";
 
-type TemplateType = 'thankyou' | 'receipt';
+type TemplateType = "thankyou" | "receipt";
 
-type Variable = { label: string; value: string; showIn: TemplateType | 'both' };
+type Variable = { label: string; value: string; showIn: TemplateType | "both" };
 
 type Props = {
+  showTemplateWarning: boolean;
   staffEmail: string;
 
   templateType: TemplateType;
@@ -26,10 +27,10 @@ type Props = {
   onReset: () => void;
 
   variables: Variable[];
-
 };
 
 export default function TemplatesSection({
+  showTemplateWarning ,
   staffEmail,
   templateType,
   setTemplateType,
@@ -40,82 +41,89 @@ export default function TemplatesSection({
   onSave,
   onReset,
   variables,
-
 }: Props) {
   return (
     <section className="rounded-xl border border-[#195D4B] bg-white overflow-hidden">
       <div className="px-5 pt-5 pb-3">
         <h2 className="text-lg font-semibold text-gray-900">Templates</h2>
-       
+        {showTemplateWarning && (
+          <div className="mt-4 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800">
+            Please ensure you configure and <strong className="underline">SAVE BOTH</strong> <strong>Thank You</strong>{" "}
+            and <strong>Receipt</strong> templates before sending emails.
+          </div>
+        )}
       </div>
 
       <div className="px-5 pb-6">
         <div className="mb-4 flex items-center gap-2">
-          <button type="button"
+          <button
+            type="button"
             className={classNames(
-              'rounded-md px-3 py-2 text-sm font-semibold border transition',
-              templateType === 'thankyou'
-                ? 'bg-[#206378] border-[#206378] text-white'
-                : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50',
+              "rounded-md px-3 py-2 text-sm font-semibold border transition",
+              templateType === "thankyou"
+                ? "bg-[#206378] border-[#206378] text-white"
+                : "bg-white border-gray-200 text-gray-700 hover:bg-gray-50",
             )}
-            onClick={() => setTemplateType('thankyou')}
+            onClick={() => setTemplateType("thankyou")}
           >
             Thank you
           </button>
-          <button type="button" 
+          <button
+            type="button"
             className={classNames(
-              'rounded-md px-3 py-2 text-sm font-semibold border transition',
-              templateType === 'receipt'
-                ? 'bg-[#206378] border-[#206378] text-white'
-                : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50',
+              "rounded-md px-3 py-2 text-sm font-semibold border transition",
+              templateType === "receipt"
+                ? "bg-[#206378] border-[#206378] text-white"
+                : "bg-white border-gray-200 text-gray-700 hover:bg-gray-50",
             )}
-            onClick={() => setTemplateType('receipt')}
+            onClick={() => setTemplateType("receipt")}
           >
             Receipt
           </button>
         </div>
 
-      <div className="mb-3 flex flex-wrap gap-2">
-  {variables
-    .filter((v) => v.showIn === 'both' || v.showIn === templateType)
-    .map((v) => (
-      <button
-        key={v.value}
-        type="button"
-        className="rounded-full border border-gray-200 bg-gray-50 px-3 py-1 text-xs text-gray-700 hover:bg-gray-100"
-        onClick={() => {
-          const el = templateMessageRef.current;
-          if (!el) return;
+        <div className="mb-3 flex flex-wrap gap-2">
+          {variables
+            .filter((v) => v.showIn === "both" || v.showIn === templateType)
+            .map((v) => (
+              <button
+                key={v.value}
+                type="button"
+                className="rounded-full border border-gray-200 bg-gray-50 px-3 py-1 text-xs text-gray-700 hover:bg-gray-100"
+                onClick={() => {
+                  const el = templateMessageRef.current;
+                  if (!el) return;
 
-          const start = el.selectionStart ?? templateForm.message.length;
-          const end = el.selectionEnd ?? templateForm.message.length;
+                  const start =
+                    el.selectionStart ?? templateForm.message.length;
+                  const end = el.selectionEnd ?? templateForm.message.length;
 
-          const next =
-            templateForm.message.slice(0, start) +
-            v.value +
-            templateForm.message.slice(end);
+                  const next =
+                    templateForm.message.slice(0, start) +
+                    v.value +
+                    templateForm.message.slice(end);
 
-          const cursor = start + v.value.length;
+                  const cursor = start + v.value.length;
 
-          setTemplateForm((p) => ({ ...p, message: next }));
+                  setTemplateForm((p) => ({ ...p, message: next }));
 
-          requestAnimationFrame(() => {
-            el.focus();
-            el.setSelectionRange(cursor, cursor);
-          });
-        }}
-      >
-        Insert {v.label}
-      </button>
-    ))}
-</div>
+                  requestAnimationFrame(() => {
+                    el.focus();
+                    el.setSelectionRange(cursor, cursor);
+                  });
+                }}
+              >
+                Insert {v.label}
+              </button>
+            ))}
+        </div>
         <div className="grid gap-4 lg:grid-cols-2">
           <div className="rounded-lg border border-gray-200 bg-gray-50 p-4">
             <label className="block text-xs uppercase tracking-[0.16em] text-gray-500">
               Staff email
             </label>
             <input
-              value={staffEmail || 'Loading...'}
+              value={staffEmail || "Loading..."}
               readOnly
               disabled={!staffEmail}
               className="mt-2 w-full rounded-md border border-gray-200 bg-gray-100 px-3 py-2 text-sm text-gray-700 cursor-not-allowed"
@@ -161,10 +169,10 @@ export default function TemplatesSection({
                 disabled={busy}
                 onClick={onSave}
                 className={classNames(
-                  'rounded-md px-4 py-2 text-sm font-semibold transition',
+                  "rounded-md px-4 py-2 text-sm font-semibold transition",
                   busy
-                    ? 'bg-gray-200 text-gray-500'
-                    : 'bg-[#206378] text-white hover:opacity-95',
+                    ? "bg-gray-200 text-gray-500"
+                    : "bg-[#206378] text-white hover:opacity-95",
                 )}
               >
                 Save template
