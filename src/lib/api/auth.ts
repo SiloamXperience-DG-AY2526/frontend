@@ -20,8 +20,13 @@ export async function login(loginData: LoginInputData): Promise<LoginResponse> {
   const data = await res.json();
 
   // Staff first log in flow
-  if (data && typeof data === 'object' && (data as any).mustChangePassword === true) {
-    const token = (data as any).token;
+  if (
+    data &&
+    typeof data === 'object' &&
+    'mustChangePassword' in data &&
+    data.mustChangePassword === true
+  ) {
+    const token = data.token;
     if (typeof token === 'string' && token.length > 0) {
       return { mustChangePassword: true, token };
     }
