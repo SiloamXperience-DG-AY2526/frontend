@@ -8,11 +8,11 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 
 // auth hook to use in pages
 export function useAuth() {
-  const authCtx = useContext(AuthContext);
+    const authCtx = useContext(AuthContext);
 
-  if (!authCtx) throw new Error('useAuth must be used within <AuthProvider />');
+    if (!authCtx) throw new Error('useAuth must be used within <AuthProvider />');
 
-  return authCtx;
+    return authCtx;
 };
 
  function isAuthUser(response: LoginResponse): response is AuthUser {
@@ -21,8 +21,8 @@ export function useAuth() {
 
 // auth provider
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<AuthUser | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+    const [user, setUser] = useState<AuthUser | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
 
   const authLogin = useCallback(async (payload: AuthPayload): Promise<LoginResponse> => { 
     const result = await login(payload);
@@ -38,46 +38,49 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return result;
   }, []);
 
-  const authLogout = useCallback( async () => {
-    await logout();
-    setUser(null);
-  }, []);
+    const authLogout = useCallback(async () => {
+        await logout();
+        setUser(null);
+    }, []);
 
-  const authRefresh = useCallback(async () => {
+    const authRefresh = useCallback(async () => {
 
-    setIsLoading(true);
+        setIsLoading(true);
 
-    const authUser = await getAuthUser();
-    setUser(authUser);
-
-    setIsLoading(false);
-  }, []);
-
-  // Check authentication status on mount
-  useEffect(() => {
-    const initAuth = async () => {
-      setIsLoading(true);
-      try {
         const authUser = await getAuthUser();
         setUser(authUser);
-      } catch {
-        // Silently fail if not authenticated
-        setUser(null);
-      } finally {
+
         setIsLoading(false);
-      }
-    };
-    
-    initAuth();
-  }, []);
+    }, []);
 
-  const value = useMemo(
-    () => ({ user, isLoading, authLogin, authLogout, authRefresh }),
-    [user, isLoading, authLogin, authLogout, authRefresh]
-  );
+    // Check authentication status on mount
+    useEffect(() => {
+        const initAuth = async () => {
+            // TEMPORARY: Inject provided bearer token
+            document.cookie = `access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIxZDk1ZjcwNy1jOTU0LTQ3MjItOTM5Mi1jNjMxNTBlNzc1ZjQiLCJyb2xlIjoicGFydG5lciIsImhhc09uYm9hcmRlZCI6ZmFsc2UsImlhdCI6MTc3MDEyNjEyMiwiZXhwIjoxNzcwMjEyNTIyfQ.nIlTvC-Qqr730kysgZ4hWWdaX7A9wmFcd5foMlWXC50; path=/`;
 
-  return <AuthContext.Provider value={value}>{ children }</AuthContext.Provider>;
-} 
+            setIsLoading(true);
+            try {
+                const authUser = await getAuthUser();
+                setUser(authUser);
+            } catch {
+                // Silently fail if not authenticated
+                setUser(null);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        initAuth();
+    }, []);
+
+    const value = useMemo(
+        () => ({ user, isLoading, authLogin, authLogout, authRefresh }),
+        [user, isLoading, authLogin, authLogout, authRefresh]
+    );
+
+    return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+}
 
 
 
