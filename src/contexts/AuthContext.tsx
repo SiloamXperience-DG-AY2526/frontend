@@ -1,7 +1,7 @@
 'use client';
 
 import { getAuthUser, login, logout } from '@/lib/api/auth';
-import { AuthUser, AuthPayload, AuthContextValue } from '@/types/AuthData';
+import { AuthUser, AuthPayload, AuthContextValue, LoginResponse } from '@/types/AuthData';
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -15,17 +15,27 @@ export function useAuth() {
   return authCtx;
 };
 
+ function isAuthUser(response: LoginResponse): response is AuthUser {
+   return !('mustChangePassword' in response && response.mustChangePassword);
+ }
+
 // auth provider
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  const authLogin = useCallback(async (payload: AuthPayload): Promise<AuthUser> => { 
-    const authUser = await login(payload);
+  const authLogin = useCallback(async (payload: AuthPayload): Promise<LoginResponse> => { 
+    const result = await login(payload);
 
-    setUser(authUser);
+    if ('mustChangePassword' in result && result.mustChangePassword) {
+      return result;
+    }
 
-    return authUser;
+    if (isAuthUser(result)) {
+      setUser(result);
+    }
+
+    return result;
   }, []);
 
   const authLogout = useCallback( async () => {
