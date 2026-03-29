@@ -18,7 +18,7 @@ export type AuthUser = {
 export type AuthContextValue = {
   user: AuthUser | null,
   isLoading: boolean,
-  authLogin: ( payload: AuthPayload ) => Promise<AuthUser>,
+  authLogin: (payload: AuthPayload) => Promise<LoginResponse>;
   authLogout: () => Promise<void>,
   authRefresh: () => Promise<void>
 };
@@ -45,5 +45,12 @@ export type LoginInputData = {
   email: string;
   password: string;
 };
+
+export type LoginResponse =
+  | AuthUser
+  | {
+      mustChangePassword: true
+      token: string
+    };
 
 // other auth types here
