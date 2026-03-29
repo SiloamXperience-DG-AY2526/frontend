@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import UpdatePasswordForm from '@/components/update-password/UpdatePasswordForm';
 import Image from 'next/image';
 
@@ -8,7 +9,9 @@ export default function UpdatePasswordPage() {
 
         {/* Left Form */}
         <div className="w-full md:w-3/5 bg-white md:h-dvh overflow-y-auto px-6 md:px-14 py-10 flex items-center">
-          <UpdatePasswordForm />
+          <Suspense>
+            <UpdatePasswordForm />
+          </Suspense>
         </div>
 
         {/* Right Image */}
