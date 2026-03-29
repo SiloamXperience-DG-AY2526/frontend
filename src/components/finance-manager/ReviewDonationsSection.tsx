@@ -24,7 +24,7 @@ type Props = {
   busy: boolean;
 
   onSendThankYou: () => Promise<void>;
-  // onSendFollowUp: () => Promise<void>;
+  onSendFollowUp: () => Promise<void>;
   onProcessReceipt: () => Promise<void>;
 };
 
@@ -41,7 +41,7 @@ export default function ReviewDonationsSection({
   setRemarks,
   busy,
   onSendThankYou,
-  // onSendFollowUp,
+  onSendFollowUp,
   onProcessReceipt,
 }: Props) {
   return (
@@ -107,7 +107,8 @@ export default function ReviewDonationsSection({
                 </div>
               </div>
 
-              <div className="mt-4">
+              <div className="mt-4 space-y-2">
+                {/* Thank You */}
                 <button
                   disabled={busy || selectedTx.isThankYouSent}
                   onClick={onSendThankYou}
@@ -118,7 +119,23 @@ export default function ReviewDonationsSection({
                       : 'bg-[#206378] text-white hover:opacity-95',
                   )}
                 >
-                  {selectedTx.isThankYouSent ? 'Sent' : 'Send thank you'}
+                  {selectedTx.isThankYouSent
+                    ? 'Thank you sent'
+                    : 'Send thank you'}
+                </button>
+
+                {/* Follow Up */}
+                <button
+                  disabled={busy || selectedTx.receiptStatus !== 'pending'}
+                  onClick={onSendFollowUp}
+                  className={classNames(
+                    'w-full rounded-md px-4 py-2 text-sm font-semibold transition border',
+                    busy || selectedTx.receiptStatus !== 'pending'
+                      ? 'bg-gray-100 text-gray-400 border-gray-200 '
+                      : 'bg-white text-[#206378] border-[#206378] cursor-pointer hover:bg-[#206378] hover:text-white',
+                  )}
+                >
+                  Send follow-up reminder
                 </button>
               </div>
 

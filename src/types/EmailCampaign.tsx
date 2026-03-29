@@ -45,7 +45,7 @@ export type EmailCampaignListResponse = {
 };
 
 //financial manager
-export type DonationReviewTemplateType = 'thankyou' | 'receipt';
+export type DonationReviewTemplateType = 'thankyou' | 'receipt' | 'followup';
 
 export type DonationReviewTemplate = {
   senderAddress?: string | null;
