@@ -176,6 +176,7 @@ export default function FinanceManagerEmailPage() {
 
     return () => clearTimeout(t);
   }, [banner]);
+
   // Load donations
   async function loadFinanceData(projectId: string) {
     setIsLoadingDonations(true);

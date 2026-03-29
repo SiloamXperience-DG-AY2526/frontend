@@ -1,11 +1,9 @@
 'use client';
 
-
 import { classNames } from '@/lib/utils/finance-manager-email/classNames';
 import { formatAmount } from '@/lib/utils/finance-manager-email/formatAmount';
 import { DonationTransaction } from '@/types/DonationProject';
 import DonationsTable from './DonationTable';
-
 
 type Props = {
   pendingDonations: DonationTransaction[];
@@ -26,7 +24,7 @@ type Props = {
   busy: boolean;
 
   onSendThankYou: () => Promise<void>;
-  onSendFollowUp: () => Promise<void>;
+  // onSendFollowUp: () => Promise<void>;
   onProcessReceipt: () => Promise<void>;
 };
 
@@ -43,13 +41,15 @@ export default function ReviewDonationsSection({
   setRemarks,
   busy,
   onSendThankYou,
-  onSendFollowUp,
+  // onSendFollowUp,
   onProcessReceipt,
 }: Props) {
   return (
     <section className="rounded-xl border border-[#195D4B] bg-white overflow-hidden">
       <div className="px-5 pt-5 pb-3">
-        <h2 className="text-lg font-semibold text-gray-900">Donations to review</h2>
+        <h2 className="text-lg font-semibold text-gray-900">
+          Donations to review
+        </h2>
         <p className="text-sm text-gray-500">
           Select a donation to send messages or issue receipts.
         </p>
@@ -81,7 +81,9 @@ export default function ReviewDonationsSection({
           ) : (
             <>
               <div className="mt-3 rounded-lg border border-gray-200 bg-white p-3">
-                <div className="text-sm font-semibold text-gray-900">Donation details</div>
+                <div className="text-sm font-semibold text-gray-900">
+                  Donation details
+                </div>
                 <div className="mt-2 text-sm text-gray-700">
                   <div>
                     <span className="text-gray-500">Amount:</span>{' '}
@@ -105,36 +107,25 @@ export default function ReviewDonationsSection({
                 </div>
               </div>
 
-              <div className="mt-4 flex flex-wrap gap-2">
+              <div className="mt-4">
                 <button
-                  disabled={busy}
+                  disabled={busy || selectedTx.isThankYouSent}
                   onClick={onSendThankYou}
                   className={classNames(
-                    'rounded-md px-3 py-2 text-sm font-semibold transition',
-                    busy
-                      ? 'bg-gray-200 text-gray-500'
+                    'w-full rounded-md px-4 py-2 text-sm font-semibold transition',
+                    busy || selectedTx.isThankYouSent
+                      ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
                       : 'bg-[#206378] text-white hover:opacity-95',
                   )}
                 >
-                  Send thank you
-                </button>
-
-                <button
-                  disabled={busy}
-                  onClick={onSendFollowUp}
-                  className={classNames(
-                    'rounded-md px-3 py-2 text-sm font-semibold transition border',
-                    busy
-                      ? 'bg-gray-200 text-gray-500 border-gray-200'
-                      : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50',
-                  )}
-                >
-                  Send follow-up
+                  {selectedTx.isThankYouSent ? 'Sent' : 'Send thank you'}
                 </button>
               </div>
 
               <div className="mt-4 rounded-lg border border-gray-200 bg-white p-3">
-                <div className="text-sm font-semibold text-gray-900">Issue receipt</div>
+                <div className="text-sm font-semibold text-gray-900">
+                  Issue receipt
+                </div>
 
                 <label className="mt-3 block text-xs uppercase tracking-[0.16em] text-gray-500">
                   Receipt number *
@@ -173,7 +164,7 @@ export default function ReviewDonationsSection({
                   onClick={onProcessReceipt}
                   className={classNames(
                     'mt-4 w-full rounded-md px-4 py-2 text-sm font-semibold transition',
-                    busy || !receiptNumber.trim()
+                    busy || !receiptNumber.trim() || !receiptDate
                       ? 'bg-gray-200 text-gray-500'
                       : 'bg-[#206378] text-white hover:opacity-95',
                   )}
