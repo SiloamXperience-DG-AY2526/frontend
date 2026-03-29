@@ -43,11 +43,6 @@ export async function GET(
 
     const data = await response.json();
 
-    console.log(
-      'Raw donor detail data from backend:',
-      JSON.stringify(data, null, 2),
-    );
-
     // Validate backend response with Zod
     const validatedBackendData = BackendDonorDetailResponseSchema.parse(data);
 
@@ -89,11 +84,6 @@ export async function GET(
       })),
       status: (user.isActive ?? donorDetails.isActive) ? 'Active' : 'Inactive',
     };
-
-    console.log(
-      'Transformed donor:',
-      JSON.stringify(transformedDonor, null, 2),
-    );
 
     return NextResponse.json(transformedDonor, { status: 200 });
   } catch (error) {

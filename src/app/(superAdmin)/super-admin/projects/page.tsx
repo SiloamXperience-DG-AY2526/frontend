@@ -182,7 +182,7 @@ export default function SuperAdminProjectsPage() {
   };
 
   const handleDonationDelete = (projectId: string) => {
-    console.log(
+    throw new Error(
       `Delete project ${projectId} - functionality to be implemented`,
     );
   };
