@@ -9,7 +9,7 @@ import {
   getDonationReviewTemplate,
   saveDonationReviewTemplate,
   sendDonationReviewThankYou,
-  sendDonationReviewFollowUp,
+  // sendDonationReviewFollowUp,
   processDonationReviewReceipt,
 } from '@/lib/api/emailCampaign';
 import type { DonationProject } from '@/types/DonationProjectData';
@@ -484,12 +484,12 @@ export default function FinanceManagerEmailPage() {
               'Thank you email sent.',
             )
           }
-          onSendFollowUp={() =>
-            runAction(
-              () => sendDonationReviewFollowUp(selectedTx!.id),
-              'Payment reminder sent.',
-            )
-          }
+          // onSendFollowUp={() =>
+          //   runAction(
+          //     () => sendDonationReviewFollowUp(selectedTx!.id),
+          //     'Payment reminder sent.',
+          //   )
+          // }
           onProcessReceipt={() =>
             runAction(
               () =>
