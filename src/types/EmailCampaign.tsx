@@ -43,3 +43,20 @@ export type EmailCampaignListResponse = {
     totalPages: number;
   };
 };
+
+//financial manager
+export type DonationReviewTemplateType = 'thankyou' | 'receipt';
+
+export type DonationReviewTemplate = {
+  senderAddress?: string | null;
+  subject?: string | null;
+  previewText?: string | null;
+  body?: string | null;
+};
+
+export type TemplateForm = {
+  senderAddress: string;
+  subject: string;
+  message: string; // plain text
+  customNote: string;
+};
