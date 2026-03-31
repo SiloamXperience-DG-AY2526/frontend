@@ -140,8 +140,8 @@ export async function deleteCampaign(campaignId: string) {
   }
   return json;
 }
-//financial manager review
 
+//financial manager review
 
 export async function getDonationReviewTemplate(projectId: string, type: DonationReviewTemplateType) {
   const res = await fetch(`/api/email-campaigns/financial-manager/get-templates/${projectId}?type=${type}`);

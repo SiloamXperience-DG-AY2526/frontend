@@ -6,7 +6,7 @@ import { classNames } from '@/lib/utils/finance-manager-email/classNames';
 import { safeTextToHtml } from '@/lib/utils/finance-manager-email/text-html';
 import { TemplateForm } from '@/types/EmailCampaign';
 
-type TemplateType = 'thankyou' | 'receipt';
+type TemplateType = 'thankyou' | 'receipt' | 'followup';
 
 type Variable = { label: string; value: string; showIn: TemplateType | 'both' };
 
@@ -30,7 +30,7 @@ type Props = {
 };
 
 export default function TemplatesSection({
-  showTemplateWarning ,
+  showTemplateWarning,
   staffEmail,
   templateType,
   setTemplateType,
@@ -48,8 +48,10 @@ export default function TemplatesSection({
         <h2 className="text-lg font-semibold text-gray-900">Templates</h2>
         {showTemplateWarning && (
           <div className="mt-4 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800">
-            Please ensure you configure and <strong className="underline">SAVE BOTH</strong> <strong>Thank You</strong>{' '}
-            and <strong>Receipt</strong> templates before sending emails.
+            Please ensure you configure and{' '}
+            <strong className="underline">SAVE ALL templates:</strong>{' '}
+            <strong>Thank You, Follow Up</strong> and <strong>Receipt</strong> templates
+            before sending emails.
           </div>
         )}
       </div>
@@ -67,6 +69,18 @@ export default function TemplatesSection({
             onClick={() => setTemplateType('thankyou')}
           >
             Thank you
+          </button>
+          <button
+            type="button"
+            className={classNames(
+              'rounded-md px-3 py-2 text-sm font-semibold border transition',
+              templateType === 'followup'
+                ? 'bg-[#206378] border-[#206378] text-white'
+                : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50',
+            )}
+            onClick={() => setTemplateType('followup')}
+          >
+            Follow up
           </button>
           <button
             type="button"
