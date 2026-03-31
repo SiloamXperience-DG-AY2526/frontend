@@ -5,7 +5,6 @@ import Link from 'next/link';
 import {
   HomeIcon,
   UserGroupIcon,
-  DocumentTextIcon,
   ChartBarIcon,
   CurrencyDollarIcon,
   EnvelopeIcon 
