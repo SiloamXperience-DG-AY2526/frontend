@@ -9,7 +9,7 @@ import {
   getDonationReviewTemplate,
   saveDonationReviewTemplate,
   sendDonationReviewThankYou,
-  // sendDonationReviewFollowUp,
+   sendDonationReviewFollowUp,
   processDonationReviewReceipt,
 } from '@/lib/api/emailCampaign';
 import type { DonationProject } from '@/types/DonationProjectData';
@@ -28,7 +28,7 @@ import ReviewDonationsSection from '@/components/finance-manager/ReviewDonations
 import TemplatesSection from '@/components/finance-manager/EmailTemplateSection';
 
 type Tab = 'review' | 'templates';
-type TemplateType = 'thankyou' | 'receipt';
+type TemplateType = 'thankyou' | 'receipt' | 'followup';
 
 const DEFAULT_TEXT_TEMPLATE: Record<
   TemplateType,
@@ -59,6 +59,17 @@ const DEFAULT_TEXT_TEMPLATE: Record<
       'With gratitude,\n' +
       'Finance Team',
   },
+  followup: {
+  subject: 'Reminder: Complete your donation for {{project}}',
+  message:
+    'Hi {{name}},\n\n' +
+    'We noticed that your donation to {{project}} is still pending.\n' +
+    'Amount: {{amount}}\n\n' +
+    'Please complete your payment at your earliest convenience.\n' +
+    'If you have already made the payment, kindly ignore this message.\n\n' +
+    'Thank you for your support.\n' +
+    'Finance Team',
+}
 };
 
 const VARIABLES: Array<{
@@ -308,7 +319,7 @@ export default function FinanceManagerEmailPage() {
         setBanner({
           type: 'error',
           message:
-            'Email templates are not configured. Please set up BOTH "Thank You" and "Receipt" templates before sending emails.',
+            'Email templates are not configured.  SAVE ALL templates: Thank You, Follow Up and Receipt templates before sending emails.',
         });
         setShowTemplateWarning(true);
         setTab('templates');
@@ -484,12 +495,12 @@ export default function FinanceManagerEmailPage() {
               'Thank you email sent.',
             )
           }
-          // onSendFollowUp={() =>
-          //   runAction(
-          //     () => sendDonationReviewFollowUp(selectedTx!.id),
-          //     'Payment reminder sent.',
-          //   )
-          // }
+          onSendFollowUp={() =>
+            runAction(
+              () => sendDonationReviewFollowUp(selectedTx!.id),
+              'Payment reminder sent.',
+            )
+          }
           onProcessReceipt={() =>
             runAction(
               () =>
