@@ -46,14 +46,16 @@ export default function GeneralManagerHomePage() {
           setPartners((partnersData ?? []) as PartnerSummary[]);
           const list = Array.isArray(applicationsData?.data)
             ? applicationsData.data
-            : applicationsData ?? [];
+            : (applicationsData ?? []);
           setApplications(list as VolunteerApplication[]);
           setErrorMessage(null);
         }
       } catch (error) {
         if (isMounted) {
           setErrorMessage(
-            error instanceof Error ? error.message : 'Failed to load dashboard data.'
+            error instanceof Error
+              ? error.message
+              : 'Failed to load dashboard data.',
           );
         }
       } finally {
@@ -72,17 +74,20 @@ export default function GeneralManagerHomePage() {
 
   const activePartners = useMemo(
     () => partners.filter((partner) => partner.status === 'Active').length,
-    [partners]
+    [partners],
   );
 
   const pendingApplications = useMemo(
     () => applications.filter((app) => app.status === 'reviewing').length,
-    [applications]
+    [applications],
   );
 
   const recentApplications = useMemo(() => {
     return [...applications]
-      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+      .sort(
+        (a, b) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+      )
       .slice(0, 5);
   }, [applications]);
 
@@ -105,25 +110,35 @@ export default function GeneralManagerHomePage() {
       ) : null}
 
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <div className="rounded-lg border border-gray-200 bg-white p-4 border-l-4 border-l-[#56E0C2]">
-          <p className="text-xs uppercase tracking-[0.18em] text-gray-400">Total partners</p>
+        <div className="relative rounded-lg border border-gray-200 bg-white p-4 pl-5 overflow-hidden">
+          <div className="absolute left-0 top-0 h-full w-1 bg-gradient-to-b from-[#1F7A67] to-[#2AAE92]" />
+          <p className="text-xs uppercase tracking-[0.18em] text-gray-400">
+            Total partners
+          </p>
           <p className="mt-2 text-2xl font-semibold text-gray-900">
             {isLoading ? 'Loading...' : partners.length}
           </p>
         </div>
-        <div className="rounded-lg border border-gray-200 bg-white p-4 border-l-4 border-l-[#56E0C2]">
-          <p className="text-xs uppercase tracking-[0.18em] text-gray-400">Active partners</p>
+        <div className="relative rounded-lg border border-gray-200 bg-white p-4 pl-5 overflow-hidden">
+          <div className="absolute left-0 top-0 h-full w-1 bg-gradient-to-b from-[#1F7A67] to-[#2AAE92]" />
+          <p className="text-xs uppercase tracking-[0.18em] text-gray-400">
+            Active partners
+          </p>
           <p className="mt-2 text-2xl font-semibold text-gray-900">
             {isLoading ? 'Loading...' : activePartners}
           </p>
         </div>
-        <div className="rounded-lg border border-gray-200 bg-white p-4 border-l-4 border-l-[#56E0C2]">
-          <p className="text-xs uppercase tracking-[0.18em] text-gray-400">Applications</p>
+        <div className="relative rounded-lg border border-gray-200 bg-white p-4 pl-5 overflow-hidden">
+          <div className="absolute left-0 top-0 h-full w-1 bg-gradient-to-b from-[#1F7A67] to-[#2AAE92]" />
+          <p className="text-xs uppercase tracking-[0.18em] text-gray-400">
+            Applications
+          </p>
           <p className="mt-2 text-2xl font-semibold text-gray-900">
             {isLoading ? 'Loading...' : applications.length}
           </p>
         </div>
-        <div className="rounded-lg border border-gray-200 bg-white p-4 border-l-4 border-l-[#56E0C2]">
+        <div className="relative rounded-lg border border-gray-200 bg-white p-4 pl-5 overflow-hidden">
+          <div className="absolute left-0 top-0 h-full w-1 bg-gradient-to-b from-[#1F7A67] to-[#2AAE92]" />
           <p className="text-xs uppercase tracking-[0.18em] text-gray-400">
             Pending review
           </p>
@@ -138,7 +153,9 @@ export default function GeneralManagerHomePage() {
           <h2 className="text-lg font-semibold text-gray-900">
             Recent volunteer applications
           </h2>
-          <p className="text-sm text-gray-500">Newest submissions across projects.</p>
+          <p className="text-sm text-gray-500">
+            Newest submissions across projects.
+          </p>
         </div>
 
         <div className="overflow-x-auto">
@@ -161,16 +178,19 @@ export default function GeneralManagerHomePage() {
                 </tr>
               ) : recentApplications.length ? (
                 recentApplications.map((application) => {
-                  const volunteerName = `${application.volunteer?.firstName ?? ''} ${
-                    application.volunteer?.lastName ?? ''
-                  }`.trim();
+                  const volunteerName =
+                    `${application.volunteer?.firstName ?? ''} ${
+                      application.volunteer?.lastName ?? ''
+                    }`.trim();
                   return (
                     <tr
                       key={application.id}
                       className="border-b border-gray-100 last:border-b-0"
                     >
                       <td className="px-4 py-3 font-medium text-gray-900">
-                        {volunteerName || application.volunteer?.email || 'Unknown'}
+                        {volunteerName ||
+                          application.volunteer?.email ||
+                          'Unknown'}
                       </td>
                       <td className="px-4 py-3 text-gray-700">
                         {application.position?.projectTitle ?? '—'}

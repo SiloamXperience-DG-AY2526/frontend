@@ -4,10 +4,11 @@ import { z } from 'zod';
 import { BackendDonorDetailResponseSchema } from '@/types/DonorData';
 
 const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:3000/api/v1';
+const DonorPatchPayloadSchema = z.object({ isActive: z.boolean() }).strict();
 
 export async function GET(
   req: Request,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const { id } = await params;
@@ -36,16 +37,11 @@ export async function GET(
       const errorData = await response.json().catch(() => ({}));
       return NextResponse.json(
         { error: errorData.message || 'Failed to fetch donor details' },
-        { status: response.status }
+        { status: response.status },
       );
     }
 
     const data = await response.json();
-
-    console.log(
-      'Raw donor detail data from backend:',
-      JSON.stringify(data, null, 2)
-    );
 
     // Validate backend response with Zod
     const validatedBackendData = BackendDonorDetailResponseSchema.parse(data);
@@ -82,14 +78,12 @@ export async function GET(
         date: donation.date,
       })),
       cumulativeAmount,
-      projects: user.managedDonationProjects.map((p) => p.title),
-      status: donorDetails.isActive ? 'Active' : 'Inactive',
+      projects: user.managedDonationProjects.map((p) => ({
+        id: p.id,
+        title: p.title,
+      })),
+      status: (user.isActive ?? donorDetails.isActive) ? 'Active' : 'Inactive',
     };
-
-    console.log(
-      'Transformed donor:',
-      JSON.stringify(transformedDonor, null, 2)
-    );
 
     return NextResponse.json(transformedDonor, { status: 200 });
   } catch (error) {
@@ -97,21 +91,75 @@ export async function GET(
       console.error('Validation error:', error.message);
       console.error(
         'Validation issues:',
-        JSON.stringify(error.issues, null, 2)
+        JSON.stringify(error.issues, null, 2),
       );
       return NextResponse.json(
         {
           error: 'Invalid response format from backend',
           details: error.issues,
         },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
     console.error('Error fetching donor details:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
-      { status: 500 }
+      { status: 500 },
+    );
+  }
+}
+
+export async function PATCH(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  try {
+    const { id } = await params;
+    const cookieStore = await cookies();
+    const token = cookieStore.get('access_token')?.value;
+
+    if (!token) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const rawBody = await request.json();
+    const parsedBody = DonorPatchPayloadSchema.safeParse(rawBody);
+
+    if (!parsedBody.success) {
+      return NextResponse.json(
+        {
+          error: 'Invalid request payload',
+          details: parsedBody.error.issues,
+        },
+        { status: 400 },
+      );
+    }
+
+    const res = await fetch(`${BACKEND_URL}/donors/${id}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(parsedBody.data),
+    });
+
+    if (!res.ok) {
+      const errorData = await res.json().catch(() => ({}));
+      return NextResponse.json(
+        { error: errorData.message || 'Failed to update donor' },
+        { status: res.status },
+      );
+    }
+
+    const data = await res.json();
+    return NextResponse.json(data, { status: 200 });
+  } catch (error) {
+    console.error('Error updating donor:', error);
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 },
     );
   }
 }
