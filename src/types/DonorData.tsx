@@ -104,7 +104,8 @@ const BackendDonationSchema = z.object({
     location: z.string(),
     image: z.string().nullable(),
     type: z.string(),
-    brickSize: z.string().nullable(),
+    brickCost: z.string().nullable().optional(),
+    brickSize: z.string().nullable().optional(),
   }),
 });
 

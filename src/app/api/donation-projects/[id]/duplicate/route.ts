@@ -1,7 +1,9 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
+import { z } from 'zod';
 
 const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:3000/api/v1';
+const DuplicateDonationProjectResponseSchema = z.record(z.string(), z.unknown());
 
 export async function POST(
   _request: Request,
@@ -36,7 +38,16 @@ export async function POST(
     }
 
     const data = await response.json();
-    return NextResponse.json(data, { status: 201 });
+    const parsed = DuplicateDonationProjectResponseSchema.safeParse(data);
+
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: 'Invalid response from backend' },
+        { status: 502 }
+      );
+    }
+
+    return NextResponse.json(parsed.data, { status: response.status });
   } catch (error) {
     console.error('Error duplicating donation project:', error);
     return NextResponse.json(

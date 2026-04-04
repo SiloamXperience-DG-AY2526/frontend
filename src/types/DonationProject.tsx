@@ -20,7 +20,8 @@ export type DonationProject = {
   initiatorName: string | null;
   organisingTeam: string | null;
   targetFund: string | null; // Backend returns as string
-  brickSize: string | null; // Backend returns as string
+  brickCost?: string | null; // Preferred field name
+  brickSize?: string | null; // Legacy field name kept for compatibility
   deadline: string | null;
   type: DonationProjectType;
   startDate: string;

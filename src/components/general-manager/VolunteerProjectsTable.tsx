@@ -118,7 +118,9 @@ export default function VolunteerProjectTable({
         title: 'Failed to duplicate project',
         message: err instanceof Error ? err.message : 'Please try again',
       });
+    } finally {
       setIsDuplicating(false);
+      setDuplicatingProjectId(null);
     }
   };
 

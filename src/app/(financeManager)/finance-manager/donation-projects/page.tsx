@@ -81,7 +81,7 @@ export default function DonationProjectsPage() {
       setToast({ open: true, type: 'success', title: 'Project duplicated successfully' });
       // Redirect to the edit page of the duplicated project
       setTimeout(() => {
-        router.push(`${basePath}/donation-projects/${duplicatedProject.id}`);
+        router.push(`${basePath}/donation-projects/${duplicatedProject.id}/edit`);
       }, 1000);
     } catch (err) {
       setToast({

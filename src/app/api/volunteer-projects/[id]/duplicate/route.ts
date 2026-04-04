@@ -36,7 +36,7 @@ export async function POST(
     }
 
     const data = await response.json();
-    return NextResponse.json(data, { status: 201 });
+    return NextResponse.json(data, { status: response.status });
   } catch (error) {
     console.error('Error duplicating volunteer project:', error);
     return NextResponse.json(
