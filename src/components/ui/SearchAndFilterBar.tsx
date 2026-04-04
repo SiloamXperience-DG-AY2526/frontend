@@ -1,24 +1,18 @@
 import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
-import FilterButton from './FilterButton';
 
 interface SearchAndFilterBarProps {
   searchQuery: string;
   onSearchChange: (query: string) => void;
-  onFilterClick: () => void;
   searchPlaceholder?: string;
 }
 
 export default function SearchAndFilterBar({
   searchQuery,
   onSearchChange,
-  onFilterClick,
   searchPlaceholder = 'Search...',
 }: SearchAndFilterBarProps) {
   return (
     <div className="mb-6 flex items-center gap-4">
-      {/* Filter Button */}
-      <FilterButton onClick={onFilterClick} />
-
       {/* Search Input */}
       <div className="flex-1 relative max-w-md">
         <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import PageHeader from '@/components/ui/PageHeader';
@@ -18,8 +18,8 @@ import { DocumentDuplicateIcon } from '@heroicons/react/24/outline';
 type TabKey = 'donations' | 'donors';
 
 const tabs: { key: TabKey; label: string }[] = [
-  { key: 'donations', label: 'Donations' },
-  { key: 'donors', label: 'Your Donors' },
+    { key: 'donations', label: 'Donations' },
+    { key: 'donors', label: 'Your Donors' },
 ];
 
 export default function DonationProjectDetail() {
@@ -36,25 +36,25 @@ export default function DonationProjectDetail() {
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [isDuplicating, setIsDuplicating] = useState(false);
 
-  const fetchProjectData = async () => {
-    try {
-      setLoading(true);
-      const data = await getDonationProjectFinance(projectId);
-      setProjectData(data);
-    } catch (error) {
-      console.error('Error fetching project finance data:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+    const fetchProjectData = useCallback(async () => {
+        try {
+            setLoading(true);
+            const data = await getDonationProjectFinance(projectId);
+            setProjectData(data);
+        } catch (error) {
+            console.error('Error fetching project finance data:', error);
+        } finally {
+            setLoading(false);
+        }
+    }, [projectId]);
 
-  useEffect(() => {
-    fetchProjectData();
-  }, [projectId]);
+    useEffect(() => {
+        fetchProjectData();
+    }, [fetchProjectData]);
 
-  const handleRefresh = () => {
-    fetchProjectData();
-  };
+    const handleRefresh = () => {
+        fetchProjectData();
+    };
 
   const handleDuplicateClick = () => {
     setShowConfirmDialog(true);
@@ -98,16 +98,28 @@ export default function DonationProjectDetail() {
     );
   }
 
-  if (!projectData) {
     return (
-      <div className="min-h-screen bg-gray-50 p-8">
-        <PageHeader title="Error" />
-        <div className="mt-6 text-center text-gray-600">
-          Failed to load project data.
-        </div>
-      </div>
-    );
-  }
+        <div className="min-h-screen bg-gray-50 p-8">
+            {/* Page Header with Funds Card */}
+            <div className="flex items-start justify-between gap-6 mb-6">
+                <PageHeader title={projectData.project.title} />
+                <div className="flex w-full max-w-md flex-col items-end gap-3">
+                    <Link
+                        href={`${basePath}/donation-projects/${projectId}/edit`}
+                        className="rounded-full border border-[#0E5A4A] px-6 py-2 text-sm font-semibold text-[#0E5A4A] hover:bg-[#E6F5F1]"
+                    >
+                        Edit project
+                    </Link>
+                    <TotalFundsRaisedCard
+                        currentFund={parseFloat(projectData.totalRaised)}
+                        targetFund={
+                            projectData.project.targetFund
+                                ? parseFloat(projectData.project.targetFund)
+                                : null
+                        }
+                    />
+                </div>
+            </div>
 
   return (
     <div className="min-h-screen bg-gray-50 p-8">
@@ -154,26 +166,15 @@ export default function DonationProjectDetail() {
         </div>
       </div>
 
-      {/* Tabs */}
-      <div className="mb-6">
-        <div className="flex gap-3">
-          {tabs.map((tab) => {
-            const isActive = activeTab === tab.key;
-            return (
-              <button
-                key={tab.key}
-                onClick={() => setActiveTab(tab.key)}
-                className={[
-                  'px-8 py-3 rounded-full text-sm font-medium border-2 transition cursor-pointer',
-                  isActive
-                    ? 'bg-[#B8E6E0] text-[#195D4B] border-[#195D4B]'
-                    : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50',
-                ].join(' ')}
-              >
-                {tab.label}
-              </button>
-            );
-          })}
+            {/* Tab Content */}
+            <div className="mt-6">
+                {activeTab === 'donations' && (
+                    <DonationsTab donations={projectData.donations} onRefresh={handleRefresh} />
+                )}
+                {activeTab === 'donors' && (
+                    <YourDonorsTab donors={projectData.donors} />
+                )}
+            </div>
         </div>
       </div>
 

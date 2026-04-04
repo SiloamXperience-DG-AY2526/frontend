@@ -26,26 +26,37 @@ function pillToneFromValue(value?: string): Tone {
   return 'info';
 }
 
-function StatusPill({ text }: { text: string }) {
-  const tone = pillToneFromValue(text);
-  const cls =
-    tone === 'success'
-      ? 'bg-emerald-50 text-emerald-700'
-      : tone === 'warning'
-        ? 'bg-amber-50 text-amber-700'
-        : tone === 'danger'
-          ? 'bg-red-50 text-red-700'
-          : tone === 'info'
-            ? 'bg-sky-50 text-sky-700'
-            : 'bg-gray-100 text-gray-600';
+function getSubmissionVariant(status?: string) {
+  if (!status) return 'neutral' as const;
+  switch (status.toLowerCase()) {
+    case 'submitted':
+      return 'success' as const;
+    case 'withdrawn':
+      return 'error' as const;
+    case 'draft':
+      return 'warning' as const;
+    default:
+      return 'neutral' as const;
+  }
+}
 
-  return (
-    <span
-      className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ${cls}`}
-    >
-      {text}
-    </span>
-  );
+function getOperationVariant(status?: string) {
+  if (!status) return 'neutral' as const;
+  switch (status.toLowerCase()) {
+    case 'notstarted':
+      return 'neutral' as const;
+    case 'ongoing':
+      return 'success' as const;
+    case 'paused':
+      return 'warning' as const;
+    case 'cancelled':
+    case 'canceled':
+      return 'error' as const;
+    case 'completed':
+      return 'info' as const;
+    default:
+      return 'neutral' as const;
+  }
 }
 
 function formatEnumLabel(s?: string) {
@@ -89,7 +100,11 @@ export default function VolunteerProjectTable({
 
   const onDelete = (projectId: string) => {
     // await deleteVolunteerProject(projectId);
-    setToast({ open: true, type: 'success', title: `Deleted project ${projectId}` });
+    setToast({
+      open: true,
+      type: 'success',
+      title: `Deleted project ${projectId}`,
+    });
     router.refresh();
   };
 
@@ -194,15 +209,28 @@ export default function VolunteerProjectTable({
                   </td>
 
                   <td className="px-5 py-4">
-                    <StatusPill text={submission} />
+                    <StatusBadge
+                      label={submission}
+                      variant={getSubmissionVariant(p.submissionStatus)}
+                    />
                   </td>
 
                   <td className="px-5 py-4">
-                    <StatusPill text={approval} />
+                    <StatusBadge
+                      label={approval}
+                      variant={getApprovalVariant(
+                        p.approvalStatus as unknown as string,
+                      )}
+                    />
                   </td>
 
                   <td className="px-5 py-4">
-                    <StatusPill text={operation} />
+                    <StatusBadge
+                      label={operation}
+                      variant={getOperationVariant(
+                        p.operationStatus as unknown as string,
+                      )}
+                    />
                   </td>
 
                   <td className="px-5 py-4">

@@ -19,6 +19,11 @@ export const DonationSchema = z.object({
   date: z.string(),
 });
 
+export const DonorProjectSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+});
+
 export const DonorDetailSchema = z.object({
   donorId: z.string(),
   fullName: z.string(),
@@ -31,7 +36,7 @@ export const DonorDetailSchema = z.object({
   preferredCommunicationMethod: z.string(),
   donations: z.array(DonationSchema),
   cumulativeAmount: z.number(),
-  projects: z.array(z.string()),
+  projects: z.array(DonorProjectSchema),
   status: z.string(),
 });
 
@@ -39,6 +44,7 @@ export const DonorDetailSchema = z.object({
 export type Donor = z.infer<typeof DonorSchema>;
 export type DonorTableData = Donor[];
 export type Donation = z.infer<typeof DonationSchema>;
+export type DonorProject = z.infer<typeof DonorProjectSchema>;
 export type DonorDetail = z.infer<typeof DonorDetailSchema>;
 
 // Backend response Zod schemas for validation
@@ -50,11 +56,12 @@ const BackendDonorSchema = z.object({
     firstName: z.string(),
     lastName: z.string(),
     email: z.string(),
+    isActive: z.boolean().optional().default(true),
     managedDonationProjects: z.array(
       z.object({
         id: z.string(),
         title: z.string(),
-      })
+      }),
     ),
   }),
   gender: z.string(),
@@ -67,7 +74,7 @@ const BackendDonorSchema = z.object({
   contactModes: z.array(
     z.object({
       mode: z.string(),
-    })
+    }),
   ),
   totalDonations: z.union([z.string(), z.number()]),
 });
@@ -118,12 +125,13 @@ export const BackendDonorDetailResponseSchema = z.object({
       firstName: z.string(),
       lastName: z.string(),
       email: z.string(),
+      isActive: z.boolean().optional().default(true),
       managedDonationProjects: z
         .array(
           z.object({
             id: z.string(),
             title: z.string(),
-          })
+          }),
         )
         .optional()
         .default([]),
@@ -142,7 +150,7 @@ export const BackendDonorDetailResponseSchema = z.object({
       .array(
         z.object({
           mode: z.string(),
-        })
+        }),
       )
       .optional()
       .default([]),

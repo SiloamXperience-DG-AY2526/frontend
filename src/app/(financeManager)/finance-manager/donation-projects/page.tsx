@@ -1,7 +1,13 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
+import {
+  FunnelIcon,
+  ChevronUpIcon,
+  ChevronDownIcon,
+  MagnifyingGlassIcon,
+} from '@heroicons/react/24/outline';
 import PageHeader from '@/components/ui/PageHeader';
 import ProjectsDataTable from './_components/ProjectsDataTable';
 import Pagination from '@/components/ui/Pagination';
@@ -26,43 +32,67 @@ export default function DonationProjectsPage() {
   const [isDuplicating, setIsDuplicating] = useState(false);
   const ITEMS_PER_PAGE = 20;
 
-  const fetchProjects = async () => {
-    try {
+  useEffect(() => {
+    const searchChanged = prevDebouncedSearch.current !== debouncedSearch;
+    if (searchChanged) {
+      prevDebouncedSearch.current = debouncedSearch;
+      if (currentPage !== 1) {
+        setCurrentPage(1);
+        return;
+      }
+    }
+    async function fetchProjects() {
       setLoading(true);
       setError(null);
-      const response = await getFinanceManagerProjects(
-        currentPage,
-        ITEMS_PER_PAGE
-      );
-      setProjects(response.projects);
-      setTotalPages(response.pagination.totalPages);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load projects');
-      console.error('Error fetching projects:', err);
-    } finally {
-      setLoading(false);
+      try {
+        const response = await getFinanceManagerProjects(
+          currentPage,
+          ITEMS_PER_PAGE,
+          typeFilter || undefined,
+          debouncedSearch || undefined,
+        );
+        setProjects(response.projects);
+        setTotalPages(response.pagination.totalPages);
+      } catch (err) {
+        setError(
+          err instanceof Error ? err.message : 'Failed to load projects',
+        );
+      } finally {
+        setLoading(false);
+      }
     }
-  };
-
-  useEffect(() => {
     fetchProjects();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentPage]);
-
-  const handleFilterClick = () => {
-    // Placeholder for filter functionality
-    console.log('Filter button clicked - filters to be implemented');
-  };
+  }, [currentPage, typeFilter, debouncedSearch, refreshKey]);
 
   const handleEditClick = (projectId: string) => {
-    router.push(`${basePath}/donation-projects/${projectId}`);
+    router.push(`${basePath}/donation-projects/${projectId}/edit`);
   };
 
   const handleDeleteClick = (projectId: string) => {
-    // Placeholder for delete functionality
-    console.log(
-      `Delete project ${projectId} - functionality to be implemented`
-    );
+    setProjectToDelete(projectId);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!projectToDelete) return;
+    setDeleting(true);
+    try {
+      await cancelDonationProjectById(projectToDelete);
+      setProjectToDelete(null);
+      setToast({
+        open: true,
+        type: 'success',
+        title: 'Project cancelled successfully.',
+      });
+      setRefreshKey((k) => k + 1);
+    } catch (err) {
+      setToast({
+        open: true,
+        type: 'error',
+        title: err instanceof Error ? err.message : 'Failed to cancel project.',
+      });
+    } finally {
+      setDeleting(false);
+    }
   };
 
   const handleDuplicateClick = (projectId: string) => {
@@ -127,15 +157,75 @@ export default function DonationProjectsPage() {
           <PageHeader title="All Projects" />
           <button
             type="button"
-            onClick={() => router.push(`${basePath}/donation-projects/new`)}
+            onClick={() => router.push(`${basePath}/donation-projects/create`)}
             className="rounded-full bg-[#0E5A4A] px-6 py-2 text-sm font-semibold text-white hover:opacity-95"
           >
             Add project
           </button>
         </div>
 
-        <div className="mt-2 mb-4">
-          <FilterButton onClick={handleFilterClick} />
+        <div className="mt-4 flex w-full md:w-1/2 items-center gap-3 rounded-xl bg-[#F0F0F2] px-4 py-3 shadow-sm">
+          <MagnifyingGlassIcon className="h-5 w-5 shrink-0 text-gray-400" />
+          <input
+            type="text"
+            placeholder="Search projects"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full bg-transparent text-sm text-gray-800 outline-none placeholder:text-gray-400"
+          />
+        </div>
+
+        <div className="mt-3 mb-4">
+          <button
+            type="button"
+            onClick={() => setShowFilters((prev) => !prev)}
+            className="flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition"
+          >
+            <FunnelIcon className="h-4 w-4" />
+            Filters
+            {typeFilter && (
+              <span className="ml-1 flex h-5 w-5 items-center justify-center rounded-full bg-[#0E5A4A] text-xs font-semibold text-white">
+                1
+              </span>
+            )}
+            {showFilters ? (
+              <ChevronUpIcon className="h-4 w-4" />
+            ) : (
+              <ChevronDownIcon className="h-4 w-4" />
+            )}
+          </button>
+
+          {showFilters && (
+            <div className="mt-2 flex flex-wrap items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-3 shadow-sm">
+              <span className="mr-1 text-sm font-medium text-gray-600">
+                Type:
+              </span>
+              {(
+                [
+                  { value: '', label: 'All types' },
+                  { value: 'brick', label: 'Brick' },
+                  { value: 'sponsor', label: 'Sponsor' },
+                  { value: 'partnerLed', label: 'Partner Led' },
+                ] as { value: DonationProjectType | ''; label: string }[]
+              ).map(({ value, label }) => (
+                <button
+                  key={value || 'all'}
+                  type="button"
+                  onClick={() => {
+                    setTypeFilter(value);
+                    setCurrentPage(1);
+                  }}
+                  className={`rounded-full px-3 py-1 text-sm font-medium transition ${
+                    typeFilter === value
+                      ? 'bg-[#0E5A4A] text-white'
+                      : 'border border-gray-200 bg-gray-50 text-gray-700 hover:bg-gray-100'
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
         <ProjectsDataTable
@@ -174,6 +264,21 @@ export default function DonationProjectsPage() {
           onCancel={handleCancelDuplicate}
         />
       </main>
+
+      {projectToDelete && (
+        <DeleteConfirmDialog
+          onConfirm={handleConfirmDelete}
+          onClose={() => setProjectToDelete(null)}
+          loading={deleting}
+        />
+      )}
+
+      <Toast
+        open={toast.open}
+        type={toast.type}
+        title={toast.title}
+        onClose={() => setToast((t) => ({ ...t, open: false }))}
+      />
     </div>
   );
 }

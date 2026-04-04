@@ -128,6 +128,7 @@ export default function OnboardingPage() {
     const e: Record<string, string> = {};
     if (!data.countryCode) e.countryCode = 'Required';
     if (!data.contactNumber) e.contactNumber = 'Required';
+    if (!data.dob) e.dob = 'Required';
     if (!data.gender) e.gender = 'Required';
     if (!data.availability) e.availability = 'Required';
     if (!data.nationality.trim()) e.nationality = 'Required';
@@ -168,7 +169,7 @@ export default function OnboardingPage() {
       const payload = {
         countryCode: data.countryCode,
         contactNumber: data.contactNumber,
-        dob: data.dob || undefined,
+        dob: data.dob,
         nationality: data.nationality.trim(),
         occupation: data.occupation.trim(),
         gender: data.gender,
@@ -294,6 +295,7 @@ export default function OnboardingPage() {
                   label="Date of Birth"
                   type="date"
                   value={data.dob}
+                  required
                   onChange={(v) => setData({ ...data, dob: v })}
                 />
               </div>

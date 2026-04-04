@@ -1,7 +1,10 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { getDonationHomepage, getFinanceManagerProjects } from '@/lib/api/donation';
+import {
+  getDonationHomepage,
+  getFinanceManagerProjects,
+} from '@/lib/api/donation';
 import type { DonationHomepage } from '@/types/DonationData';
 import type { DonationProjectsResponse } from '@/types/DonationProjectData';
 import type { PartnerSummary } from '@/types/Partner';
@@ -61,7 +64,7 @@ export default function SuperAdminHomePage() {
         setPartners((partnersData ?? []) as PartnerSummary[]);
         const list = Array.isArray(applicationsData?.data)
           ? applicationsData.data
-          : applicationsData ?? [];
+          : (applicationsData ?? []);
         setApplications(list as VolunteerApplication[]);
         setHomepage(homepageData);
         setProjectsResponse(projectsData);
@@ -69,7 +72,9 @@ export default function SuperAdminHomePage() {
       } catch (error) {
         if (isMounted) {
           setErrorMessage(
-            error instanceof Error ? error.message : 'Failed to load dashboard data.'
+            error instanceof Error
+              ? error.message
+              : 'Failed to load dashboard data.',
           );
         }
       } finally {
@@ -88,18 +93,24 @@ export default function SuperAdminHomePage() {
 
   const activePartners = useMemo(
     () => partners.filter((partner) => partner.status === 'Active').length,
-    [partners]
+    [partners],
   );
 
   const pendingApplications = useMemo(
     () => applications.filter((app) => app.status === 'reviewing').length,
-    [applications]
+    [applications],
   );
 
   const stats = homepage?.statistics;
-  const totalRaised = stats ? currencyFormatter.format(parseAmount(stats.totalRaised)) : '--';
-  const totalDonations = stats ? numberFormatter.format(stats.totalDonations) : '--';
-  const activeProjects = stats ? numberFormatter.format(stats.activeProjects) : '--';
+  const totalRaised = stats
+    ? currencyFormatter.format(parseAmount(stats.totalRaised))
+    : '--';
+  const totalDonations = stats
+    ? numberFormatter.format(stats.totalDonations)
+    : '--';
+  const activeProjects = stats
+    ? numberFormatter.format(stats.activeProjects)
+    : '--';
   const trackedProjects = projectsResponse
     ? numberFormatter.format(projectsResponse.pagination.totalCount)
     : '--';
@@ -127,25 +138,35 @@ export default function SuperAdminHomePage() {
           Volunteer operations
         </h2>
         <div className="mt-3 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          <div className="rounded-lg border border-gray-200 bg-white p-4 border-l-4 border-l-[#56E0C2]">
-            <p className="text-xs uppercase tracking-[0.18em] text-gray-400">Total partners</p>
+          <div className="relative rounded-lg border border-gray-200 bg-white p-4 pl-5 overflow-hidden">
+            <div className="absolute left-0 top-0 h-full w-1 bg-gradient-to-b from-[#1F7A67] to-[#2AAE92]" />
+            <p className="text-xs uppercase tracking-[0.18em] text-gray-400">
+              Total partners
+            </p>
             <p className="mt-2 text-2xl font-semibold text-gray-900">
               {isLoading ? 'Loading...' : partners.length}
             </p>
           </div>
-          <div className="rounded-lg border border-gray-200 bg-white p-4 border-l-4 border-l-[#56E0C2]">
-            <p className="text-xs uppercase tracking-[0.18em] text-gray-400">Active partners</p>
+          <div className="relative rounded-lg border border-gray-200 bg-white p-4 pl-5 overflow-hidden">
+            <div className="absolute left-0 top-0 h-full w-1 bg-gradient-to-b from-[#1F7A67] to-[#2AAE92]" />
+            <p className="text-xs uppercase tracking-[0.18em] text-gray-400">
+              Active partners
+            </p>
             <p className="mt-2 text-2xl font-semibold text-gray-900">
               {isLoading ? 'Loading...' : activePartners}
             </p>
           </div>
-          <div className="rounded-lg border border-gray-200 bg-white p-4 border-l-4 border-l-[#56E0C2]">
-            <p className="text-xs uppercase tracking-[0.18em] text-gray-400">Applications</p>
+          <div className="relative rounded-lg border border-gray-200 bg-white p-4 pl-5 overflow-hidden">
+            <div className="absolute left-0 top-0 h-full w-1 bg-gradient-to-b from-[#1F7A67] to-[#2AAE92]" />
+            <p className="text-xs uppercase tracking-[0.18em] text-gray-400">
+              Applications
+            </p>
             <p className="mt-2 text-2xl font-semibold text-gray-900">
               {isLoading ? 'Loading...' : applications.length}
             </p>
           </div>
-          <div className="rounded-lg border border-gray-200 bg-white p-4 border-l-4 border-l-[#56E0C2]">
+          <div className="relative rounded-lg border border-gray-200 bg-white p-4 pl-5 overflow-hidden">
+            <div className="absolute left-0 top-0 h-full w-1 bg-gradient-to-b from-[#1F7A67] to-[#2AAE92]" />
             <p className="text-xs uppercase tracking-[0.18em] text-gray-400">
               Pending review
             </p>
@@ -161,19 +182,26 @@ export default function SuperAdminHomePage() {
           Donation performance
         </h2>
         <div className="mt-3 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          <div className="rounded-lg border border-gray-200 bg-white p-4 border-l-4 border-l-[#56E0C2]">
-            <p className="text-xs uppercase tracking-[0.18em] text-gray-400">Total raised</p>
+          <div className="relative rounded-lg border border-gray-200 bg-white p-4 pl-5 overflow-hidden">
+            <div className="absolute left-0 top-0 h-full w-1 bg-gradient-to-b from-[#1F7A67] to-[#2AAE92]" />
+            <p className="text-xs uppercase tracking-[0.18em] text-gray-400">
+              Total raised
+            </p>
             <p className="mt-2 text-2xl font-semibold text-gray-900">
               {isLoading ? 'Loading...' : totalRaised}
             </p>
           </div>
-          <div className="rounded-lg border border-gray-200 bg-white p-4 border-l-4 border-l-[#56E0C2]">
-            <p className="text-xs uppercase tracking-[0.18em] text-gray-400">Total donations</p>
+          <div className="relative rounded-lg border border-gray-200 bg-white p-4 pl-5 overflow-hidden">
+            <div className="absolute left-0 top-0 h-full w-1 bg-gradient-to-b from-[#1F7A67] to-[#2AAE92]" />
+            <p className="text-xs uppercase tracking-[0.18em] text-gray-400">
+              Total donations
+            </p>
             <p className="mt-2 text-2xl font-semibold text-gray-900">
               {isLoading ? 'Loading...' : totalDonations}
             </p>
           </div>
-          <div className="rounded-lg border border-gray-200 bg-white p-4 border-l-4 border-l-[#56E0C2]">
+          <div className="relative rounded-lg border border-gray-200 bg-white p-4 pl-5 overflow-hidden">
+            <div className="absolute left-0 top-0 h-full w-1 bg-gradient-to-b from-[#1F7A67] to-[#2AAE92]" />
             <p className="text-xs uppercase tracking-[0.18em] text-gray-400">
               Active donation projects
             </p>
@@ -181,7 +209,8 @@ export default function SuperAdminHomePage() {
               {isLoading ? 'Loading...' : activeProjects}
             </p>
           </div>
-          <div className="rounded-lg border border-gray-200 bg-white p-4 border-l-4 border-l-[#56E0C2]">
+          <div className="relative rounded-lg border border-gray-200 bg-white p-4 pl-5 overflow-hidden">
+            <div className="absolute left-0 top-0 h-full w-1 bg-gradient-to-b from-[#1F7A67] to-[#2AAE92]" />
             <p className="text-xs uppercase tracking-[0.18em] text-gray-400">
               Projects tracked
             </p>

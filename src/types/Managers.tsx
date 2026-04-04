@@ -6,7 +6,7 @@ export const ManagerScehema = z.object({
   name: z.string(),
   projects: z.array(z.string()),
   email: z.string(),
-  role: z.enum(['Project Manager', 'Finance Manager']),
+  role: z.enum(['subAdmin', 'generalManager', 'financeManager']),
   status: z.enum(['Active', 'Inactive']),
 });
 
@@ -26,9 +26,11 @@ const BackendManagerSchema = z.object({
 });
 
 export const BackendManagersResponseSchema = z.object({
-  data: z.array(BackendManagerSchema)
+  data: z.array(BackendManagerSchema),
 });
 
 // TypeScript types for backend responses
 export type BackendManager = z.infer<typeof BackendManagerSchema>;
-export type BackendManagersResponse = z.infer<typeof BackendManagersResponseSchema>;
+export type BackendManagersResponse = z.infer<
+  typeof BackendManagersResponseSchema
+>;

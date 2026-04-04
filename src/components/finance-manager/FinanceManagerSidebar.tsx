@@ -5,9 +5,9 @@ import Link from 'next/link';
 import {
   HomeIcon,
   UserGroupIcon,
-  DocumentTextIcon,
   ChartBarIcon,
   CurrencyDollarIcon,
+  EnvelopeIcon 
 } from '@heroicons/react/24/outline';
 import { ArrowLeftStartOnRectangleIcon } from '@heroicons/react/24/solid';
 import { useRouter } from 'next/navigation';
@@ -22,7 +22,7 @@ const menu = [
     icon: ChartBarIcon,
     href: '/finance-manager/donation-projects',
   },
-  { name: 'Reports', icon: DocumentTextIcon, href: '/finance-manager/reports' },
+  { name: 'Email', icon: EnvelopeIcon, href: '/finance-manager/email-configure' },
   { name: 'My Profile', icon: UserGroupIcon, href: '/finance-manager/profile' },
 ];
 
