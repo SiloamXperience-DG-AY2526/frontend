@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   FunnelIcon,
@@ -11,57 +11,105 @@ import {
 import PageHeader from '@/components/ui/PageHeader';
 import ProjectsDataTable from './_components/ProjectsDataTable';
 import Pagination from '@/components/ui/Pagination';
-import { getFinanceManagerProjects, duplicateDonationProject } from '@/lib/api/donation';
-import { DonationProject } from '@/types/DonationProjectData';
-import FilterButton from '@/components/ui/FilterButton';
+import {
+  getFinanceManagerProjects,
+  duplicateDonationProject,
+  cancelDonationProjectById,
+} from '@/lib/api/donation';
+import {
+  DonationProject,
+  DonationProjectType,
+} from '@/types/DonationProjectData';
 import { useManagerBasePath } from '@/lib/utils/managerBasePath';
 import Toast from '@/components/ui/Toast';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
+import DeleteConfirmDialog from '@/components/ui/DeleteConfirmDialog';
+
+function useDebouncedValue<T>(value: T, delayMs = 450) {
+  const [debounced, setDebounced] = useState(value);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setDebounced(value), delayMs);
+    return () => clearTimeout(timer);
+  }, [value, delayMs]);
+
+  return debounced;
+}
 
 export default function DonationProjectsPage() {
   const router = useRouter();
   const basePath = useManagerBasePath('finance');
+
   const [projects, setProjects] = useState<DonationProject[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const [search, setSearch] = useState('');
+  const debouncedSearch = useDebouncedValue(search, 450);
+  const [typeFilter, setTypeFilter] = useState<DonationProjectType | ''>('');
+  const [showFilters, setShowFilters] = useState(false);
+
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [toast, setToast] = useState<{ open: boolean; type: 'success' | 'error'; title: string; message?: string }>({ open: false, type: 'success', title: '' });
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  const [toast, setToast] = useState<{
+    open: boolean;
+    type: 'success' | 'error';
+    title: string;
+    message?: string;
+  }>({ open: false, type: 'success', title: '' });
+
+  const [projectToDelete, setProjectToDelete] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
+
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [duplicatingProjectId, setDuplicatingProjectId] = useState<string | null>(null);
   const [isDuplicating, setIsDuplicating] = useState(false);
+
   const ITEMS_PER_PAGE = 20;
 
   useEffect(() => {
-    const searchChanged = prevDebouncedSearch.current !== debouncedSearch;
-    if (searchChanged) {
-      prevDebouncedSearch.current = debouncedSearch;
-      if (currentPage !== 1) {
-        setCurrentPage(1);
-        return;
-      }
-    }
-    async function fetchProjects() {
+    setCurrentPage(1);
+  }, [debouncedSearch, typeFilter]);
+
+  useEffect(() => {
+    let mounted = true;
+    const controller = new AbortController();
+
+    const fetchProjects = async () => {
       setLoading(true);
       setError(null);
+
       try {
         const response = await getFinanceManagerProjects(
           currentPage,
           ITEMS_PER_PAGE,
           typeFilter || undefined,
           debouncedSearch || undefined,
+          controller.signal,
         );
+
+        if (!mounted) return;
         setProjects(response.projects);
         setTotalPages(response.pagination.totalPages);
       } catch (err) {
-        setError(
-          err instanceof Error ? err.message : 'Failed to load projects',
-        );
+        if ((err as Error).name === 'AbortError') return;
+        if (!mounted) return;
+        setError(err instanceof Error ? err.message : 'Failed to load projects');
       } finally {
-        setLoading(false);
+        if (mounted) {
+          setLoading(false);
+        }
       }
-    }
+    };
+
     fetchProjects();
+
+    return () => {
+      mounted = false;
+      controller.abort();
+    };
   }, [currentPage, typeFilter, debouncedSearch, refreshKey]);
 
   const handleEditClick = (projectId: string) => {
@@ -74,6 +122,7 @@ export default function DonationProjectsPage() {
 
   const handleConfirmDelete = async () => {
     if (!projectToDelete) return;
+
     setDeleting(true);
     try {
       await cancelDonationProjectById(projectToDelete);
@@ -108,8 +157,12 @@ export default function DonationProjectsPage() {
 
     try {
       const duplicatedProject = await duplicateDonationProject(duplicatingProjectId);
-      setToast({ open: true, type: 'success', title: 'Project duplicated successfully' });
-      // Redirect to the edit page of the duplicated project
+      setToast({
+        open: true,
+        type: 'success',
+        title: 'Project duplicated successfully',
+      });
+      // Redirect to the edit page of the duplicated project.
       setTimeout(() => {
         router.push(`${basePath}/donation-projects/${duplicatedProject.id}/edit`);
       }, 1000);
@@ -141,9 +194,7 @@ export default function DonationProjectsPage() {
         <main className="flex-1 px-10 py-8">
           <PageHeader title="All Projects" />
           <div className="mt-8 rounded-lg border border-red-200 bg-red-50 p-4">
-            <p className="text-red-800">
-              Failed to load projects. Please try again.
-            </p>
+            <p className="text-red-800">Failed to load projects. Please try again.</p>
           </div>
         </main>
       </div>
@@ -157,14 +208,14 @@ export default function DonationProjectsPage() {
           <PageHeader title="All Projects" />
           <button
             type="button"
-            onClick={() => router.push(`${basePath}/donation-projects/create`)}
+            onClick={() => router.push(`${basePath}/donation-projects/new`)}
             className="rounded-full bg-[#0E5A4A] px-6 py-2 text-sm font-semibold text-white hover:opacity-95"
           >
             Add project
           </button>
         </div>
 
-        <div className="mt-4 flex w-full md:w-1/2 items-center gap-3 rounded-xl bg-[#F0F0F2] px-4 py-3 shadow-sm">
+        <div className="mt-4 flex w-full items-center gap-3 rounded-xl bg-[#F0F0F2] px-4 py-3 shadow-sm md:w-1/2">
           <MagnifyingGlassIcon className="h-5 w-5 shrink-0 text-gray-400" />
           <input
             type="text"
@@ -175,11 +226,11 @@ export default function DonationProjectsPage() {
           />
         </div>
 
-        <div className="mt-3 mb-4">
+        <div className="mb-4 mt-3">
           <button
             type="button"
             onClick={() => setShowFilters((prev) => !prev)}
-            className="flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition"
+            className="flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
           >
             <FunnelIcon className="h-4 w-4" />
             Filters
@@ -197,9 +248,7 @@ export default function DonationProjectsPage() {
 
           {showFilters && (
             <div className="mt-2 flex flex-wrap items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-3 shadow-sm">
-              <span className="mr-1 text-sm font-medium text-gray-600">
-                Type:
-              </span>
+              <span className="mr-1 text-sm font-medium text-gray-600">Type:</span>
               {(
                 [
                   { value: '', label: 'All types' },
@@ -211,10 +260,7 @@ export default function DonationProjectsPage() {
                 <button
                   key={value || 'all'}
                   type="button"
-                  onClick={() => {
-                    setTypeFilter(value);
-                    setCurrentPage(1);
-                  }}
+                  onClick={() => setTypeFilter(value)}
                   className={`rounded-full px-3 py-1 text-sm font-medium transition ${
                     typeFilter === value
                       ? 'bg-[#0E5A4A] text-white'
@@ -272,13 +318,6 @@ export default function DonationProjectsPage() {
           loading={deleting}
         />
       )}
-
-      <Toast
-        open={toast.open}
-        type={toast.type}
-        title={toast.title}
-        onClose={() => setToast((t) => ({ ...t, open: false }))}
-      />
     </div>
   );
 }

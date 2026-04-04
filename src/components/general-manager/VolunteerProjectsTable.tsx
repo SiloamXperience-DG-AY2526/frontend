@@ -10,20 +10,22 @@ import { useManagerBasePath } from '@/lib/utils/managerBasePath';
 import Toast from '@/components/ui/Toast';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
 import { duplicateVolunteerProject } from '@/lib/api/volunteer';
+import StatusBadge from '@/components/table/StatusBadge';
 
-type Tone = 'success' | 'warning' | 'danger' | 'muted' | 'info';
-
-function pillToneFromValue(value?: string): Tone {
-  if (!value) return 'muted';
-  const v = value.toLowerCase();
-
-  if (['approved', 'active', 'ongoing', 'completed'].includes(v))
-    return 'success';
-  if (['reviewing', 'pending', 'submitted'].includes(v)) return 'warning';
-  if (['rejected', 'cancelled', 'canceled'].includes(v)) return 'danger';
-  if (['paused', 'inactive'].includes(v)) return 'muted';
-
-  return 'info';
+function getApprovalVariant(status?: string) {
+  if (!status) return 'neutral' as const;
+  switch (status.toLowerCase()) {
+    case 'approved':
+      return 'success' as const;
+    case 'rejected':
+      return 'error' as const;
+    case 'pending':
+      return 'neutral' as const;
+    case 'reviewing':
+      return 'warning' as const;
+    default:
+      return 'neutral' as const;
+  }
 }
 
 function getSubmissionVariant(status?: string) {
