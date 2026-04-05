@@ -420,3 +420,20 @@ export async function getDonationProjectFinance(
     donors,
   };
 }
+
+// Duplicate a donation project (Finance Manager or Super Admin only)
+export async function duplicateDonationProject(
+  projectId: string
+): Promise<DonationProjectDetail> {
+  const res = await fetch(`/api/donation-projects/${projectId}/duplicate`, {
+    method: 'POST',
+  });
+
+  if (!res.ok) {
+    const error = await res.json().catch(() => ({}));
+    throw new Error(error.error || 'Failed to duplicate donation project.');
+  }
+
+  const data = await res.json();
+  return data.data;
+}

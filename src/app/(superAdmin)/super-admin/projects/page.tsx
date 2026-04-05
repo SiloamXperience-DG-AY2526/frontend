@@ -16,7 +16,10 @@ import VolunteerProjectsTable from '@/components/general-manager/VolunteerProjec
 import ProjectsDataTable from '@/app/(financeManager)/finance-manager/donation-projects/_components/ProjectsDataTable';
 import Pagination from '@/components/ui/Pagination';
 import { getAllVolunteerProjects } from '@/lib/api/volunteer';
-import { getFinanceManagerProjects } from '@/lib/api/donation';
+import {
+  getFinanceManagerProjects,
+  duplicateDonationProject,
+} from '@/lib/api/donation';
 import { VolunteerProjectRow } from '@/types/Volunteer';
 import {
   DonationProject,
@@ -71,6 +74,9 @@ export default function SuperAdminProjectsPage() {
   const debouncedDonationSearch = useDebouncedValue(donationSearch, 450);
   const prevDebouncedDonationSearch = useRef(debouncedDonationSearch);
   const donationLimit = 20;
+  const [isDonationDuplicating, setIsDonationDuplicating] = useState(false);
+  const [duplicatingDonationProjectId, setDuplicatingDonationProjectId] =
+    useState<string | null>(null);
 
   useEffect(() => {
     if (!user?.role) return;
@@ -185,6 +191,23 @@ export default function SuperAdminProjectsPage() {
     throw new Error(
       `Delete project ${projectId} - functionality to be implemented`,
     );
+  };
+
+  const handleDonationDuplicate = (projectId: string) => {
+    setDuplicatingDonationProjectId(projectId);
+    setIsDonationDuplicating(true);
+
+    void (async () => {
+      try {
+        const duplicated = await duplicateDonationProject(projectId);
+        router.push(`${financeBasePath}/donation-projects/${duplicated.id}/edit`);
+      } catch (error) {
+        console.error('Failed to duplicate donation project:', error);
+      } finally {
+        setIsDonationDuplicating(false);
+        setDuplicatingDonationProjectId(null);
+      }
+    })();
   };
 
   return (
@@ -350,6 +373,9 @@ export default function SuperAdminProjectsPage() {
               loading={donationLoading}
               onEditClick={handleDonationEdit}
               onDeleteClick={handleDonationDelete}
+              onDuplicateClick={handleDonationDuplicate}
+              isDuplicating={isDonationDuplicating}
+              duplicatingProjectId={duplicatingDonationProjectId}
             />
 
             {!donationLoading && donationProjects.length > 0 && (

@@ -39,7 +39,9 @@ const DonationProjectBaseSchema = z.object({
   initiatorName: z.string().nullable(),
   organisingTeam: z.string().nullable(),
   targetFund: z.string().nullable(),
-  brickSize: z.string().nullable(),
+  // Support both new and legacy backend field names during migration.
+  brickCost: z.string().nullable().optional(),
+  brickSize: z.string().nullable().optional(),
   deadline: z.string().nullable(),
   type: DonationProjectTypeSchema,
   startDate: z.string(),

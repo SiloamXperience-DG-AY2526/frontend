@@ -4,10 +4,12 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { VolunteerProjectRow } from '@/types/Volunteer';
 import { formatShortDate } from '@/lib/utils/date';
-import { PencilSquareIcon, TrashIcon } from '@heroicons/react/24/outline';
+import { PencilSquareIcon, TrashIcon, DocumentDuplicateIcon } from '@heroicons/react/24/outline';
 import { useRouter } from 'next/navigation';
 import { useManagerBasePath } from '@/lib/utils/managerBasePath';
 import Toast from '@/components/ui/Toast';
+import ConfirmDialog from '@/components/ui/ConfirmDialog';
+import { duplicateVolunteerProject } from '@/lib/api/volunteer';
 import StatusBadge from '@/components/table/StatusBadge';
 
 function getApprovalVariant(status?: string) {
@@ -20,7 +22,6 @@ function getApprovalVariant(status?: string) {
     case 'pending':
       return 'neutral' as const;
     case 'reviewing':
-    case 'under_review':
       return 'warning' as const;
     default:
       return 'neutral' as const;
@@ -78,11 +79,10 @@ export default function VolunteerProjectTable({
 }) {
   const basePath = useManagerBasePath('general');
   const router = useRouter();
-  const [toast, setToast] = useState<{
-    open: boolean;
-    type: 'success' | 'error';
-    title: string;
-  }>({ open: false, type: 'success', title: '' });
+  const [toast, setToast] = useState<{ open: boolean; type: 'success' | 'error'; title: string; message?: string }>({ open: false, type: 'success', title: '' });
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [duplicatingProjectId, setDuplicatingProjectId] = useState<string | null>(null);
+  const [isDuplicating, setIsDuplicating] = useState(false);
 
   if (loading) {
     return (
@@ -110,13 +110,53 @@ export default function VolunteerProjectTable({
     router.refresh();
   };
 
+  const handleDuplicateClick = (projectId: string) => {
+    setDuplicatingProjectId(projectId);
+    setShowConfirmDialog(true);
+  };
+
+  const handleConfirmDuplicate = async () => {
+    if (!duplicatingProjectId) return;
+
+    setIsDuplicating(true);
+    setShowConfirmDialog(false);
+
+    try {
+      const duplicatedProject = await duplicateVolunteerProject(duplicatingProjectId);
+      setToast({ open: true, type: 'success', title: 'Project duplicated successfully' });
+      // Redirect to the edit page of the duplicated project
+      setTimeout(() => {
+        router.push(`${basePath}/projects/${duplicatedProject.id}/edit`);
+      }, 1000);
+    } catch (err) {
+      setToast({
+        open: true,
+        type: 'error',
+        title: 'Failed to duplicate project',
+        message: err instanceof Error ? err.message : 'Please try again',
+      });
+    } finally {
+      setIsDuplicating(false);
+      setDuplicatingProjectId(null);
+    }
+  };
+
+  const handleCancelDuplicate = () => {
+    setShowConfirmDialog(false);
+    setDuplicatingProjectId(null);
+  };
+
   return (
     <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
-      <Toast
-        open={toast.open}
-        type={toast.type}
-        title={toast.title}
-        onClose={() => setToast((t) => ({ ...t, open: false }))}
+      <Toast open={toast.open} type={toast.type} title={toast.title} message={toast.message} onClose={() => setToast((t) => ({ ...t, open: false }))} />
+      <ConfirmDialog
+        open={showConfirmDialog}
+        title="Duplicate this project?"
+        message="This will create a copy of the project in draft status. You can then edit the duplicated project."
+        confirmText="Duplicate"
+        cancelText="Cancel"
+        onConfirm={handleConfirmDuplicate}
+        onCancel={handleCancelDuplicate}
       />
       <div className="w-full overflow-x-auto">
         <table className="w-full min-w-[1080px] border-collapse">
@@ -205,6 +245,24 @@ export default function VolunteerProjectTable({
                       >
                         <PencilSquareIcon className="h-5 w-5 text-[#0F5E5E]" />
                       </Link>
+
+                      <button
+                        type="button"
+                        onClick={() => handleDuplicateClick(p.id)}
+                        disabled={isDuplicating && duplicatingProjectId === p.id}
+                        className="rounded-md p-2 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                        aria-label="Duplicate project"
+                        title="Duplicate"
+                      >
+                        {isDuplicating && duplicatingProjectId === p.id ? (
+                          <svg className="h-5 w-5 animate-spin" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                          </svg>
+                        ) : (
+                          <DocumentDuplicateIcon className="h-5 w-5 text-blue-600" />
+                        )}
+                      </button>
 
                       <button
                         type="button"

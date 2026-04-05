@@ -37,7 +37,8 @@ export type DonationApplication = {
     location: string;
     image: string | null;
     type: string;
-    brickSize: string | null;
+    brickCost?: string | null;
+    brickSize?: string | null;
   };
 };
 
