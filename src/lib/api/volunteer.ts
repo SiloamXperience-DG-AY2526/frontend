@@ -72,7 +72,19 @@ export async function submitVolunteerApplication(
   });
 
   const json = await res.json().catch(() => null);
-  if (!res.ok) throw new Error(json?.message ?? `Request failed ${res.status}`);
+  if (!res.ok) {
+    const code = json?.code ?? json?.error ?? json?.message;
+
+    if (res.status === 409 && String(code) === 'ALREADY_APPLIED') {
+      throw new Error('You have already applied for this position.');
+    }
+
+    if (res.status === 409 && String(code) === 'PROJECT_NOT_OPERATIONAL') {
+      throw new Error('This volunteer project is not accepting applications right now.');
+    }
+
+    throw new Error(json?.message ?? `Request failed ${res.status}`);
+  }
   return json;
 }
 

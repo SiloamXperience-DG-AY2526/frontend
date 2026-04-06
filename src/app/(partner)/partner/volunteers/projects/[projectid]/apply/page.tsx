@@ -127,8 +127,24 @@ export default function VolunteerApplication({
     } catch (e: unknown) {
       console.error(e);
       setToastType('error');
-      setToastTitle('Submission failed');
-      setToastMsg(e instanceof Error ? e.message : String(e));
+      const message = e instanceof Error ? e.message : String(e);
+      const alreadyApplied = message.includes('already applied');
+      const notOperational = message.includes('not accepting applications');
+
+      setToastTitle(
+        alreadyApplied
+          ? 'Already applied'
+          : notOperational
+            ? 'Not available'
+            : 'Submission failed'
+      );
+      setToastMsg(
+        alreadyApplied
+          ? 'You have already submitted an application for this position.'
+          : notOperational
+            ? 'This volunteer project is not accepting applications at the moment.'
+            : message
+      );
       setToastOpen(true);
     } finally {
       setSubmitting(false);
