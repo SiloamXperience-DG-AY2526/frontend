@@ -22,6 +22,7 @@ type TimePeriod = 'one-time' | 'ongoing';
 type FrequencyUI = 'weekly' | 'monthly' | 'ad-hoc';
 
 type PositionForm = {
+  id?: string;
   role: string;
   description: string;
   totalSlots: string;
@@ -110,7 +111,7 @@ export default function EditVolunteerProjectPage({
 
   // Positions
   const [positions, setPositions] = useState<PositionForm[]>([
-    { role: '', description: '', totalSlots: '1', skills: [''] },
+    { id: undefined, role: '', description: '', totalSlots: '1', skills: [''] },
   ]);
 
   // Status
@@ -171,17 +172,26 @@ export default function EditVolunteerProjectPage({
         setBeneficiaries(p.beneficiaries ?? '');
         setProposedPlan(p.proposedPlan ?? '');
 
-        // TODO: objectives currently stored as a bullet string in db        
+        // TODO: objectives currently stored as a bullet string in db
         setObjectives(parseBullets(p.objectives));
 
         // expecting p.positions like: { role, description, totalSlots, skills: string[] }
         setPositions(
           (p.positions?.length ? p.positions : []).map((pos) => ({
+            id: pos.id,
             role: pos.role ?? '',
             description: pos.description ?? '',
             totalSlots: String(pos.totalSlots ?? 1),
             skills: pos.skills?.length ? pos.skills : [''],
-          })) || [{ role: '', description: '', totalSlots: '1', skills: [''] }],
+          })) || [
+            {
+              id: undefined,
+              role: '',
+              description: '',
+              totalSlots: '1',
+              skills: [''],
+            },
+          ],
         );
 
         setApprovalStatus(p.approvalStatus);
@@ -261,7 +271,13 @@ export default function EditVolunteerProjectPage({
   const addPosition = () =>
     setPositions((prev) => [
       ...prev,
-      { role: '', description: '', totalSlots: '1', skills: [''] },
+      {
+        id: undefined,
+        role: '',
+        description: '',
+        totalSlots: '1',
+        skills: [''],
+      },
     ]);
 
   const removePosition = (idx: number) =>
@@ -302,13 +318,14 @@ export default function EditVolunteerProjectPage({
       startDate: toISODateOnly(startDate),
       endDate: toISODateOnly(endDate),
       startTime: toISODateTime(startDate, startTime),
-      endTime: toISODateTime(startDate, endTime),
+      endTime: toISODateTime(endDate, endTime),
 
       frequency,
       dayOfWeek: frequencyNotes.trim() || undefined,
       attachments: TEMP_PDF_URL,
       image: TEMP_IMAGE_URL, //replace with s3 link
       positions: positions.map((p) => ({
+        id: p.id,
         role: p.role.trim(),
         description: p.description.trim(),
 
@@ -362,7 +379,10 @@ export default function EditVolunteerProjectPage({
     try {
       setSubmitting(true);
       const payload = buildPayload(isUpdate ? undefined : 'submitted');
-      await updateVolunteerProject(projectId, payload as EditVolunteerProjectPayload);
+      await updateVolunteerProject(
+        projectId,
+        payload as EditVolunteerProjectPayload,
+      );
 
       setToastType('success');
       setToastTitle(isUpdate ? 'Project Updated' : 'Project Submitted');
@@ -805,13 +825,21 @@ export default function EditVolunteerProjectPage({
           </button>
           <button
             type="button"
-            disabled={!canSubmit || savingDraft || submitting || submissionStatus !== 'draft'}
+            disabled={
+              !canSubmit ||
+              savingDraft ||
+              submitting ||
+              submissionStatus !== 'draft'
+            }
             onClick={onSaveDraft}
             className={[
               'rounded-xl px-10 py-4 font-bold',
               'border border-[#0E5A4A] text-[#0E5A4A]',
               'hover:bg-[#E6F5F1] transition',
-              !canSubmit || savingDraft || submitting || submissionStatus !== 'draft'
+              !canSubmit ||
+              savingDraft ||
+              submitting ||
+              submissionStatus !== 'draft'
                 ? 'opacity-50 cursor-not-allowed'
                 : '',
             ].join(' ')}
@@ -831,8 +859,12 @@ export default function EditVolunteerProjectPage({
             ].join(' ')}
           >
             {submitting
-              ? isUpdate ? 'Updating...' : 'Submitting...'
-              : isUpdate ? 'Update' : 'Submit for Review'}
+              ? isUpdate
+                ? 'Updating...'
+                : 'Submitting...'
+              : isUpdate
+                ? 'Update'
+                : 'Submit for Review'}
           </button>
         </div>
       </main>

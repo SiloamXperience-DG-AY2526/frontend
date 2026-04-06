@@ -14,7 +14,7 @@ export default function VolunteeringTab() {
   const [items, setItems] = useState<VolunteerApplicationDTO[]>([]);
   const [error, setError] = useState<string | null>(null);
 
-  // show volunteering items where application status is APPROVED
+  // show volunteering items where application status is active
   useEffect(() => {
     let mounted = true;
 
@@ -23,10 +23,7 @@ export default function VolunteeringTab() {
         setLoading(true);
         setError(null);
 
-        // fetch only approved from backend
-        const data = await fetchMyVolunteerApplications({
-          status: 'approved',
-        });
+        const data = await fetchMyVolunteerApplications();
 
         if (!mounted) return;
         setItems(data);
@@ -61,7 +58,9 @@ export default function VolunteeringTab() {
       return { key: 'active' as const };
     };
 
-    const decorated = items.map((a) => ({
+    const volunteeringItems = items.filter((a) => a.status === 'active');
+
+    const decorated = volunteeringItems.map((a) => ({
       a,
       bucket: getBucket(a),
     }));

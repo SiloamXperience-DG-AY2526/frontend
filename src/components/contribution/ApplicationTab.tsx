@@ -20,10 +20,10 @@ export default function ApplicationsTab() {
 
     (async () => {
       try {
-        const data = await fetchMyVolunteerApplications({
-          status: 'reviewing',
-        });
-        if (mounted) setItems(data);
+        const data = await fetchMyVolunteerApplications();
+        if (mounted) {
+          setItems(data.filter((item) => item.status === 'reviewing'));
+        }
       } catch (e: unknown) {
         if (!mounted) return;
 
