@@ -29,7 +29,32 @@ const ProjectManagerSchema = z.object({
   lastName: z.string(),
 });
 
-const DonationProjectBaseSchema = z.object({
+const NullableStringNumberSchema = z
+  .union([z.string(), z.number()])
+  .nullish()
+  .transform((value) => (value == null ? null : String(value)));
+
+const RequiredStringNumberSchema = z
+  .union([z.string(), z.number()])
+  .transform((value) => String(value));
+
+const normalizeBrickFields = <
+  T extends {
+    brickCost: string | null;
+    brickSize: string | null;
+  }
+>(
+  project: T
+) => {
+  const brickValue = project.brickCost ?? project.brickSize;
+  return {
+    ...project,
+    brickCost: brickValue,
+    brickSize: brickValue,
+  };
+};
+
+const DonationProjectBaseFields = {
   id: z.string().uuid(),
   title: z.string(),
   location: z.string(),
@@ -38,9 +63,9 @@ const DonationProjectBaseSchema = z.object({
   beneficiaries: z.string().nullable(),
   initiatorName: z.string().nullable(),
   organisingTeam: z.string().nullable(),
-  targetFund: z.string().nullable(),
-  brickCost: z.string().nullable(),
-  brickSize: z.string().nullable(),
+  targetFund: NullableStringNumberSchema,
+  brickCost: NullableStringNumberSchema,
+  brickSize: NullableStringNumberSchema,
   deadline: z.string().nullable(),
   type: DonationProjectTypeSchema,
   startDate: z.string(),
@@ -52,11 +77,18 @@ const DonationProjectBaseSchema = z.object({
   approvalStatus: DonationProjectApprovalStatusSchema.optional(),
   submissionStatus: DonationProjectSubmissionStatusSchema.optional(),
   operationStatus: DonationProjectOperationStatusSchema.optional(),
-});
+};
 
-const DonationProjectSchema = DonationProjectBaseSchema.extend({
-  totalRaised: z.string(),
-});
+const DonationProjectBaseSchema = z
+  .object(DonationProjectBaseFields)
+  .transform(normalizeBrickFields);
+
+const DonationProjectSchema = z
+  .object({
+    ...DonationProjectBaseFields,
+    totalRaised: RequiredStringNumberSchema,
+  })
+  .transform(normalizeBrickFields);
 
 const PaginationSchema = z.object({
   page: z.number(),
@@ -117,12 +149,15 @@ const ProjectObjectiveSchema = z.object({
   updatedAt: z.string(),
 });
 
-const DonationProjectDetailSchema = DonationProjectBaseSchema.extend({
-  managedBy: z.string().uuid().optional(),
-  approvalNotes: z.string().nullable().optional(),
-  updatedAt: z.string().optional(),
-  objectivesList: z.array(ProjectObjectiveSchema).optional(),
-});
+const DonationProjectDetailSchema = z
+  .object({
+    ...DonationProjectBaseFields,
+    managedBy: z.string().uuid().optional(),
+    approvalNotes: z.string().nullable().optional(),
+    updatedAt: z.string().optional(),
+    objectivesList: z.array(ProjectObjectiveSchema).optional(),
+  })
+  .transform(normalizeBrickFields);
 
 const ProjectDonationsResponseSchema = z.object({
   donations: z.array(ProjectDonationSchema),

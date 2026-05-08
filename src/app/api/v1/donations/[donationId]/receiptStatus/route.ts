@@ -39,6 +39,10 @@ export async function PATCH(
       );
     }
 
+    if (res.status === 204) {
+      return new Response(null, { status: 204 });
+    }
+
     const data = await res.json();
     return NextResponse.json(data);
   } catch (error) {
