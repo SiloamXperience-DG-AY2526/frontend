@@ -182,6 +182,7 @@ export default function VolunteerProjectDetailPage({
         title: 'Failed to duplicate project',
         message: err instanceof Error ? err.message : 'Please try again',
       });
+    } finally {
       setIsDuplicating(false);
     }
   };

@@ -11,20 +11,9 @@ import {
   CreditCardIcon,
 } from '@heroicons/react/24/outline';
 
-type DonationWithProject = DonationApplication & {
-  project?: {
-    id: string;
-    title: string;
-    location: string;
-    image: string | null;
-    type: string;
-    brickSize: string | null;
-  };
-};
-
 export default function DonationsTab() {
   const [loading, setLoading] = useState(true);
-  const [items, setItems] = useState<DonationWithProject[]>([]);
+  const [items, setItems] = useState<DonationApplication[]>([]);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {

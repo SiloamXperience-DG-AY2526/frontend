@@ -1,12 +1,12 @@
-import { AuthUser, LoginInputData, UserCredentials, UserRole } from '@/types/AuthData';
+import { AuthUser, LoginInputData, LoginResponse, UserCredentials, UserRole } from '@/types/AuthData';
 import { getUserProfile } from './user';
 
 // DO NOT CALL THESE FUNCTIONS
 // functions reserved for auth context 
 
 // use route handlers for server-side calls
-export async function login( loginData: LoginInputData ): Promise<AuthUser> {
-  
+export async function login(loginData: LoginInputData): Promise<LoginResponse> {
+
   const res = await fetch('/api/auth/login', { // auth token set here
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -17,8 +17,24 @@ export async function login( loginData: LoginInputData ): Promise<AuthUser> {
     throw new Error('Invalid email or password.');
   }
 
-  const authUser = getAuthUser();
+  const data = await res.json();
 
+  // Staff first log in flow
+  if (
+    data &&
+    typeof data === 'object' &&
+    'mustChangePassword' in data &&
+    data.mustChangePassword === true
+  ) {
+    const token = data.token;
+    if (typeof token === 'string' && token.length > 0) {
+      return { mustChangePassword: true, token };
+    }
+    throw new Error('Invalid first-login response from server.');
+  }
+
+  // Normal login
+  const authUser = await getAuthUser();
   return authUser;
 }
 
@@ -35,7 +51,7 @@ export async function getUserCredentials(): Promise<UserCredentials> {
     const body = await res.json();
     throw Error(body.errMsg);
   }
-  
+
   const { userId, role, hasOnboarded } = await res.json();
 
   return { userId: userId, role: role, hasOnboarded: hasOnboarded ?? false };

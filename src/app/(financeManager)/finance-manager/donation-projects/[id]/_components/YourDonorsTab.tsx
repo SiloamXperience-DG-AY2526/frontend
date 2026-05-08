@@ -2,7 +2,6 @@
 
 import Link from 'next/link';
 import DataTable, { Column } from '@/components/table/DataTable';
-import EditButton from '@/components/ui/EditButton';
 import { ProjectDonor } from '@/types/DonationProjectData';
 import FilterButton from '@/components/ui/FilterButton';
 import { formatDateDDMMYYYY } from '@/lib/formatDate';
@@ -18,10 +17,6 @@ export default function YourDonorsTab({ donors }: YourDonorsTabProps) {
   const handleFilterClick = () => {
     // Placeholder for filter functionality
     console.log('Filter button clicked - filters to be implemented');
-  };
-
-  const handleEditClick = (donorId: string) => {
-    console.log(`Edit donor ${donorId} - functionality to be implemented`);
   };
 
   const formatCurrency = (amount: string) => {
@@ -58,15 +53,6 @@ export default function YourDonorsTab({ donors }: YourDonorsTabProps) {
     {
       header: 'Created At',
       accessor: (donor: ProjectDonor) => formatDateDDMMYYYY(donor.createdAt),
-    },
-    {
-      header: '',
-      accessor: (donor: ProjectDonor) => (
-        <EditButton
-          onClick={() => handleEditClick(donor.id)}
-          ariaLabel="Edit donor"
-        />
-      ),
     },
   ];
 

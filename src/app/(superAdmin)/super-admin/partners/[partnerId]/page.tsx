@@ -25,7 +25,7 @@ export default function SuperAdminPartnerDetailPage() {
   const basePath = useManagerBasePath('general');
 
   const [partnerInfo, setPartnerInfo] = useState<PartnerInfoResponse | null>(
-    null
+    null,
   );
   const [applications, setApplications] = useState<
     PartnerVolunteerApplication[]
@@ -38,7 +38,7 @@ export default function SuperAdminPartnerDetailPage() {
 
   const [profileError, setProfileError] = useState<string | null>(null);
   const [applicationsError, setApplicationsError] = useState<string | null>(
-    null
+    null,
   );
   const [proposalsError, setProposalsError] = useState<string | null>(null);
 
@@ -71,7 +71,7 @@ export default function SuperAdminPartnerDetailPage() {
       } catch (e: unknown) {
         if (isMounted) {
           setProfileError(
-            e instanceof Error ? e.message : 'Failed to load partner profile'
+            e instanceof Error ? e.message : 'Failed to load partner profile',
           );
         }
       } finally {
@@ -94,7 +94,7 @@ export default function SuperAdminPartnerDetailPage() {
       } catch (e: unknown) {
         if (isMounted) {
           setApplicationsError(
-            e instanceof Error ? e.message : 'Failed to load applications'
+            e instanceof Error ? e.message : 'Failed to load applications',
           );
         }
       } finally {
@@ -106,7 +106,7 @@ export default function SuperAdminPartnerDetailPage() {
       try {
         setLoadingProposals(true);
         const res = await fetch(
-          `/api/v1/volunteer-projects/partner/${partnerId}/proposals`
+          `/api/v1/volunteer-projects/partner/${partnerId}/proposals`,
         );
         const data = await res.json();
         if (!res.ok) {
@@ -118,7 +118,7 @@ export default function SuperAdminPartnerDetailPage() {
       } catch (e: unknown) {
         if (isMounted) {
           setProposalsError(
-            e instanceof Error ? e.message : 'Failed to load proposals'
+            e instanceof Error ? e.message : 'Failed to load proposals',
           );
         }
       } finally {
@@ -177,16 +177,18 @@ export default function SuperAdminPartnerDetailPage() {
 
         <div className="mt-6 space-y-6">
           <PartnerProfileDetailsCard profile={partnerInfo.profile} />
-          <PartnershipInterestsCard interests={partnerInfo.partnershipInterests} />
+          <PartnershipInterestsCard
+            interests={partnerInfo.partnershipInterests}
+          />
 
           <div className="flex flex-wrap gap-3">
             <button
               type="button"
               onClick={() => setActiveTab('volunteer')}
-              className={`rounded-full px-4 py-2 text-sm font-semibold ${
+              className={`rounded-full px-4 py-2 text-sm font-semibold transition shadow-sm active:scale-[0.99] ${
                 activeTab === 'volunteer'
-                  ? 'bg-[#1F6B7C] text-white'
-                  : 'border border-gray-200 bg-white text-gray-700'
+                  ? 'bg-gradient-to-r from-[#1F7A67] to-[#2AAE92] text-white hover:from-[#1A6A59] hover:to-[#22997F]'
+                  : 'border border-gray-200 bg-white text-gray-700 hover:bg-gray-50'
               }`}
             >
               Volunteer
@@ -194,10 +196,10 @@ export default function SuperAdminPartnerDetailPage() {
             <button
               type="button"
               onClick={() => setActiveTab('donor')}
-              className={`rounded-full px-4 py-2 text-sm font-semibold ${
+              className={`rounded-full px-4 py-2 text-sm font-semibold transition shadow-sm active:scale-[0.99] ${
                 activeTab === 'donor'
-                  ? 'bg-[#1F6B7C] text-white'
-                  : 'border border-gray-200 bg-white text-gray-700'
+                  ? 'bg-gradient-to-r from-[#1F7A67] to-[#2AAE92] text-white hover:from-[#1A6A59] hover:to-[#22997F]'
+                  : 'border border-gray-200 bg-white text-gray-700 hover:bg-gray-50'
               }`}
             >
               Donor

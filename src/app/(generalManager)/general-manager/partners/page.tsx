@@ -12,10 +12,6 @@ export default function PartnersPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const filteredPartners = usePartnerSearchFilter(partners, searchQuery);
 
-  const handleFilterClick = () => {
-    console.log('Filter button clicked - filters to be implemented');
-  };
-
   if (statusCode === 403) {
     return <UnauthorizedAccessCard />;
   }
@@ -43,7 +39,6 @@ export default function PartnersPage() {
         <SearchAndFilterBar
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
-          onFilterClick={handleFilterClick}
           searchPlaceholder="Partner Name"
         />
 

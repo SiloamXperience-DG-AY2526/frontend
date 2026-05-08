@@ -1,24 +1,25 @@
 export enum UserRole {
   SUPER_ADMIN = 'superAdmin',
+  SUB_ADMIN = 'subAdmin',
   GENERAL_MANAGER = 'generalManager',
   FINANCE_MANAGER = 'financeManager',
-  PARTNER = 'partner'
+  PARTNER = 'partner',
 }
 
 export type AuthUser = {
-  userId: string,
-  firstName: string,
-  lastName: string,
-  title?: string, 
-  role: UserRole,
-  email: string,
-  hasOnboarded: boolean
-}; 
+  userId: string;
+  firstName: string;
+  lastName: string;
+  title?: string;
+  role: UserRole;
+  email: string;
+  hasOnboarded: boolean;
+};
 
 export type AuthContextValue = {
   user: AuthUser | null,
   isLoading: boolean,
-  authLogin: ( payload: AuthPayload ) => Promise<AuthUser>,
+  authLogin: (payload: AuthPayload) => Promise<LoginResponse>;
   authLogout: () => Promise<void>,
   authRefresh: () => Promise<void>
 };
@@ -45,5 +46,12 @@ export type LoginInputData = {
   email: string;
   password: string;
 };
+
+export type LoginResponse =
+  | AuthUser
+  | {
+      mustChangePassword: true
+      token: string
+    };
 
 // other auth types here

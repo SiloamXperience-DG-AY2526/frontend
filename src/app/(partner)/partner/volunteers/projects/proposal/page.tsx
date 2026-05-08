@@ -1,8 +1,8 @@
 'use client';
 
-import { useMemo, useState, useEffect } from 'react';
+import { Suspense, useMemo, useState, useEffect } from 'react';
 import Input from '@/components/ui/Input';
-import TextArea from '@/components/ui/Textarea';    
+import TextArea from '@/components/ui/Textarea';
 import { proposeVolunteerProject, updateVolunteerProposal } from '@/lib/api/volunteer';
 import {
   ProjectFrequency,
@@ -40,6 +40,14 @@ const TEMP_IMAGE_URL =
   'https://nvpc.org.sg/wp-content/uploads/2025/04/two-women-gardening-1024x682.jpg';
 
 export default function VolunteerProjectProposalPage() {
+  return (
+    <Suspense>
+      <VolunteerProjectProposalContent />
+    </Suspense>
+  );
+}
+
+function VolunteerProjectProposalContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const draftId = searchParams.get('projectId');

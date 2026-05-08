@@ -9,7 +9,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { ROLE_HOME } from '@/lib/homeRoutes';
-import { UserRole } from '@/types/AuthData';
+import { LoginResponse, UserRole } from '@/types/AuthData';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -21,30 +21,40 @@ export default function LoginPage() {
   const { authLogin } = useAuth();
 
   const handleLogin = async () => {
-    
-    const loginData = { 
-      email: email, 
-      password: password 
+
+    const loginData = {
+      email: email,
+      password: password
     };
 
     try {
-      const authUser = await authLogin(loginData);
+      const result = await authLogin(loginData);
 
-      const role = authUser.role;
+      function isFirstLogin(result: LoginResponse): result is { mustChangePassword: true; token: string } {
+        return 'mustChangePassword' in result && result.mustChangePassword === true;
+      }
+
+      if (isFirstLogin(result)) {
+        // First-login user → redirect to update-password page
+        router.replace(`/update-password?token=${encodeURIComponent(result.token)}`);
+        return;
+      }
+
+      const role = result.role;
 
       const home =
-        role === UserRole.PARTNER && !authUser.hasOnboarded
+        role === UserRole.PARTNER && !result.hasOnboarded
           ? '/onboarding'
           : ROLE_HOME[role] || '/login-error';
 
-      router.replace(home); 
+      router.replace(home);
 
     } catch (e: unknown) {
       setToast({ open: true, type: 'error', title: 'Login failed', message: `Please try again. ${e}` });
       return;
     }
 
-    
+
   };
 
   return (

@@ -1,23 +1,34 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import PageHeader from '@/components/ui/PageHeader';
 import SearchAndFilterBar from '@/components/ui/SearchAndFilterBar';
 import DonorsDataTable from './_components/DonorsDataTable';
 import UnauthorizedAccessCard from '@/components/UnauthorizedAccessCard';
-import { useDonors, useSearchFilter } from '@/hooks/useDonors';
+import { useDonors } from '@/hooks/useDonors';
+import { useManagerBasePath } from '@/lib/utils/managerBasePath';
+
+function useDebouncedValue<T>(value: T, delayMs = 450) {
+  const [debounced, setDebounced] = useState(value);
+  useEffect(() => {
+    const t = setTimeout(() => setDebounced(value), delayMs);
+    return () => clearTimeout(t);
+  }, [value, delayMs]);
+  return debounced;
+}
 
 export default function DonorsPage() {
-  const { donors, loading, error, statusCode } = useDonors();
+  const router = useRouter();
+  const basePath = useManagerBasePath('finance');
   const [searchQuery, setSearchQuery] = useState('');
-  const filteredDonors = useSearchFilter(donors, searchQuery);
-
-  const handleFilterClick = () => {
-    console.log('Filter button clicked - filters to be implemented');
-  };
+  const debouncedSearch = useDebouncedValue(searchQuery, 450);
+  const { donors, loading, error, statusCode } = useDonors({
+    search: debouncedSearch,
+  });
 
   const handleEditClick = (donorId: string) => {
-    console.log(`Edit donor ${donorId} - functionality to be implemented`);
+    router.push(`${basePath}/donors/${donorId}/edit`);
   };
 
   if (statusCode === 403) {
@@ -45,12 +56,11 @@ export default function DonorsPage() {
         <SearchAndFilterBar
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
-          onFilterClick={handleFilterClick}
-          searchPlaceholder="Partner Name"
+          searchPlaceholder="Donor Name"
         />
 
         <DonorsDataTable
-          donors={filteredDonors}
+          donors={donors}
           loading={loading}
           onEditClick={handleEditClick}
         />

@@ -21,6 +21,7 @@ import {
   UpdateDonationProjectPayload,
 } from '@/lib/api/donation';
 import { useManagerBasePath } from '@/lib/utils/managerBasePath';
+import { usePartners } from '@/hooks/usePartners';
 
 const toDateInput = (d?: string | null) => {
   if (!d) return '';
@@ -99,7 +100,9 @@ export default function EditDonationProjectPage() {
     useState<DonationProjectApprovalStatus>('pending');
   const [operationStatus, setOperationStatus] =
     useState<DonationProjectOperationStatus>('notStarted');
+  const [managedBy, setManagedBy] = useState('');
 
+  const { partners } = usePartners();
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [toast, setToast] = useState<{
     open: boolean;
@@ -115,7 +118,7 @@ export default function EditDonationProjectPage() {
       try {
         setLoading(true);
         const data = (await getDonationProjectById(
-          projectId
+          projectId,
         )) as DonationProject;
         if (!mounted) return;
 
@@ -137,6 +140,7 @@ export default function EditDonationProjectPage() {
         setSubmissionStatus(data.submissionStatus ?? 'draft');
         setApprovalStatus(data.approvalStatus ?? 'pending');
         setOperationStatus(data.operationStatus ?? 'notStarted');
+        setManagedBy(data.projectManager?.id ?? '');
       } catch (error) {
         console.error('Failed to load donation project:', error);
       } finally {
@@ -158,7 +162,8 @@ export default function EditDonationProjectPage() {
     const nextErrors: Record<string, string> = {};
     if (!title.trim()) nextErrors.title = 'Title is required';
     if (!location.trim()) nextErrors.location = 'Location is required';
-    if (!aboutDesc.trim()) nextErrors.aboutDesc = 'Problem statement is required';
+    if (!aboutDesc.trim())
+      nextErrors.aboutDesc = 'Problem statement is required';
     if (!startDate) nextErrors.startDate = 'Start date is required';
     if (!endDate) nextErrors.endDate = 'End date is required';
     if (type === 'partnerLed' && !targetFund.trim()) {
@@ -220,6 +225,7 @@ export default function EditDonationProjectPage() {
       attachments: attachmentsUrl.trim() || null,
       approvalStatus,
       operationStatus,
+      managedBy: managedBy || undefined,
     };
 
     // Only include submissionStatus when actually changing it (draft → submitted).
@@ -228,11 +234,14 @@ export default function EditDonationProjectPage() {
       return {
         ...base,
         submissionStatus: status,
-        ...(status === 'submitted' && {
-          approvalStatus:
-            approvalStatus === 'approved' ? 'approved' : 'pending',
-          operationStatus: 'notStarted',
-        }),
+        ...(status === 'submitted'
+          ? {
+              approvalStatus: (approvalStatus === 'approved'
+                ? 'approved'
+                : 'pending') as DonationProjectApprovalStatus,
+              operationStatus: 'notStarted' as DonationProjectOperationStatus,
+            }
+          : {}),
       };
     }
     return base;
@@ -423,7 +432,8 @@ export default function EditDonationProjectPage() {
               value={startDate}
               onChange={(v) => {
                 setStartDate(v);
-                if (errors.startDate) setErrors((p) => ({ ...p, startDate: '' }));
+                if (errors.startDate)
+                  setErrors((p) => ({ ...p, startDate: '' }));
               }}
               type="date"
               required
@@ -549,7 +559,7 @@ export default function EditDonationProjectPage() {
                 value={approvalStatus}
                 onChange={(e) =>
                   setApprovalStatus(
-                    e.target.value as DonationProjectApprovalStatus
+                    e.target.value as DonationProjectApprovalStatus,
                   )
                 }
                 className="w-full rounded-md border border-green-700 bg-white px-3 py-2 text-sm outline-none transition focus:border-green-800 focus:ring-1 focus:ring-green-800"
@@ -570,7 +580,7 @@ export default function EditDonationProjectPage() {
                 value={operationStatus}
                 onChange={(e) =>
                   setOperationStatus(
-                    e.target.value as DonationProjectOperationStatus
+                    e.target.value as DonationProjectOperationStatus,
                   )
                 }
                 className="w-full rounded-md border border-green-700 bg-white px-3 py-2 text-sm outline-none transition focus:border-green-800 focus:ring-1 focus:ring-green-800"
@@ -584,14 +594,33 @@ export default function EditDonationProjectPage() {
             </div>
           </div>
         </div>
+
+        <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+          <SectionTitle>Partner assignment</SectionTitle>
+          <div className="max-w-sm">
+            <label className="block text-black text-md mb-2 font-semibold">
+              Assigned partner
+            </label>
+            <select
+              value={managedBy}
+              onChange={(e) => setManagedBy(e.target.value)}
+              className="w-full rounded-md border border-green-700 bg-white px-3 py-3 text-sm outline-none transition focus:border-green-800 focus:ring-1 focus:ring-green-800"
+            >
+              <option value="">— Select a partner —</option>
+              {partners.map((p) => (
+                <option key={p.partnerId} value={p.partnerId}>
+                  {p.fullName} ({p.email})
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
       </div>
 
       <div className="mt-10 flex items-center justify-end gap-3">
         <button
           type="button"
-          onClick={() =>
-            router.push(`${basePath}/donation-projects/${projectId}`)
-          }
+          onClick={() => router.back()}
           disabled={submitting || savingDraft}
           className={[
             'rounded-xl px-8 py-3 font-bold',
@@ -630,8 +659,12 @@ export default function EditDonationProjectPage() {
           ].join(' ')}
         >
           {submitting
-            ? isUpdate ? 'Updating...' : 'Submitting...'
-            : isUpdate ? 'Update' : 'Submit for Review'}
+            ? isUpdate
+              ? 'Updating...'
+              : 'Submitting...'
+            : isUpdate
+              ? 'Update'
+              : 'Submit for Review'}
         </button>
       </div>
 
