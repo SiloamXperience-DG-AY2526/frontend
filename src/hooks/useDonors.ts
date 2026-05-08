@@ -1,20 +1,27 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Donor, DonorDetail } from '@/types/DonorData';
 
-export function useDonors() {
+export function useDonors({
+  search = '',
+  page = 1,
+  limit = 20,
+}: { search?: string; page?: number; limit?: number } = {}) {
   const [donors, setDonors] = useState<Donor[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [statusCode, setStatusCode] = useState<number | null>(null);
+  const [totalPages, setTotalPages] = useState(1);
 
-  useEffect(() => {
-    fetchDonors();
-  }, []);
-
-  const fetchDonors = async () => {
+  const fetchDonors = useCallback(async () => {
     try {
       setLoading(true);
-      const res = await fetch('/api/donors/');
+      const params = new URLSearchParams({
+        page: String(page),
+        limit: String(limit),
+      });
+      if (search.trim()) params.set('search', search.trim());
+
+      const res = await fetch(`/api/donors/?${params.toString()}`);
       setStatusCode(res.status);
 
       if (!res.ok) {
@@ -25,7 +32,8 @@ export function useDonors() {
       }
 
       const data = await res.json();
-      setDonors(data);
+      setDonors(data.donors ?? []);
+      setTotalPages(data.pagination?.totalPages ?? 1);
       setError(null);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Unknown error';
@@ -34,9 +42,20 @@ export function useDonors() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [search, page, limit]);
 
-  return { donors, loading, error, statusCode, refetch: fetchDonors };
+  useEffect(() => {
+    fetchDonors();
+  }, [fetchDonors]);
+
+  return {
+    donors,
+    loading,
+    error,
+    statusCode,
+    totalPages,
+    refetch: fetchDonors,
+  };
 }
 
 export function useDonor(id: string) {
@@ -79,6 +98,6 @@ export function useDonor(id: string) {
 
 export function useSearchFilter(donors: Donor[], searchQuery: string) {
   return donors.filter((donor) =>
-    donor.partnerName.toLowerCase().includes(searchQuery.toLowerCase())
+    donor.partnerName.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 }

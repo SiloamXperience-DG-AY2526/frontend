@@ -22,7 +22,7 @@ export default function FeedbackAnalyticsPage() {
       try {
         setIsLoading(true);
         const data = await getProjectPeerFeedback(projectId);
-        setFeedbackData(data);
+        setFeedbackData(data.data);
       } catch {
         setError('Failed to load feedback data');
       } finally {

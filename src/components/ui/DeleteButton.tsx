@@ -9,7 +9,7 @@ function DeleteButton({ onClick, ariaLabel = 'Delete' }: DeleteButtonProps) {
   return (
     <button
       onClick={onClick}
-      className="text-gray-600 hover:text-[#195D4B] transition"
+      className="cursor-pointer rounded-md p-1 text-gray-500 transition hover:bg-red-50 hover:text-red-600"
       aria-label={ariaLabel}
     >
       <TrashIcon className="h-5 w-5" />

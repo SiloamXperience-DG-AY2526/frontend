@@ -230,3 +230,15 @@ export async function updateVolunteerProject(projectId: string, payload: EditVol
   if (!res.ok) throw new Error(json?.message ?? `Failed to edit project (${res.status})`);
   return json;
 }
+
+// Duplicate a volunteer project (General Manager or Super Admin only)
+export async function duplicateVolunteerProject(projectId: string) {
+  const res = await fetch(`/api/volunteer-projects/${projectId}/duplicate`, {
+    method: 'POST',
+    credentials: 'include',
+  });
+
+  const json = await res.json().catch(() => null);
+  if (!res.ok) throw new Error(json?.error || json?.message || 'Failed to duplicate volunteer project');
+  return json.data;
+}

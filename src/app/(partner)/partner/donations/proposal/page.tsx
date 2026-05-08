@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState, useEffect } from 'react';
+import { Suspense, useMemo, useState, useEffect } from 'react';
 import Input from '@/components/ui/Input';
 import TextArea from '@/components/ui/Textarea';
 import UploadBox from '@/components/ui/UploadBox';
@@ -27,6 +27,14 @@ const toYYYYMMDD = (d: Date) => {
 };
 
 export default function DonationProjectProposalPage() {
+  return (
+    <Suspense>
+      <DonationProjectProposalContent />
+    </Suspense>
+  );
+}
+
+function DonationProjectProposalContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const draftId = searchParams.get('projectId');
