@@ -134,6 +134,6 @@ Folders in parentheses are Next.js route groups and do not appear in the URL. Fo
 ## Known handover cautions
 
 - The donation confirmation screen still uses a simulated random success/failure result and shows “Donation Successful”; [frontend issue #48](https://github.com/SiloamXperience-DG-AY2526/frontend/issues/48) remains open.
-- Some donation screens format amounts as SGD even though the agreed product currency is USD.
+- Several partner donation screens explicitly format amounts as SGD even though the agreed product currency is USD.
 - File/image proposal fields still contain temporary placeholders until storage integration is completed.
-- Review `src/contexts/AuthContext.tsx` before deployment: it currently contains a temporary hard-coded development token that must be removed.
+- Review `src/contexts/AuthContext.tsx` before deployment: it currently injects a temporary hard-coded JWT into the auth cookie and must be cleaned up.
